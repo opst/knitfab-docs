@@ -122,16 +122,19 @@ Knitfab がある入力に割り当てる "データ" は、その入力の "タ
 
 ### ランとリネージ
 
-"ラン"とは、実行された機械学習タスクの記録である。"ラン" は "プラン" と "データ" に基づいて導出される。
-
-Knitfabは、各 "プラン" に対して、ある "データ" を入力に割り当ててよいことを検出すると、自動的に入力と "データ" の組み合わせから "ラン" を生成する。
+"ラン"とは、実行された機械学習タスクの記録である。"ラン" は "プラン" をひな形として、入出力に具体的な "データ" を割り当てることで生成される。Knitfab は各 "プラン" の入力について、割り当て可能な "データ" を検出すると、自動的にその "プラン" と "データ" の組み合わせから "ラン" を生成する。
 
 ある "プラン" に対して、可能な入力の割り当て方は複数通り存在する場合がある。
-たとえば、 "プラン" のセクションで示した例をとれば、 `/in/dataset` に設定可能な "データ"  (評価用データセット) が 2 通り、 `/in/model` に設定可能な "データ" (訓練済みモデル) が 3 通りあれば、 $2 \times 3 = 6$ 個の "ラン" をそれぞれ生成・実行する。
+たとえば、 "プラン" のセクションで示した例をとれば、 `/in/dataset` に設定可能な "データ"  (評価用データセット) が 2 通り、 `/in/model` に設定可能な "データ" (訓練済みモデル) が 3 通りあれば、 Knitfab は $2 \times 3 = 6$ 個の "ラン" をそれぞれ生成・実行する。
 
 "ラン" は具体的な入力 "データ" と出力 "データ" 、およびその "ラン" の元となった "プラン" の情報から構成されている。
 これは「どの機械学習タスクに、何を入力したら、何が出力されたか」という記録、すなわちリネージの 1 ステップ分にほかならない。
 Knitfab はリネージを "ラン" と "データ" の依存関係が連鎖している様として表現しているということである。
+
+"ラン" に対応する機械学習タスクは、Kubernetes の Pod として、他から隔離された環境で実行される。
+この Pod は、"ラン" の入出力に割り当てられた "データ" をボリュームとしてマウントされた状態で、"ラン" を生成した "プラン" に指定されたイメージを実行するように起動される。
+Knitfab はこの Pod の状態を監視していて、Pod が正常に終了すれば "ラン" も正常に終了したものと記録され、出力 "データ" の作成が完了する。
+"データ" の作成が完了すると、それをいずれかの "プラン" の入力に割り当てることができるか自動的にチェックされ、連鎖的に "ラン" が実行されることになる。
 
 CLI ツール: knit
 -----------------
@@ -347,48 +350,63 @@ knit data find -t knit#id:KNIT-ID
 ```json
 [
     {
-        "knitId": "87038a1d-467c-45d4-9cc7-876473f3fc04",
+        "knitId": "5ea1b982-0e2c-4e02-adb6-431da718c7c1",
         "tags": [
             "format:mnist",
-            "knit#id:87038a1d-467c-45d4-9cc7-876473f3fc04",
-            "knit#timestamp:2024-03-06T09:53:21.792+00:00",
-            "mode:test",
-            "name:qmnist-test",
-            "project:first-Knitfab",
+            "knit#id:5ea1b982-0e2c-4e02-adb6-431da718c7c1",
+            "knit#timestamp:2024-10-16T09:03:42.726+00:00",
+            "mode:training",
+            "name:qmnist-train",
+            "project:first-knitfab",
             "type:dataset"
         ],
         "upstream": {
             "path": "/upload",
             "tags": [],
             "run": {
-                "runId": "71c4593b-449f-4843-a503-0cd44720d85e",
+                "runId": "0f6ffd26-9917-4d37-8f24-5bc920ef4c26",
                 "status": "done",
-                "updatedAt": "2024-03-06T09:53:21.792+00:00",
+                "updatedAt": "2024-10-16T09:03:42.726+00:00",
                 "plan": {
-                    "planId": "fb9b7087-9fe7-43c3-9302-a35488c85ffb",
+                    "planId": "ea0fd879-c5f3-4c8c-9ff6-23852f4d3e46",
                     "name": "knit#uploaded"
                 }
             }
         },
         "downstreams": [
             {
-                "path": "/in/dataset",
+                "path": "/in/1/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
                 "run": {
-                    "runId": "3cb1b091-01ad-41b1-acac-3f042f9df97c",
+                    "runId": "95fa5441-0146-42a7-86e7-48593d2666ad",
                     "status": "done",
-                    "updatedAt": "2024-03-06T10:01:16.301+00:00",
+                    "updatedAt": "2024-10-17T02:32:06.928+00:00",
                     "exit": {
                         "code": 0,
-                        "message": "Completed"
+                        "message": ""
                     },
                     "plan": {
-                        "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-                        "image": "localhost:30503/Knitfab-first-validation:v1.0"
+                        "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+                        "image": "localhost:30503/knitfab-first-train:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "train.py"
+                        ],
+                        "args": [
+                            "--dataset",
+                            "/in/1/dataset",
+                            "--save-to",
+                            "/out/1/model"
+                        ],
+                        "annotations": [
+                            "description=this is knitfab hands-on plan",
+                            "detailed-description=this is detailed description\n containing new line."
+                        ]
                     }
                 }
             }
@@ -397,13 +415,17 @@ knit data find -t knit#id:KNIT-ID
             {
                 "path": "/in/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
                 "plan": {
-                    "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-                    "image": "localhost:30503/Knitfab-first-validation:v1.0"
+                    "planId": "352b17f7-1dde-437f-b4b9-d473e2bb13ec",
+                    "image": "localhost:30503/knitfab-first-train:v1.0",
+                    "annotations": [
+                        "description=this is knitfab hands-on plan",
+                        "detailed-description=this is detailed description\n containing new line."
+                    ]
                 }
             }
         ]
@@ -465,17 +487,28 @@ knit data tag --remove old:tag KNIT_ID
 
 とすると、ID `KNIT_ID` で特定される "データ" から "タグ" `old:tag` が除去される。
 
-すでに "データ" に存在する "タグ" を追加したり、まだない "タグ" を除去したりしようとした場合には、何もおきないだけでエラーにはならない。
+タグを削除するに当たり、特定のキーを有するものを一括除去することもできる。
+
+```
+knit data tag --remove-key example-key KNIT_ID
+```
+
+こうすることで、 ID `KNIT_ID` で特定される "データ" から、キー `example-key` を有するタグをすべて除去できる。
+
+"データ" に存在する "タグ" を追加したり、まだない "タグ" を除去したりしようとした場合には、何もおきないだけでエラーにはならない。
 
 この場合でも、キーが `knit#` から始まる "タグ" は追加したり除去したりすることはできない。システムが予約・管理しているからある。
 
 #### コマンドラインオプション
 
-- `--add key:value`: "タグ" を追加する
-- `--remove key:value`: "タグ" を除去する
+- `--add KEY:VALUE`: "タグ" を追加する
+- `--remove KEY:VALUE`: キーと値が一致する "タグ" を除去する
+- `--remove-key KEY`: キーが一致するタグをすべて除去する。
 
 いずれも複数回指定でき、すべて効果を発揮する。
-ただし、同じ "タグ" について `--add` と `--remove` を指定した場合には、 `--remove` が勝つ。
+
+`--remove` や `--remove-key` と `--add` を同時に指定した場合には、まず除去してから、続いて追加を行う。
+したがって、 `knit data tag --remove foo:bar --add foo:bar KNIT_ID` としたなら、その "データ" は最終的に `foo:bar` でタグ付けられることになる。
 
 ### データは削除できない
 
@@ -581,6 +614,42 @@ docker save IMAGE_NAME:TAG | knit plan tempalte > IMAGE.TAG.plan.yaml
 
 ここに示したもの以外にも、オプショナルな属性が存在する。
 
+### `entrypoint` と `args`
+
+"プラン" に基づく "ラン" の Pod を実行するにあたって、Pod に指定される [entrypoint と args](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#entrypoint) を指定できる。
+
+```yaml
+entrypoint: ["python", "main.py"]
+args: ["--arg", "value"]
+```
+
+`entrypoint` と `args` （一方だけでもよい）を指定することで、 "プラン" の `image` に設定されているデフォルトのエントリポイントと引数を上書きできる。
+
+#### `annotation`
+
+入出力の"タグ"とは別に、 "プラン" 自体にもメタデータをセットすることができる。それが `annotation` (アノテーション) である。
+
+```yaml
+annoation:
+    - key=value
+    - description=...
+    # ...
+```
+
+アノテーションは "キー=値" 組のリストであり、内容は任意である。その"プラン"についての説明、作成者の情報など、実務上の必要に応じて自由に設定するとよい。
+アノテーションはリネージとは無関係であり、どのようなアノテーションがセットされていたとしても、Knitfab が "プラン" から "ラン" を生成する挙動には影響しない。
+
+ひとつの Plan に複数のアノテーションを登録できる。また、キーが重複したアノテーションでも、値が異なるものは登録できる。たとえば、次のような `annotation` は有効である。
+
+```yaml
+annoation:
+    - created-by=Alice
+    - created-by=Bob
+    - created-by=Charie
+```
+
+`annotation` は"プラン"作成後にも変更可能なパラメータである。
+
 #### `active`
 
 ```yaml
@@ -592,6 +661,7 @@ active: true
 "プラン" を登録する際、いきなりその "プラン" の "ラン" が実行されては困る、というケースもあるだろう。
 その場合には、 `active: false` (非アクティブ) をセットした "プラン" 定義ファイルを `knit plan apply` するとよい。
 
+`active` はプラン作成後にも変更可能なパラメータである。
 
 #### `resource`
 
@@ -633,6 +703,22 @@ resources:
 >
 > この値は、最終的には kubernetes の pod 定義における `resources.limits` と `resources.requests` として使われる。
 >
+
+`resource` はプラン作成後にも変更可能なパラメータである。
+
+### service_account
+
+```yaml
+service_account: SERVICE_ACCOUNT_NAME
+```
+
+"プラン"に基づく"ラン"は、Kubernetes の Pod として実行される。`service_account` には、この Pod に指定される Kubernetes の [ServiceAccount](https://kubernetes.io/docs/concepts/security/service-accounts/) を指定できる。
+
+この項目はオプショナルであり、設定しなかった場合には ServiceAccount なしで Pod が起動することになる。"ラン" のタスクが Pod 内に閉じているのなら、ServiceAccount は不要であろう。
+
+クラスタに存在する ServiceAccount については、クラスタの管理者に問い合わせて欲しい。
+
+`service_account` はプラン作成後にも変更可能なパラメータである。
 
 #### on_node
 
@@ -685,6 +771,8 @@ on_node:
 > これらの指定が有効に機能するためには、管理者によって kubernetes クラスタが適切に設定されている必要がある。
 >
 
+`on_node` はプラン作成後に変更可能なパラメータである。
+
 ### プラン定義を確認する
 
 登録済みの "プラン" 定義は、次のようにして確認できる。
@@ -697,33 +785,48 @@ knit plan show PLAN_ID
 指定した "プラン" が存在していれば、次のようなコンソール出力が得られる。
 
 ```json
-
 {
-    "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-    "image": "localhost:30503/Knitfab-first-validation:v1.0",
+    "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+    "image": "localhost:30503/knitfab-first-train:v1.0",
+    "entrypoint": [
+        "python",
+        "-u",
+        "train.py"
+    ],
+    "args": [
+        "--dataset",
+        "/in/1/dataset",
+        "--save-to",
+        "/out/1/model"
+    ],
+    "annotations": [
+        "description=this is knitfab hands-on plan",
+        "detailed-description=this is detailed description\n containing new line."
+    ],
     "inputs": [
         {
-            "path": "/in/dataset",
+            "path": "/in/1/dataset",
             "tags": [
-                "mode:test",
-                "project:first-Knitfab",
+                "mode:training",
+                "project:first-knitfab",
                 "type:dataset"
             ]
-        },
+        }
+    ],
+    "outputs": [
         {
-            "path": "/in/model",
+            "path": "/out/1/model",
             "tags": [
-                "project:first-Knitfab",
+                "description:2 layer CNN + 2 layer Affine",
+                "project:first-knitfab",
                 "type:model"
             ]
         }
     ],
-    "outputs": [],
     "log": {
         "Tags": [
-            "project:first-Knitfab",
-            "type:log",
-            "type:validation"
+            "project:first-knitfab",
+            "type:log"
         ]
     },
     "active": true,
@@ -787,6 +890,62 @@ knit plan find --active yes
 - `-o KEY:VALUE`, `--out-tag KEY:VALUE`: 指定した "タグ" が設定されている出力をもつものに限る。
     - もしこのフラグを繰り返し指定したら、すべての "タグ" が設定された出力があるものだけを検索する。
 
+### プランにアノテーションを追加する、削除する
+
+"プラン" 本体のメタデータであるアノテーションは、 "プラン" 登録後に変更（= 削除、追加）できる。
+
+
+"プラン" にアノテーションを追加する場合は、
+
+```
+knit plan annotate --add KEY=VALUE PLAN_ID
+```
+
+とする。`--add` フラグに追加したいアノテーションを、キーと値の組を `=` で繋いだものとして渡している。
+こうすると、ID `PLAN_ID` で特定される "プラン" に新しいアノテーションを追加できる。
+
+"プラン" からアノテーションを除去したい場合は、
+
+```
+knit plan annotate --remove KEY=VALUE PLAN_ID
+```
+
+とする。
+
+また、"プラン" から、あるキーをもったアノテーションを取り除くには
+
+```
+knit plan annotate --remove-key KEY PLAN_ID
+```
+
+とすればよい。
+
+削除しようとしたアノテーションが "プラン" に存在しない場合や、追加しようとしたアノテーションがすでに "プラン" に存在する場合には、無視される。
+
+たとえば、 `aaa=bbb` というアノテーションのみを持っている "プラン" に対して
+
+```
+knit plan annotate --add aaa=bbb --add ccc=ddd --remove eee=fff PLAN_ID
+```
+
+とした場合、これは
+
+```
+knit plan --add ccc=ddd PLAN_ID
+```
+
+と等価である。
+
+#### コマンドラインフラグ: `knit plan annotate`
+
+- `--remove KEY=VALUE`: 指定した キー=値 をもったアノテーションを削除する。
+- `--remove-key KEY`: 指定した キー をもったアノテーションをすべて削除する。
+- `--add KEY=VALUE`: 指定した キー=値 のアノテーションを追加する。
+
+いずれもオプショナルであり、繰り返し設定でき、同時に設定できる。
+
+`--remove` や `--remove-key` と `--add` が同時に指定された場合には、先に削除をしてから、続いて登録を行う。
+
 ### プランをアクティブにする、非アクティブにする
 
 もう使わない "プラン" は非活性にしたい。
@@ -806,6 +965,22 @@ knit plan active yes PLAN_ID
 ```
 
 `PLAN_ID` の "プラン" に基づく "ラン" のうち、実行が抑止されていたものは再度実行されるようになる。
+
+### プランに ServiceAccount を設定する/除去する
+
+"プラン" に ServiceAccount を設定する場合には、次のようにする。
+
+```
+knit plan serviceaccount --set SERVICE_ACCOUNT_NAME PLAN_ID
+```
+
+また、ServiceAccount を除去するには、次のようにする。
+
+```
+knit plan serviceaccount --unset PLAN_ID
+```
+
+コマンドラインフラグ `--set` と `--unset` は排他的であり、いずれか一方のみを指定することができる。
 
 ### プランが要求する計算機リソースを更新する
 
@@ -947,40 +1122,56 @@ knit run find -s ready -s starting -s running -s completing -s aborting
 ```json
 [
     {
-        "runId": "3cb1b091-01ad-41b1-acac-3f042f9df97c",
-        "status": "starting",
-        "updatedAt": "2024-03-07T06:28:31.59+00:00",
+        "runId": "95fa5441-0146-42a7-86e7-48593d2666ad",
+        "status": "done",
+        "updatedAt": "2024-10-17T02:32:06.928+00:00",
         "plan": {
-            "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-            "image": "localhost:30503/Knitfab-first-validation:v1.0"
+            "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+            "image": "localhost:30503/knitfab-first-train:v1.0",
+            "entrypoint": [
+                "python",
+                "-u",
+                "train.py"
+            ],
+            "args": [
+                "--dataset",
+                "/in/1/dataset",
+                "--save-to",
+                "/out/1/model"
+            ],
+            "annotations": [
+                "description=this is knitfab hands-on plan",
+                "detailed-description=this is detailed description\n containing new line."
+            ]
         },
         "inputs": [
             {
-                "path": "/in/dataset",
+                "path": "/in/1/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
-                "knitId": "87038a1d-467c-45d4-9cc7-876473f3fc04"
-            },
-            {
-                "path": "/in/model",
-                "tags": [
-                    "project:first-Knitfab",
-                    "type:model"
-                ],
-                "knitId": "46173435-d55a-46ae-8300-11560ca371d9"
+                "knitId": "5ea1b982-0e2c-4e02-adb6-431da718c7c1"
             }
         ],
-        "outputs": [],
+        "outputs": [
+            {
+                "path": "/out/1/model",
+                "tags": [
+                    "description:2 layer CNN + 2 layer Affine",
+                    "project:first-knitfab",
+                    "type:model"
+                ],
+                "knitId": "88d60df9-8699-4b85-8b40-8741824b6737"
+            }
+        ],
         "log": {
             "Tags": [
-                "project:first-Knitfab",
-                "type:log",
-                "type:validation"
+                "project:first-knitfab",
+                "type:log"
             ],
-            "knitId": "9bb07d29-ab79-4ec0-a233-ec000e418261"
+            "knitId": "d75cd6e0-0d92-4536-812c-4308f8180a12"
         }
     }
 ]
@@ -1008,8 +1199,7 @@ knit run find -s ready -s starting -s running -s completing -s aborting
         "message": "Completed"
     },
     "plan": {
-        "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-        "image": "localhost:30503/Knitfab-first-validation:v1.0"
+        ...
     },
     "inputs": [...],
     "outputs": [...],
