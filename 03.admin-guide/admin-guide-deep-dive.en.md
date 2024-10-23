@@ -716,7 +716,6 @@ On changing Run's status, Knitfab performs as following:
 2. Changes Run's status.
     - When succeeded, goes ahead.
 3. Sends requests to After Hooks.
-    - responses are ignored.
 
 Before Hooks receive one request per one status changing, normally. These Hooks receive requests *at least once*, but it can receives more in cases of:
 
@@ -855,6 +854,36 @@ The format of Run JSON, as same as outputs of `knit run show`, is below:
 - `log`: Output for STDOUT+STDERR.
     - `tags[*]`: Tags for this Output. Not Data's Tag
     - `knitId`: Identifier of the Data holding the log.
+
+### 7.2.3. Handling of Responses from Life Cycle Hook
+
+Knitfab assume that Lifecycle Hook is succeeded when the response has status code 2xx.
+
+If Before Hook does not success, Knitfab fails to change status of Run. Please beware on implementing your Hook.
+
+As a ground rule, response bodies from Hooks are ignored. But some Hooks handles responses specially.
+
+#### 7.2.3.1. Starting Before Hook
+
+On Before Hook invoked on changing status of Run from "ready" to "starting", responses met following conditions are handled specially.
+
+- Having a header `Content-Type: application/json`
+- As JSON, containing a part as following
+
+```ts
+{
+  "knitfabExtension": {
+    "env": { [key: string]: string }
+  }
+}
+```
+
+(The type notation is in TypeScript syntax.)
+
+If conditions above are met, Knitfab inject content of `knitfabExtension.env` as environmental variables into Pod of the Run. With this feature, you can build your Hook determines environmental variables dynamically for each Run information.
+
+If the conditions are not met, Knitfab just ignore such response bodies.
+
 
 ## 7.3. Register Extended Web API
 

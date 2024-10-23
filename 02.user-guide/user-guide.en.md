@@ -117,7 +117,7 @@ When the machine learning task is executed, the output Data is newly created, an
 
 ### Runs and Lineage
 
-A Run is a record of an executed machine learning task. A Run is derived based on a Plan and Data.
+A Run is a record of an executed machine learning task. A Run is made form a Plan as a template, and actual Data assigned to inputs and outputs.
 
 When Knitfab detects that a certain Data can be assigned as input for each Plan, it automatically generates a Run from the combination of inputs and Data.
 
@@ -127,6 +127,10 @@ For example, taking the example shown in the Plan section, if there are two poss
 A Run consists of specific input Data, output Data, and information about the Plan that the Run is based on.
 It is simply a record of "What was inputted and outputted for a specific machine learning task", representing one step of lineage.
 Knitfab represents lineage as a chain of dependencies between Runs and Data.
+
+A Machine Learning Task corresponding with a Run is executed on a Kubernetes Pod in isorated environment. The Pod is started with Data assigned to Run as Volumes, and executing the image of the Plan.
+
+Knitfab watches Pods status and when Pod stop successfully, Knitfab records the correcponding Run get be done and output Data is finished to be generated. Then, Knitfab checkes assignability of the Data to any Plans and start next Runs in a chain reaction.
 
 CLI Tool: knit
 -----------------
@@ -338,48 +342,63 @@ The following results will be returned.
 ```json
 [
     {
-        "knitId": "87038a1d-467c-45d4-9cc7-876473f3fc04",
+        "knitId": "5ea1b982-0e2c-4e02-adb6-431da718c7c1",
         "tags": [
             "format:mnist",
-            "knit#id:87038a1d-467c-45d4-9cc7-876473f3fc04",
-            "knit#timestamp:2024-03-06T09:53:21.792+00:00",
-            "mode:test",
-            "name:qmnist-test",
-            "project:first-Knitfab",
+            "knit#id:5ea1b982-0e2c-4e02-adb6-431da718c7c1",
+            "knit#timestamp:2024-10-16T09:03:42.726+00:00",
+            "mode:training",
+            "name:qmnist-train",
+            "project:first-knitfab",
             "type:dataset"
         ],
         "upstream": {
             "path": "/upload",
             "tags": [],
             "run": {
-                "runId": "71c4593b-449f-4843-a503-0cd44720d85e",
+                "runId": "0f6ffd26-9917-4d37-8f24-5bc920ef4c26",
                 "status": "done",
-                "updatedAt": "2024-03-06T09:53:21.792+00:00",
+                "updatedAt": "2024-10-16T09:03:42.726+00:00",
                 "plan": {
-                    "planId": "fb9b7087-9fe7-43c3-9302-a35488c85ffb",
+                    "planId": "ea0fd879-c5f3-4c8c-9ff6-23852f4d3e46",
                     "name": "knit#uploaded"
                 }
             }
         },
         "downstreams": [
             {
-                "path": "/in/dataset",
+                "path": "/in/1/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
                 "run": {
-                    "runId": "3cb1b091-01ad-41b1-acac-3f042f9df97c",
+                    "runId": "95fa5441-0146-42a7-86e7-48593d2666ad",
                     "status": "done",
-                    "updatedAt": "2024-03-06T10:01:16.301+00:00",
+                    "updatedAt": "2024-10-17T02:32:06.928+00:00",
                     "exit": {
                         "code": 0,
-                        "message": "Completed"
+                        "message": ""
                     },
                     "plan": {
-                        "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-                        "image": "localhost:30503/Knitfab-first-validation:v1.0"
+                        "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+                        "image": "localhost:30503/knitfab-first-train:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "train.py"
+                        ],
+                        "args": [
+                            "--dataset",
+                            "/in/1/dataset",
+                            "--save-to",
+                            "/out/1/model"
+                        ],
+                        "annotations": [
+                            "description=this is knitfab hands-on plan",
+                            "detailed-description=this is detailed description\n containing new line."
+                        ]
                     }
                 }
             }
@@ -388,13 +407,17 @@ The following results will be returned.
             {
                 "path": "/in/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
                 "plan": {
-                    "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-                    "image": "localhost:30503/Knitfab-first-validation:v1.0"
+                    "planId": "352b17f7-1dde-437f-b4b9-d473e2bb13ec",
+                    "image": "localhost:30503/knitfab-first-train:v1.0",
+                    "annotations": [
+                        "description=this is knitfab hands-on plan",
+                        "detailed-description=this is detailed description\n containing new line."
+                    ]
                 }
             }
         ]
@@ -455,17 +478,28 @@ knit data tag --remove old:tag KNIT_ID
 ```
 
 will removed the Tag `old:tag` from the Data identified by the ID `KNIT_ID`.
+
+It is able to remove Tags by their key.
+
+```
+knit data tag --remove-key example-key KNIT_ID
+```
+
+Doing above, all Tags keyed with `example-key` are removed from Data identfied by ID `KNIT_ID`.
+
 If you try to add a Tag that already exists in the Data or remove a Tag that doesn't exist, nothing will happen and no error will be thrown.
 
 In this case, you cannot add or remove Tag that start with the key `knit#`. These tags are reserved and managed by the system.
 
 #### Command-line options
 
-- `--add key:value`: Add a Tag.
-- `--remove key:value`: Remove a Tag.
+- `--add KEY:VALUE`: Add a Tag with the key and value.
+- `--remove KEY:VALUE`: Remove a Tag matching the key and the value.
+- `--remove-key KEY`: Remove Tags keyed `KEY`.
 
 Both options can be specified multiple times and will take effect for all specified Tags.
-However, if `--add` and `--remove` are specified for the same Tag, `--remove` will take precedence.
+
+When `--remove`, `--remove-key` and `--add` are passed at a time, Knitfab perform removing first, and then adding. So, when you do `knit data tag --remove foo:bar --add foo:bar KNIT_ID`, the Data is tagged with `foo:bar` finally.
 
 ### Data cannot be deleted
 
@@ -571,6 +605,41 @@ Even when executing this command, it is necessary to review the contents of the 
 
 In addition to what is shown here, there are optional attributes.
 
+#### `entrypoint` and `args`
+
+Plan can be set [entrypoint and args](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#entrypoint) for a Pod of a Run based the Plan.
+
+```yaml
+entrypoint: ["python", "main.py"]
+args: ["--arg", "value"]
+```
+
+By setting `entrypoint` or `args` (both is okay), the default entrypoint or args in the image of the Plan are overridden.
+
+#### `annotation`
+
+Besides of Tags on input/output, Plan itself can have metadata, `annotation`.
+
+```yaml
+annoation:
+    - key=value
+    - description=...
+    # ...
+```
+
+Annotations are list of "key=value" pair of arbitary content. You can use this to describe the Plan, record the creator or anything which is needed. Lineage does not care annotations, so annotations have no effect for Knitfab to derive Runs from Plans.
+
+A Plan can have many annotations. And also, a Plan can have annotations with same key if their values are different. For example, `annotation` like below are valid.
+
+```yaml
+annoation:
+    - created-by=Alice
+    - created-by=Bob
+    - created-by=Charie
+```
+
+`annotation` is mutable.
+
 #### `active`
 
 ```yaml
@@ -582,6 +651,7 @@ Specifies the "active" status of the Plan. Only the Runs based on an "active" Pl
 There may be cases where you don't want the Runs based on the Plan to be executed immediately when registering that Plan.
 In such cases, it is recommended to set `active: false` (inactive) in the Plan definition file and apply it using `knit plan apply`.
 
+`active` is mutable.
 
 #### `resource`
 
@@ -622,6 +692,22 @@ The types of compute resources that can be specified other than `cpu` and `memor
 >
 > This value will ultimately be used as `resources.limits` and `resources.requests` in the pod definition of Kubernetes.
 >
+
+`resource` is mutable.
+
+### service_account
+
+```yaml
+service_account: SERVICE_ACCOUNT_NAME
+```
+
+The ML task of a Run based a Plan are execute as Kubernetes Pod. With the `service_account` field, you can specify a Kubernetes [ServiceAccount](https://kubernetes.io/docs/concepts/security/ service-accounts/) for the Pod.
+
+This field is optional and Pods have no ServiceAccount by default. As long as the Task of a Run is closed in a Pod, ServiceAccount may not needed.
+
+Ask your Kubernetes Admin for avaiable ServiceAccounts.
+
+`service_account` is mutable.
 
 #### on_node
 
@@ -674,6 +760,8 @@ The meanings of each item are as follows:
 > In order for these specifications to work effectively, the Kubernetes cluster needs to be properly configured by the administrator.
 >
 
+`on_node` is mutable.
+
 ### Check Plan Definitions
 
 You can check the registered Plan definitions with the following command:
@@ -686,33 +774,48 @@ To get detailed information about a specific Plan, you need to specify the ID of
 If the specified Plan exists, you will receive console output similar to the following:
 
 ```json
-
 {
-    "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-    "image": "localhost:30503/Knitfab-first-validation:v1.0",
+    "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+    "image": "localhost:30503/knitfab-first-train:v1.0",
+    "entrypoint": [
+        "python",
+        "-u",
+        "train.py"
+    ],
+    "args": [
+        "--dataset",
+        "/in/1/dataset",
+        "--save-to",
+        "/out/1/model"
+    ],
+    "annotations": [
+        "description=this is knitfab hands-on plan",
+        "detailed-description=this is detailed description\n containing new line."
+    ],
     "inputs": [
         {
-            "path": "/in/dataset",
+            "path": "/in/1/dataset",
             "tags": [
-                "mode:test",
-                "project:first-Knitfab",
+                "mode:training",
+                "project:first-knitfab",
                 "type:dataset"
             ]
-        },
+        }
+    ],
+    "outputs": [
         {
-            "path": "/in/model",
+            "path": "/out/1/model",
             "tags": [
-                "project:first-Knitfab",
+                "description:2 layer CNN + 2 layer Affine",
+                "project:first-knitfab",
                 "type:model"
             ]
         }
     ],
-    "outputs": [],
     "log": {
         "Tags": [
-            "project:first-Knitfab",
-            "type:log",
-            "type:validation"
+            "project:first-knitfab",
+            "type:log"
         ]
     },
     "active": true,
@@ -770,6 +873,50 @@ When `knit plan find` is executed without any search conditions, it will match a
 - `-o KEY:VALUE`, `--out-tag KEY:VALUE`: Limits the search to those with outputs that have the specified Tags.
     - If this flag is specified multiple times, it only searches for those with outputs that have all the specified Tags".
 
+### Annotate or Unannotate a Plan
+
+Annotation, metadata of Plan, can be set or unset after Plan is registered.
+
+To add annotations to a Plan identified with ID `PLAN_ID`, do:
+
+```
+knit plan annotate --add KEY=VALUE PLAN_ID
+```
+
+Pass an annotation as key-value pair joined with `=` to `--add` flag.
+
+To remove annotations from a Plan, do:
+
+```
+knit plan annotate --remove KEY=VALUE PLAN_ID
+```
+
+And, to remove all annotations with a key from a Plan, do:
+
+```
+knit plan annotate --remove-key KEY PLAN_ID
+```
+
+Annotations to be removed will be ignored if they are not on a Plan. As like that, Annotations to be added will be ignored if they have been already on a Plan.
+
+For example, when the Plan `PLAN_ID` has an annotation `aaa=bbb`, doing
+
+```
+knit plan annotate --add aaa=bbb --add ccc=ddd --remove eee=fff PLAN_ID
+```
+
+is same as
+
+```
+knit plan annotate --add ccc=ddd PLAN_ID
+```
+
+#### Commandline Flags: `knit plan annotate`
+
+- `--remove KEY=VALUE`: remove the passed annotation from the Plan.
+- `--remove-key KEY`: remove all annotations with key `KEY` from the Plan.
+- `--add KEY=VALUE`: add an annotation to the Plan.
+
 ### Activating and deactivating a Plan
 
 If you no longer need a Plan, you can deactivate it:
@@ -788,6 +935,22 @@ knit plan active yes PLAN_ID
 ```
 
 This command will re-execute any prevented Run based on the Plan with the specified `PLAN_ID`.
+
+### Set or unset ServiceAccount of a Plan
+
+To set ServiceAccount on a Plan, do:
+
+```
+knit plan serviceaccount --set SERVICE_ACCOUNT_NAME PLAN_ID
+```
+
+To unset, do:
+
+```
+knit plan serviceaccount --unset PLAN_ID
+```
+
+Flag `--set` and `--unset` are mutual exclusive.
 
 ### Updating the compute resources required by a Plan
 
@@ -928,40 +1091,56 @@ The following output is expected:
 ```json
 [
     {
-        "runId": "3cb1b091-01ad-41b1-acac-3f042f9df97c",
-        "status": "starting",
-        "updatedAt": "2024-03-07T06:28:31.59+00:00",
+        "runId": "95fa5441-0146-42a7-86e7-48593d2666ad",
+        "status": "done",
+        "updatedAt": "2024-10-17T02:32:06.928+00:00",
         "plan": {
-            "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-            "image": "localhost:30503/Knitfab-first-validation:v1.0"
+            "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+            "image": "localhost:30503/knitfab-first-train:v1.0",
+            "entrypoint": [
+                "python",
+                "-u",
+                "train.py"
+            ],
+            "args": [
+                "--dataset",
+                "/in/1/dataset",
+                "--save-to",
+                "/out/1/model"
+            ],
+            "annotations": [
+                "description=this is knitfab hands-on plan",
+                "detailed-description=this is detailed description\n containing new line."
+            ]
         },
         "inputs": [
             {
-                "path": "/in/dataset",
+                "path": "/in/1/dataset",
                 "tags": [
-                    "mode:test",
-                    "project:first-Knitfab",
+                    "mode:training",
+                    "project:first-knitfab",
                     "type:dataset"
                 ],
-                "knitId": "87038a1d-467c-45d4-9cc7-876473f3fc04"
-            },
-            {
-                "path": "/in/model",
-                "tags": [
-                    "project:first-Knitfab",
-                    "type:model"
-                ],
-                "knitId": "46173435-d55a-46ae-8300-11560ca371d9"
+                "knitId": "5ea1b982-0e2c-4e02-adb6-431da718c7c1"
             }
         ],
-        "outputs": [],
+        "outputs": [
+            {
+                "path": "/out/1/model",
+                "tags": [
+                    "description:2 layer CNN + 2 layer Affine",
+                    "project:first-knitfab",
+                    "type:model"
+                ],
+                "knitId": "88d60df9-8699-4b85-8b40-8741824b6737"
+            }
+        ],
         "log": {
             "Tags": [
-                "project:first-Knitfab",
-                "type:log",
-                "type:validation"
+                "project:first-knitfab",
+                "type:log"
             ],
-            "knitId": "9bb07d29-ab79-4ec0-a233-ec000e418261"
+            "knitId": "d75cd6e0-0d92-4536-812c-4308f8180a12"
         }
     }
 ]
@@ -989,8 +1168,7 @@ Additional information is included for a stopped Run.
         "message": "Completed"
     },
     "plan": {
-        "planId": "6dbfed46-f9fb-4e4e-aadd-2a5c42d26913",
-        "image": "localhost:30503/Knitfab-first-validation:v1.0"
+        ...
     },
     "inputs": [...],
     "outputs": [...],
