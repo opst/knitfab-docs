@@ -322,11 +322,11 @@ knit data push -t format:mnist -t mode:training -t type:dataset -t project:first
 
 ```json
 {
-    "knitId": "11fbba05-1a7a-48d4-9751-32963d726f51",
+    "knitId": "92c84171-16e9-47bb-8088-deee2a981d45",
     "tags": [
         "format:mnist",
-        "knit#id:11fbba05-1a7a-48d4-9751-32963d726f51",
-        "knit#timestamp:2024-03-22T08:13:39.39+00:00",
+        "knit#id:92c84171-16e9-47bb-8088-deee2a981d45",
+        "knit#timestamp:2024-10-23T06:15:50.39+00:00",
         "mode:training",
         "name:qmnist-train",
         "project:first-knitfab",
@@ -336,11 +336,11 @@ knit data push -t format:mnist -t mode:training -t type:dataset -t project:first
         "path": "/upload",
         "tags": [],
         "run": {
-            "runId": "7dc0b8da-8949-4f69-be99-83a4786cac18",
+            "runId": "92a909be-9567-4578-a83c-4b61e9550f63",
             "status": "done",
-            "updatedAt": "2024-03-22T08:13:39.39+00:00",
+            "updatedAt": "2024-10-23T06:15:50.39+00:00",
             "plan": {
-                "planId": "4b48ceff-fbaf-4c47-b4e9-77bcc5eb8a41",
+                "planId": "7aaa8711-fed5-4a64-8543-11b082c132a6",
                 "name": "knit#uploaded"
             }
         }
@@ -520,14 +520,35 @@ docker save ${YOUR_KNITFAB_NODE}:${PORT}/knitfab-first-train:v1.0 | \
 次のようなファイルが `./knitfab-first-train.v1.0.plan.yaml` として書き出されているはずである。
 
 ```yaml
+
+
+# annotations (optional, mutable):
+#   Set Annotations of this Plan in list of "key=value" format string.
+#   You can use this for your own purpose, for example documentation. This does not affect lineage tracking.
+#   Knitfab Extensions may refer this.
+annotations: []
+#   - "key=value"
+#   - "description=This is a Plan for ..."
+
+
 # image:
-#   Container image to be executed as this plan.
-#   This image-tag should be accessible from your Knitfab cluster.
+#   Container image to be executed as this Plan.
+#   This image-tag should be accessible from your knitfab cluster.
 image: "${YOUR_KNITFAB_NODE}:${PORT}/knitfab-first-train:v1.0"
 
+# entrypoint:
+#   Command to be executed as this Plan image.
+#   This array overrides the ENTRYPOINT of the image.
+entrypoint: ["python", "-u", "train.py"]
+
+# args:
+#   Arguments to be passed to this Plan image.
+#   This array overrides the CMD of the image.
+args: ["--dataset", "/in/dataset", "--save-to", "/out/model"]
+
 # inputs:
-#   List of filepath and tags as input of this plans.
-#   1 or more inputs are needed.
+#   List of filepath and Tags as Input of this Plans.
+#   1 or more Inputs are needed.
 #   Each filepath should be absolute. Tags should be formatted in "key:value"-style.
 inputs:
   - path: "/in/dataset"
@@ -535,7 +556,7 @@ inputs:
       - "type:dataset"
 
 # outputs:
-#   List of filepathes and tags as output of this plans.
+#   List of filepathes and Tags as Output of this Plans.
 #   See "inputs" for detail.
 outputs:
   - path: "/out/model"
@@ -543,20 +564,20 @@ outputs:
       - "type:model"
 
 # log (optional):
-#   Set tags stored log (STDOUT+STDERR of runs of this plan) as data.
+#   Set Tags stored log (STDOUT+STDERR of runs of this Plan) as Data.
 #   If missing or null, log would not be stored.
 log:
   tags:
     - "type:log"
 
-# active (optional):
-#   To suspend executing runs by this plan, set false explicitly.
+# active (optional, mutable):
+#   To suspend executing Runs by this Plan, set false explicitly.
 #   If missing or null, it is assumed as true.
 active: true
 
-# resource (optional):
-# Specify the resource , cpu or memory for example, requirements for this plan.
-# This value can be changed after the plan is applied.
+# resource (optional, mutable):
+# Specify the resource , cpu or memory for example, requirements for this Plan.
+# This value can be changed after the Plan is applied.
 
 # There can be other resources. For them, ask your administrator.
 
@@ -564,13 +585,13 @@ active: true
 resouces:
 
   # cpu (optional; default = 1):
-  #   Specify the CPU resource requirements for this plan.
+  #   Specify the CPU resource requirements for this Plan.
   #   This value means "how many cores" the plan will use.
-  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for half a core.
+  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for a half of a core.
   cpu: 1
 
   # memory (optional; default = 1Gi):
-  #   Specify the memory resource requirements for this plan.
+  #   Specify the memory resource requirements for this Plan.
   #   This value means "how many bytes" the plan will use.
   #   You can use suffixes like "Ki", "Mi", "Gi" for kibi-(1024), mebi-(1024^2), gibi-(1024^3) bytes, case sensitive.
   #   For example, "1Gi" means 1 gibibyte.
@@ -579,7 +600,7 @@ resouces:
 
 
 # # on_node (optional):
-# #   Specify the node where this plan is executed.
+# #   Specify the node where this Plan is executed.
 # #
 # #   For each level (may, prefer and must), you can put node labels or taints in "key=value" format.
 # #   Labels show a node characteristic, and taints show a node restriction.
@@ -605,6 +626,11 @@ resouces:
 #   #   If no node matches, runs of the plan will be scheduled but not started.
 #   must:
 #     - "accelarator=gpu"
+#
+# # service_account (optional, mutable):
+# #   Specify the service account to run this Plan.
+# #   If missing or null, the service account is not used.
+# service_account: "default"
 ```
 
 一部、うまくない部分があるから、訂正しよう。
@@ -627,13 +653,23 @@ resouces:
 
 ```yaml
 # image:
-#   Container image to be executed as this plan.
-#   This image-tag should be accessible from your Knitfab cluster.
+#   Container image to be executed as this Plan.
+#   This image-tag should be accessible from your knitfab cluster.
 image: "localhost:${PORT}/knitfab-first-train:v1.0"
 
+# entrypoint:
+#   Command to be executed as this Plan image.
+#   This array overrides the ENTRYPOINT of the image.
+entrypoint: ["python", "-u", "train.py"]
+
+# args:
+#   Arguments to be passed to this Plan image.
+#   This array overrides the CMD of the image.
+args: ["--dataset", "/in/dataset", "--save-to", "/out/model"]
+
 # inputs:
-#   List of filepath and tags as input of this plans.
-#   1 or more inputs are needed.
+#   List of filepath and Tags as Input of this Plans.
+#   1 or more Inputs are needed.
 #   Each filepath should be absolute. Tags should be formatted in "key:value"-style.
 inputs:
   - path: "/in/dataset"
@@ -643,7 +679,7 @@ inputs:
       - "mode:training"
 
 # outputs:
-#   List of filepathes and tags as output of this plans.
+#   List of filepathes and Tags as Output of this Plans.
 #   See "inputs" for detail.
 outputs:
   - path: "/out/model"
@@ -653,21 +689,21 @@ outputs:
       - "description: 2 layer CNN + 2 layer Affine"
 
 # log (optional):
-#   Set tags stored log (STDOUT+STDERR of runs of this plan) as data.
+#   Set Tags stored log (STDOUT+STDERR of runs of this Plan) as Data.
 #   If missing or null, log would not be stored.
 log:
   tags:
     - "project:first-knitfab"
     - "type:log"
 
-# active (optional):
-#   To suspend executing runs by this plan, set false explicitly.
+# active (optional, mutable):
+#   To suspend executing Runs by this Plan, set false explicitly.
 #   If missing or null, it is assumed as true.
 active: true
 
-# resource (optional):
-# Specify the resource , cpu or memory for example, requirements for this plan.
-# This value can be changed after the plan is applied.
+# resource (optional, mutable):
+# Specify the resource , cpu or memory for example, requirements for this Plan.
+# This value can be changed after the Plan is applied.
 
 # There can be other resources. For them, ask your administrator.
 
@@ -675,13 +711,13 @@ active: true
 resouces:
 
   # cpu (optional; default = 1):
-  #   Specify the CPU resource requirements for this plan.
+  #   Specify the CPU resource requirements for this Plan.
   #   This value means "how many cores" the plan will use.
-  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for half a core.
+  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for a half of a core.
   cpu: 1
 
   # memory (optional; default = 1Gi):
-  #   Specify the memory resource requirements for this plan.
+  #   Specify the memory resource requirements for this Plan.
   #   This value means "how many bytes" the plan will use.
   #   You can use suffixes like "Ki", "Mi", "Gi" for kibi-(1024), mebi-(1024^2), gibi-(1024^3) bytes, case sensitive.
   #   For example, "1Gi" means 1 gibibyte.
@@ -699,8 +735,19 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
 
 ```json
 {
-    "planId": "2a701485-2194-4503-8a09-1916bba7e5d1",
+    "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
     "image": "localhost:30503/knitfab-first-train:v1.0",
+    "entrypoint": [
+        "python",
+        "-u",
+        "train.py"
+    ],
+    "args": [
+        "--dataset",
+        "/in/dataset",
+        "--save-to",
+        "/out/model"
+    ],
     "inputs": [
         {
             "path": "/in/dataset",
@@ -749,12 +796,23 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
 ```json
 [
     {
-        "runId": "6ece5f38-7b53-41a9-a3bc-653b89d37566",
+        "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
         "status": "running",
-        "updatedAt": "2024-03-22T09:10:08.084+00:00",
+        "updatedAt": "2024-10-23T06:48:07.861+00:00",
         "plan": {
-            "planId": "2a701485-2194-4503-8a09-1916bba7e5d1",
-            "image": "localhost:30503/knitfab-first-train:v1.0"
+            "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+            "image": "localhost:30503/knitfab-first-train:v1.0",
+            "entrypoint": [
+                "python",
+                "-u",
+                "train.py"
+            ],
+            "args": [
+                "--dataset",
+                "/in/dataset",
+                "--save-to",
+                "/out/model"
+            ]
         },
         "inputs": [
             {
@@ -764,7 +822,7 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                     "project:first-knitfab",
                     "type:dataset"
                 ],
-                "knitId": "11fbba05-1a7a-48d4-9751-32963d726f51"
+                "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
             }
         ],
         "outputs": [
@@ -775,7 +833,7 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                     "project:first-knitfab",
                     "type:model"
                 ],
-                "knitId": "cf547e09-5aa6-4755-b66a-6676d9725ab4"
+                "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
             }
         ],
         "log": {
@@ -783,7 +841,7 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                 "project:first-knitfab",
                 "type:log"
             ],
-            "knitId": "3b0eff13-a48f-4cbb-aa62-cd2c4e3e9a54"
+            "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
         }
     }
 ]
@@ -815,16 +873,27 @@ knit run show ${RUN_ID}
 
 ```json
 {
-    "runId": "6ece5f38-7b53-41a9-a3bc-653b89d37566",
+    "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
     "status": "done",
-    "updatedAt": "2024-03-22T09:37:32.923+00:00",
+    "updatedAt": "2024-10-23T07:14:15.732+00:00",
     "exit": {
         "code": 0,
-        "message": "Completed"
+        "message": ""
     },
     "plan": {
-        "planId": "2a701485-2194-4503-8a09-1916bba7e5d1",
-        "image": "localhost:30503/knitfab-first-train:v1.0"
+        "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+        "image": "localhost:30503/knitfab-first-train:v1.0",
+        "entrypoint": [
+            "python",
+            "-u",
+            "train.py"
+        ],
+        "args": [
+            "--dataset",
+            "/in/dataset",
+            "--save-to",
+            "/out/model"
+        ]
     },
     "inputs": [
         {
@@ -834,7 +903,7 @@ knit run show ${RUN_ID}
                 "project:first-knitfab",
                 "type:dataset"
             ],
-            "knitId": "11fbba05-1a7a-48d4-9751-32963d726f51"
+            "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
         }
     ],
     "outputs": [
@@ -845,7 +914,7 @@ knit run show ${RUN_ID}
                 "project:first-knitfab",
                 "type:model"
             ],
-            "knitId": "cf547e09-5aa6-4755-b66a-6676d9725ab4"
+            "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
         }
     ],
     "log": {
@@ -853,7 +922,7 @@ knit run show ${RUN_ID}
             "project:first-knitfab",
             "type:log"
         ],
-        "knitId": "3b0eff13-a48f-4cbb-aa62-cd2c4e3e9a54"
+        "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
     }
 }
 ```
@@ -1002,14 +1071,35 @@ docker save ${YOUR_KNITFAB_NODE}:${PORT}/knitfab-first-validation:v1.0 | knit pl
 次のような内容のファイルが得られる。
 
 ```yaml
+
+
+# annotations (optional, mutable):
+#   Set Annotations of this Plan in list of "key=value" format string.
+#   You can use this for your own purpose, for example documentation. This does not affect lineage tracking.
+#   Knitfab Extensions may refer this.
+annotations: []
+#   - "key=value"
+#   - "description=This is a Plan for ..."
+
+
 # image:
-#   Container image to be executed as this plan.
-#   This image-tag should be accessible from your Knitfab cluster.
+#   Container image to be executed as this Plan.
+#   This image-tag should be accessible from your knitfab cluster.
 image: "${YOUR_KNITFAB_NODE}:${PORT}/knitfab-first-validation:v1.0"
 
+# entrypoint:
+#   Command to be executed as this Plan image.
+#   This array overrides the ENTRYPOINT of the image.
+entrypoint: ["python", "-u", "validation.py", "--dataset", "/in/dataset", "--model", "/in/model/model.pth"]
+
+# args:
+#   Arguments to be passed to this Plan image.
+#   This array overrides the CMD of the image.
+args: []
+
 # inputs:
-#   List of filepath and tags as input of this plans.
-#   1 or more inputs are needed.
+#   List of filepath and Tags as Input of this Plans.
+#   1 or more Inputs are needed.
 #   Each filepath should be absolute. Tags should be formatted in "key:value"-style.
 inputs:
   - path: "/in/dataset"
@@ -1020,45 +1110,48 @@ inputs:
       - "type:model.pth"
 
 # outputs:
-#   List of filepathes and tags as output of this plans.
+#   List of filepathes and Tags as Output of this Plans.
 #   See "inputs" for detail.
 outputs: []
 
 # log (optional):
-#   Set tags stored log (STDOUT+STDERR of runs of this plan) as data.
+#   Set Tags stored log (STDOUT+STDERR of runs of this Plan) as Data.
 #   If missing or null, log would not be stored.
 log:
   tags:
     - "type:log"
 
-# active (optional):
-#   To suspend executing runs by this plan, set false explicitly.
+# active (optional, mutable):
+#   To suspend executing Runs by this Plan, set false explicitly.
 #   If missing or null, it is assumed as true.
 active: true
 
-# resource (optional):
-# Specify the resource , cpu or memory for example, requirements for this plan.
-# This value can be changed after the plan is applied.
+# resource (optional, mutable):
+# Specify the resource , cpu or memory for example, requirements for this Plan.
+# This value can be changed after the Plan is applied.
 
 # There can be other resources. For them, ask your administrator.
 
 # (advanced note: These values are passed to container.resource.limits in kubernetes.)
 resouces:
+
   # cpu (optional; default = 1):
-  #   Specify the CPU resource requirements for this plan.
+  #   Specify the CPU resource requirements for this Plan.
   #   This value means "how many cores" the plan will use.
-  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for half a core.
+  #   This can be a fraction, like "0.5" or "500m" (= 500 millicore) for a half of a core.
   cpu: 1
 
   # memory (optional; default = 1Gi):
-  #   Specify the memory resource requirements for this plan.
+  #   Specify the memory resource requirements for this Plan.
   #   This value means "how many bytes" the plan will use.
   #   You can use suffixes like "Ki", "Mi", "Gi" for kibi-(1024), mebi-(1024^2), gibi-(1024^3) bytes, case sensitive.
   #   For example, "1Gi" means 1 gibibyte.
   #   If you omit the suffix, it is assumed as bytes.
   memory: 1Gi
+
+
 # # on_node (optional):
-# #   Specify the node where this plan is executed.
+# #   Specify the node where this Plan is executed.
 # #
 # #   For each level (may, prefer and must), you can put node labels or taints in "key=value" format.
 # #   Labels show a node characteristic, and taints show a node restriction.
@@ -1084,6 +1177,11 @@ resouces:
 #   #   If no node matches, runs of the plan will be scheduled but not started.
 #   must:
 #     - "accelarator=gpu"
+#
+# # service_account (optional, mutable):
+# #   Specify the service account to run this Plan.
+# #   If missing or null, the service account is not used.
+# service_account: "default"
 ```
 
 これを訂正して、意味のあるものにしよう。
@@ -1094,7 +1192,7 @@ resouces:
     - `"mode:test"`
     - `"project:first-knitfab"`
 - 2 番目の入力が誤っている。
-  - `path` にはディレクトリを指定する必要がある。ファイル名を除去する。
+  - `path` にはディレクトリを指定する必要がある。ファイル名を除去する。(`"/in/model/model.pth"` -> `"/in/model"`)
   - タグを追加/訂正して、訓練で生成されたモデルパラメータを含む "データ" を取り込むようにする。
     - `"type:model.pth"` -> `"type:model"`
     - `"project:first-knitfab"`
