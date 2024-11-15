@@ -775,7 +775,7 @@ If the specified Plan exists, you will receive console output similar to the fol
 
 ```json
 {
-    "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+    "planId": "d134463a-9766-4e43-8f87-002e48d624a6",
     "image": "localhost:30503/knitfab-first-train:v1.0",
     "entrypoint": [
         "python",
@@ -784,31 +784,59 @@ If the specified Plan exists, you will receive console output similar to the fol
     ],
     "args": [
         "--dataset",
-        "/in/1/dataset",
+        "/in/dataset",
         "--save-to",
-        "/out/1/model"
+        "/out/model"
     ],
     "annotations": [
         "description=this is knitfab hands-on plan",
-        "detailed-description=this is detailed description\n containing new line."
+        "detailed-description=this is detailed description\ncontaining new line."
     ],
     "inputs": [
         {
-            "path": "/in/1/dataset",
+            "path": "/in/dataset",
             "tags": [
                 "mode:training",
                 "project:first-knitfab",
                 "type:dataset"
-            ]
+            ],
+            "upstreams": []
         }
     ],
     "outputs": [
         {
-            "path": "/out/1/model",
+            "path": "/out/model",
             "tags": [
                 "description:2 layer CNN + 2 layer Affine",
                 "project:first-knitfab",
                 "type:model"
+            ],
+            "downstreams": [
+                {
+                    "plan": {
+                        "planId": "a363ba5d-b874-496a-8f40-ee1ebf28b8e6",
+                        "image": "localhost:30503/knitfab-first-validation:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "validation.py",
+                            "--dataset",
+                            "/in/dataset",
+                            "--model",
+                            "/in/model/model.pth"
+                        ],
+                        "annotations": [
+                            "test=annotation"
+                        ]
+                    },
+                    "mountpoint": {
+                        "path": "/in/model",
+                        "tags": [
+                            "project:first-knitfab",
+                            "type:model"
+                        ]
+                    }
+                },
             ]
         }
     ],
@@ -816,7 +844,8 @@ If the specified Plan exists, you will receive console output similar to the fol
         "Tags": [
             "project:first-knitfab",
             "type:log"
-        ]
+        ],
+        "downstreams": []
     },
     "active": true,
     "resources": {
@@ -826,9 +855,97 @@ If the specified Plan exists, you will receive console output similar to the fol
 }
 ```
 
-Apart from the difference between JSON and YAML, the structure of a Plan definition is the same.
+This JSON is similer in structure to a Plan definition YAML.
 
-If you don't know the ID of the Plan you are interested in, you can also search for it.
+There are additional elements of definitions, `"upstreams"` in `"inputs"` and `"downstreams"` in `"outputs"` and `"log"`.
+These shows you connectivity between other Plans and these inputs, outputs and log.
+
+`"downstreams"` lists inputs of the other Plans which Data generated from the Output (in a Run of the Plan) will be assined to.
+`"upstreams"` are counterpart of that. When doing `knit plan show` of the Plan in `"downstreams"` above example, the result below will be gotten.
+
+```json
+{
+    "planId": "a363ba5d-b874-496a-8f40-ee1ebf28b8e6",
+    "image": "localhost:30503/knitfab-first-validation:v1.0",
+    "entrypoint": [
+        "python",
+        "-u",
+        "validation.py",
+        "--dataset",
+        "/in/dataset",
+        "--model",
+        "/in/model/model.pth"
+    ],
+    "annotations": [
+        "test=annotation"
+    ],
+    "inputs": [
+        {
+            "path": "/in/dataset",
+            "tags": [
+                "mode:test",
+                "project:first-knitfab",
+                "type:dataset"
+            ],
+            "upstreams": []
+        },
+        {
+            "path": "/in/model",
+            "tags": [
+                "project:first-knitfab",
+                "type:model"
+            ],
+            "upstreams": [
+                {
+                    "plan": {
+                        "planId": "d134463a-9766-4e43-8f87-002e48d624a6",
+                        "image": "localhost:30503/knitfab-first-train:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "train.py"
+                        ],
+                        "args": [
+                            "--dataset",
+                            "/in/dataset",
+                            "--save-to",
+                            "/out/model"
+                        ],
+                        "annotations": [
+                            "description=this is knitfab hands-on plan",
+                            "detailed-description=this is detailed description\ncontaining new line."
+                        ]
+                    },
+                    "mountpoint": {
+                        "path": "/out/model",
+                        "tags": [
+                            "description:2 layer CNN + 2 layer Affine",
+                            "project:first-knitfab",
+                            "type:model"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": [],
+    "log": {
+        "Tags": [
+            "project:first-knitfab",
+            "type:log",
+            "type:validation"
+        ],
+        "downstreams": []
+    },
+    "active": true,
+    "resources": {
+        "cpu": "1",
+        "memory": "1Gi"
+    }
+}
+```
+
+When you don't know the ID of the Plan you are interested in, you can also search for it.
 
 If you know the image name, you can use the following command:
 
@@ -872,6 +989,125 @@ When `knit plan find` is executed without any search conditions, it will match a
     - If this flag is specified multiple times, it only searches for those with inputs that have all the specified Tags.
 - `-o KEY:VALUE`, `--out-tag KEY:VALUE`: Limits the search to those with outputs that have the specified Tags.
     - If this flag is specified multiple times, it only searches for those with outputs that have all the specified Tags".
+
+### Connect Plans/Visualize Connectivities of Plans
+
+With Knitfab, Machine Learning Task Pipeline are made by Plans.
+
+For example, let's assume that 2 Plans below, "trainer" and "validator", are registered.
+
+```yaml:trainer.plan.yaml
+image: "localhost:30503/train:v1.0"
+annotations:
+  - "name=trainer"
+
+inputs:
+  - path: "/in/dataset"
+    tags:
+      - "project:some-project"
+      - "type:dataset"
+      - "mode:train"
+  - path: "/in/params"
+    tags:
+      - "project:some-project"
+      - "type:hyper-params"
+      - "format:yaml"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "project:some-project"
+      - "type:model"
+
+logs:
+  - "project:some-project"
+  - "type:log"
+```
+
+```yaml:validator.plan.yaml
+image: "localhost:30503/validate:v1.0"
+annotations:
+  - "name=validator"
+
+inputs:
+  - path: "/in/dataset"
+    tags:
+      - "project:some-project"
+      - "type:dataset"
+      - "mode:validate"
+  - path: "/in/model"
+    tags:
+      - "project:some-project"
+      - "type:model"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "project:some-project"
+      - "type:report"
+
+logs:
+  - "project:some-project"
+  - "type:log"
+```
+
+In the example, Data generated from a Run which based on the Plan "trainer" is assigned to the output `/in/model` of the Plan "validator". Because all Tags on the input `/in/model` of the Plan "validator" are found in Tags of `/out` of the Plan "trainer" (in the example, the tags are same).
+
+Then, Runs based on "validator" will be created when Runs based on "trainer" get done successfully.
+
+Like this, with Knitfab, "knitting up" Machine Learning Task Pipeline is realised with connecting outputs and inputs of Plans with Tags and letting Plans do chain-reaction.
+
+And, to visualize a pipeline build as above, do
+
+```
+knit plan graph PLAN_ID | dot -Tpng > graph.png
+```
+
+`knit plan graph` writes out the pipeline in 3 Plans distanced from the specified Plan as `PLAN_ID` in dot format.
+In the example command above, pass the dot script to `dot` command and convert to a PNG image. An image gotten likes below:
+
+![graph.png](images/knit-plan-graph/graph.png)
+
+This pipeline image is visualized by searching from "validator", placed in the downstream of the pipeline. In the image, Borderd objects are Plans and arrows notates the direction of dataflows.
+
+The Plan "trainer" is upperhalf of the image and the Plan "validator" is bottom half. Each narrow yellow borders is boundarie of a Plan. Bold yellow borders inside of them show summries of Plans (activeness, ID, container image and annotations). The Plan which background of ID is colord is the one specified to `knit plan graph`, thus the starting point of traverse the pipeline (in this example, "validator" is it).
+
+Green dots on narrow outer borders are inputs, outputs or log of Plans. Direction of narrow arrows between dots and Plan summaries denote the dots are input or not. Arrows heading to Plan summary are inputs, and heading to dots are output or log. Arrows are labelled with filepathes for input/output or "(log)" for log.
+
+Bold arrows shows connectivity of Plans. Inputs outputs or logs which are not connected with bold arrows means no Plans are found in the search range of `knit plan graph`.
+
+You can specify the search range with `--numbers` (or `-n`) flag. For example, to search in 10 Plans distance, do
+
+```
+knit plan graph -n 10 PLAN_ID
+```
+
+When `-n all`, `knit plan graph` searches unlimitedly.
+
+To search only upstreams,
+
+```
+knit plan graph --upstream PLAN_ID
+```
+
+For only downstreams,
+
+```
+knit plan graph --downstream PLAN_ID
+```
+
+#### Commnadline Flags: `knit plan graph`
+
+- `-n POSITIVE-INTEGER|all`, `--numbers POSITIVE-INTEGER|all`: Specify search range
+    - Pass a positive integer or `all`.
+        - When passed a positive integer, it searches Plans distanced upto the number.
+        - When passed `all`, it searches unlimitedly.
+- `-u`, `--upstream`: Search upstream.
+    - When passed it, `knit plan graph` searches upstreams of the starting Plan, that is, Plans which are reachable to inputs of the stating Plan.
+- `-d`, `--downstream`: Search downstream.
+    - When passed it, `knit plan graph` searches doenstreams of the starring Plan, that is, Plans which are reachable to outputs and log from the starting Plan.
+
+When neither of `-u` and `-d` are passed, it assumes both of them are passed, so `knit plan graph` searches upstream and downstream.
 
 ### Annotate or Unannotate a Plan
 
