@@ -786,7 +786,7 @@ knit plan show PLAN_ID
 
 ```json
 {
-    "planId": "9e5dd235-02e3-4700-a174-f2a50f74c8ba",
+    "planId": "d134463a-9766-4e43-8f87-002e48d624a6",
     "image": "localhost:30503/knitfab-first-train:v1.0",
     "entrypoint": [
         "python",
@@ -795,31 +795,59 @@ knit plan show PLAN_ID
     ],
     "args": [
         "--dataset",
-        "/in/1/dataset",
+        "/in/dataset",
         "--save-to",
-        "/out/1/model"
+        "/out/model"
     ],
     "annotations": [
         "description=this is knitfab hands-on plan",
-        "detailed-description=this is detailed description\n containing new line."
+        "detailed-description=this is detailed description\ncontaining new line."
     ],
     "inputs": [
         {
-            "path": "/in/1/dataset",
+            "path": "/in/dataset",
             "tags": [
                 "mode:training",
                 "project:first-knitfab",
                 "type:dataset"
-            ]
+            ],
+            "upstreams": []
         }
     ],
     "outputs": [
         {
-            "path": "/out/1/model",
+            "path": "/out/model",
             "tags": [
                 "description:2 layer CNN + 2 layer Affine",
                 "project:first-knitfab",
                 "type:model"
+            ],
+            "downstreams": [
+                {
+                    "plan": {
+                        "planId": "a363ba5d-b874-496a-8f40-ee1ebf28b8e6",
+                        "image": "localhost:30503/knitfab-first-validation:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "validation.py",
+                            "--dataset",
+                            "/in/dataset",
+                            "--model",
+                            "/in/model/model.pth"
+                        ],
+                        "annotations": [
+                            "test=annotation"
+                        ]
+                    },
+                    "mountpoint": {
+                        "path": "/in/model",
+                        "tags": [
+                            "project:first-knitfab",
+                            "type:model"
+                        ]
+                    }
+                },
             ]
         }
     ],
@@ -827,7 +855,8 @@ knit plan show PLAN_ID
         "Tags": [
             "project:first-knitfab",
             "type:log"
-        ]
+        ],
+        "downstreams": []
     },
     "active": true,
     "resources": {
@@ -837,9 +866,97 @@ knit plan show PLAN_ID
 }
 ```
 
-json と yaml の違いを除けば、 "プラン" 定義と同じ構造をしている。
+"プラン" 定義とよく似た構造をしている。
 
-もし関心のある "プラン" の ID がわからないなら、検索することもできる。
+"プラン" 定義に存在しなかった要素として、出力およびログの `"downstreams"` と、入力の `"upstreams"` が追加されている。
+これらは、各入出力およびログが、他のどの "プラン" と関係があるか、ということを示している。
+
+`"downstreams"` には、その出力（に対応する "ラン" の出力）から生成された "データ" が、他のどの "プラン" の入力に割り当てられるか、を示している。
+`"upstreams"` はその逆である。上に示した例で `"downstreams"` に見える "プラン" について `knit plan show` すると、次のような結果になる。
+
+```json
+{
+    "planId": "a363ba5d-b874-496a-8f40-ee1ebf28b8e6",
+    "image": "localhost:30503/knitfab-first-validation:v1.0",
+    "entrypoint": [
+        "python",
+        "-u",
+        "validation.py",
+        "--dataset",
+        "/in/dataset",
+        "--model",
+        "/in/model/model.pth"
+    ],
+    "annotations": [
+        "test=annotation"
+    ],
+    "inputs": [
+        {
+            "path": "/in/dataset",
+            "tags": [
+                "mode:test",
+                "project:first-knitfab",
+                "type:dataset"
+            ],
+            "upstreams": []
+        },
+        {
+            "path": "/in/model",
+            "tags": [
+                "project:first-knitfab",
+                "type:model"
+            ],
+            "upstreams": [
+                {
+                    "plan": {
+                        "planId": "d134463a-9766-4e43-8f87-002e48d624a6",
+                        "image": "localhost:30503/knitfab-first-train:v1.0",
+                        "entrypoint": [
+                            "python",
+                            "-u",
+                            "train.py"
+                        ],
+                        "args": [
+                            "--dataset",
+                            "/in/dataset",
+                            "--save-to",
+                            "/out/model"
+                        ],
+                        "annotations": [
+                            "description=this is knitfab hands-on plan",
+                            "detailed-description=this is detailed description\ncontaining new line."
+                        ]
+                    },
+                    "mountpoint": {
+                        "path": "/out/model",
+                        "tags": [
+                            "description:2 layer CNN + 2 layer Affine",
+                            "project:first-knitfab",
+                            "type:model"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": [],
+    "log": {
+        "Tags": [
+            "project:first-knitfab",
+            "type:log",
+            "type:validation"
+        ],
+        "downstreams": []
+    },
+    "active": true,
+    "resources": {
+        "cpu": "1",
+        "memory": "1Gi"
+    }
+}
+```
+
+"プラン"　の情報を調べるにあたり、 もし関心のある "プラン" の ID がわからないなら、検索することもできる。
 
 イメージ名がわかっているなら、
 
@@ -889,6 +1006,130 @@ knit plan find --active yes
     - もしこのフラグを繰り返し指定したら、すべての "タグ" が設定された入力があるものだけを検索する。
 - `-o KEY:VALUE`, `--out-tag KEY:VALUE`: 指定した "タグ" が設定されている出力をもつものに限る。
     - もしこのフラグを繰り返し指定したら、すべての "タグ" が設定された出力があるものだけを検索する。
+
+### プラン同士をつなげる・つながりを可視化する
+
+Knitfab では、複数の "プラン" を組み合わせて機械学習タスクのパイプラインを構築する。
+
+たとえば、次の 2 つのプラン、trainer と validator が登録されているとする。
+
+```yaml:trainer.plan.yaml
+image: "localhost:30503/train:v1.0"
+annotations:
+  - "name=trainer"
+
+inputs:
+  - path: "/in/dataset"
+    tags:
+      - "project:some-project"
+      - "type:dataset"
+      - "mode:train"
+  - path: "/in/params"
+    tags:
+      - "project:some-project"
+      - "type:hyper-params"
+      - "format:yaml"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "project:some-project"
+      - "type:model"
+
+logs:
+  - "project:some-project"
+  - "type:log"
+```
+
+```yaml:validator.plan.yaml
+image: "localhost:30503/validate:v1.0"
+annotations:
+  - "name=validator"
+
+inputs:
+  - path: "/in/dataset"
+    tags:
+      - "project:some-project"
+      - "type:dataset"
+      - "mode:validate"
+  - path: "/in/model"
+    tags:
+      - "project:some-project"
+      - "type:model"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "project:some-project"
+      - "type:report"
+
+logs:
+  - "project:some-project"
+  - "type:log"
+```
+
+このとき、trainer に基づいた "ラン" が出力 `/out` から生成した "データ" は、自動的に validator の入力 `/in/model` に割り当てられる。というのも、trainer の出力 `/out` に指定されているタグが、validator の入力 `/in/model` のタグをすべて含む（この例では一致している）からである。
+
+すると、 trainer に基づく "ラン" が正常に完了したときに、validator に基づく "ラン" も適宜生成されることになる。
+
+このように、"プラン" の出力と、別の "プラン" の入力をタグベースで関連付け、"プラン" を連鎖反応させることが、Knitfab においてパイプラインを編み上げてゆくことなのである。
+
+さて、そうして構築されたパイプラインがどういう構成をしているのか、調べたいことがある。次のコマンドを利用する。
+
+```
+knit plan graph PLAN_ID | dot -Tpng > graph.png
+```
+
+`knit plan graph` は引数 `PLAN_ID` に指定した "プラン" を起点に、前後 3 プランにわたるパイプラインを探索して、 dot 形式で書き出す。
+上のコマンド例では、それを `dot` コマンドに通して PNG 形式の画像に変換している。次のような画像が得られる。
+
+![graph.png](images/knit-plan-graph/graph.png)
+
+この画像は、パイプラインの下流側にあたる validator "プラン" を指定してパイプラインを描かせたものである。
+図中の枠は "プラン"、 矢印はデータフローの向きを示している。
+
+この図では、上側に trainer 、下側に validator が描かれている。細い黄色い枠の範囲がひとつの "プラン" に対応している。その中にある、太い黄色い内枠が "プラン" の概要（アクティブ性、ID、イメージ、アノテーション）を示している。
+ID の背景に色がついている "プラン" は、`knit plan graph` に指定した "プラン"、すなわちパイプライン探索の起点である（この例では、 validator "プラン" がそれである）。
+
+細い外枠上にある緑の小さな点は、"プラン" の入出力を示している。緑の点と "プラン" 本体をつなぐ矢印の向きは入出力に対応している。やじりが内枠側に向いているものが入力、やじりが緑の点に向いているものが出力である。ファイルパスは矢印のラベルとして示されている。
+
+"プラン" 同士のつながりは、入出力同士をつなぐ太い矢印が示している。太い矢印のつながっていない入出力は、 `knit plan graph` の探索範囲にはその上流や下流の "プラン" が見つからなかったということである。
+
+`knit plan graph` の探索範囲は `--numbers` (あるいは `-n`)フラグで指定できる。たとえば、起点から 10 "プラン" までの範囲で探したければ
+
+```
+knit plan graph -n 10 PLAN_ID
+```
+
+とすればよい。`-n all` を指定すれば、探索範囲は無制限になる。
+
+起点プランから上流側だけを探索したいときは
+
+```
+knit plan graph --upstream PLAN_ID
+```
+
+とすればよい。また、下流側だけを探索したいときは、
+
+```
+knit plan graph --downstream PLAN_ID
+```
+
+とすればよい。
+
+#### コマンドラインフラグ: `knit plan graph`
+
+- `-n POSITIVE-INTEGER|"all"`, `--numbers POSITIVE-INTEGER|"all"`: 探索範囲を指定する。
+    - 正の整数か、`all` を指定する。
+        - 正の整数を指定した場合は、起点となる "プラン" からその数だけ離れたプランまでを探索する。
+        - `all` を指定した場合は、探索範囲が無制限となる。
+    - このフラグは省略できる。デフォルトは `3` である。
+- `-u`, `--upstream`:　上流側を探索する。
+    - 起点となる "プラン" から上流側、すなわち起点となる "プラン" の入力につながっている "プラン" を探索する。
+- `-d`, `--downstream`: 下流側を探索する。
+    - 起点となる "プラン" から下流側、すなわち起点となる "プラン" の出力につながっている "プラン" を探索する。
+
+`-u` も `-d` も両方とも指定しなかった場合には、`knit plan graph` は `-u -d` の両方を指定されたものとして振る舞う（つまり、上流・下流の両方を探索する）。
 
 ### プランにアノテーションを追加する、削除する
 
