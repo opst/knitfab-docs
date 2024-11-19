@@ -302,25 +302,27 @@ At this time, what is displayed in the console is the metadata of the registered
 
 ```json
 {
-    "knitId": "92c84171-16e9-47bb-8088-deee2a981d45",
+    "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f",
     "tags": [
         "format:mnist",
-        "knit#id:92c84171-16e9-47bb-8088-deee2a981d45",
-        "knit#timestamp:2024-10-23T06:15:50.39+00:00",
+        "knit#id:63685b22-f04b-478b-9fa0-9c0a4fd7314f",
+        "knit#timestamp:2024-11-19T05:24:36.964+00:00",
         "mode:training",
         "name:qmnist-train",
         "project:first-knitfab",
         "type:dataset"
     ],
     "upstream": {
-        "path": "/upload",
-        "tags": [],
+        "mountpoint": {
+            "path": "/upload",
+            "tags": []
+        },
         "run": {
-            "runId": "92a909be-9567-4578-a83c-4b61e9550f63",
+            "runId": "4079754d-cf73-4529-9a17-c4aad942d6cd",
             "status": "done",
-            "updatedAt": "2024-10-23T06:15:50.39+00:00",
+            "updatedAt": "2024-11-19T05:24:36.964+00:00",
             "plan": {
-                "planId": "7aaa8711-fed5-4a64-8543-11b082c132a6",
+                "planId": "f9631291-31c1-4d94-aa14-dbc17dc25464",
                 "name": "knit#uploaded"
             }
         }
@@ -783,7 +785,7 @@ Then, the information of the registered Plan should be displayed. It should have
 
 ```json
 {
-    "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+    "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
     "image": "localhost:30503/knitfab-first-train:v1.0",
     "entrypoint": [
         "python",
@@ -803,7 +805,8 @@ Then, the information of the registered Plan should be displayed. It should have
                 "mode:training",
                 "project:first-knitfab",
                 "type:dataset"
-            ]
+            ],
+            "upstreams": []
         }
     ],
     "outputs": [
@@ -813,14 +816,16 @@ Then, the information of the registered Plan should be displayed. It should have
                 "description:2 layer CNN + 2 layer Affine",
                 "project:first-knitfab",
                 "type:model"
-            ]
+            ],
+            "downstreams": []
         }
     ],
     "log": {
-        "Tags": [
+        "tags": [
             "project:first-knitfab",
             "type:log"
-        ]
+        ],
+        "downstreams": []
     },
     "active": true,
     "resources": {
@@ -844,11 +849,11 @@ You will receive console output similar to the following:
 ```json
 [
     {
-        "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
+        "runId": "c9441be1-438a-42bd-ab45-61763ea09c1d",
         "status": "running",
-        "updatedAt": "2024-10-23T06:48:07.861+00:00",
+        "updatedAt": "2024-11-19T05:25:23.911+00:00",
         "plan": {
-            "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+            "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
             "image": "localhost:30503/knitfab-first-train:v1.0",
             "entrypoint": [
                 "python",
@@ -870,7 +875,7 @@ You will receive console output similar to the following:
                     "project:first-knitfab",
                     "type:dataset"
                 ],
-                "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
+                "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f"
             }
         ],
         "outputs": [
@@ -881,15 +886,15 @@ You will receive console output similar to the following:
                     "project:first-knitfab",
                     "type:model"
                 ],
-                "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
+                "knitId": "5dfd676c-9932-42c8-8b49-7c24929200c9"
             }
         ],
         "log": {
-            "Tags": [
+            "tags": [
                 "project:first-knitfab",
                 "type:log"
             ],
-            "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
+            "knitId": "8e35f658-3328-44ae-9905-92983e1d5869"
         }
     }
 ]
@@ -921,15 +926,15 @@ Now, the following content should be written to the console.
 
 ```json
 {
-    "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
+    "runId": "c9441be1-438a-42bd-ab45-61763ea09c1d",
     "status": "done",
-    "updatedAt": "2024-10-23T07:14:15.732+00:00",
+    "updatedAt": "2024-11-19T05:49:20.525+00:00",
     "exit": {
         "code": 0,
         "message": ""
     },
     "plan": {
-        "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+        "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
         "image": "localhost:30503/knitfab-first-train:v1.0",
         "entrypoint": [
             "python",
@@ -951,7 +956,7 @@ Now, the following content should be written to the console.
                 "project:first-knitfab",
                 "type:dataset"
             ],
-            "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
+            "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f"
         }
     ],
     "outputs": [
@@ -962,15 +967,15 @@ Now, the following content should be written to the console.
                 "project:first-knitfab",
                 "type:model"
             ],
-            "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
+            "knitId": "5dfd676c-9932-42c8-8b49-7c24929200c9"
         }
     ],
     "log": {
-        "Tags": [
+        "tags": [
             "project:first-knitfab",
             "type:log"
         ],
-        "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
+        "knitId": "8e35f658-3328-44ae-9905-92983e1d5869"
     }
 }
 ```
@@ -1351,10 +1356,12 @@ Accuracy (at 60000 images): 0.95985
 Accuracy: 0.95985
 ```
 
-Tutorial 3: Exploring Lineage
+Tutorial 3: Overview
 ---------------
 
-Finally, let's examine the lineage generated by the experiments so far.
+Finally, let's examine whole of the lineage and the pipeline made with the experiments so far.
+
+### Lineage
 
 You can investigate the entire lineage related to a Data using the following command.
 
@@ -1362,12 +1369,32 @@ You can investigate the entire lineage related to a Data using the following com
 knit data lineage -n all ${KNIT_ID} | dot -T png -o ./lineage-graph.png
 ```
 
-
 The `knit data lineage` command generates a lineage graph in dot format, starting from the specified `${KNIT_ID}`.
 
-By passing this command to the `dot` command of graphviz and exporting it as a png file, you can observe the lineage graph as the following image.
+By passing this command to the `dot` command of graphviz and exporting it as a PNG file, you can observe the lineage graph as the following image.
 
 ![lineage graph](images/lineage.png)
+
+You can see Data flow over Runs with this image.
+
+### Pipeline
+
+As we have seen in the previous tutorial, Machine Learning task pipeline is composed of Plans in Knitfab.
+
+To investigate the entire pipline made with the tutorials, use the following command
+
+```
+knit plan graph -n all ${PLAN_ID} | dot -T png -o ./plan-graph.p
+```
+
+`knit plan graph` generates "Plan graph" which visualizes connectivity of Plans related with the specified Plan, in dot format.
+
+Passing the standard output of the command to `dot` command of graphviz and exporting a PNG file, you can observe the Plan Graph as the following image.
+
+![plan-graph](images/plan-graph.png)
+
+While lineage graphs show flow of Machine Learing tasks which *have been executed* as dependency between Data and Runs, Plan graphs show flow of Machine Learning tasks which *will be executed* on adding new Data as dependency between Plans.
+
 
 Summary
 -------
