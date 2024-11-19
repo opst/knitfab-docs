@@ -996,11 +996,6 @@ By doing this, the content of the outputted Data will be written to the director
 Tutorial 2: Evaluating Model Performance
 ------------------
 
-### Required Tools
-
-In this section, we will use `dot` (graphviz).
-Please install it if necessary.
-
 ### Verification of the Evaluation Script
 
 You can use `./scripts/validation.py` to perform inference using the model. You can also build a command launch image using the `validation/Dockerfile`.
@@ -1360,6 +1355,11 @@ Tutorial 3: Overview
 ---------------
 
 Finally, let's examine whole of the lineage and the pipeline made with the experiments so far.
+
+### Required Tools
+
+In this section, we will use `dot` (graphviz).
+Please install it if necessary.
 
 ### Lineage
 
