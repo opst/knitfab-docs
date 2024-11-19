@@ -322,25 +322,27 @@ knit data push -t format:mnist -t mode:training -t type:dataset -t project:first
 
 ```json
 {
-    "knitId": "92c84171-16e9-47bb-8088-deee2a981d45",
+    "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f",
     "tags": [
         "format:mnist",
-        "knit#id:92c84171-16e9-47bb-8088-deee2a981d45",
-        "knit#timestamp:2024-10-23T06:15:50.39+00:00",
+        "knit#id:63685b22-f04b-478b-9fa0-9c0a4fd7314f",
+        "knit#timestamp:2024-11-19T05:24:36.964+00:00",
         "mode:training",
         "name:qmnist-train",
         "project:first-knitfab",
         "type:dataset"
     ],
     "upstream": {
-        "path": "/upload",
-        "tags": [],
+        "mountpoint": {
+            "path": "/upload",
+            "tags": []
+        },
         "run": {
-            "runId": "92a909be-9567-4578-a83c-4b61e9550f63",
+            "runId": "4079754d-cf73-4529-9a17-c4aad942d6cd",
             "status": "done",
-            "updatedAt": "2024-10-23T06:15:50.39+00:00",
+            "updatedAt": "2024-11-19T05:24:36.964+00:00",
             "plan": {
-                "planId": "7aaa8711-fed5-4a64-8543-11b082c132a6",
+                "planId": "f9631291-31c1-4d94-aa14-dbc17dc25464",
                 "name": "knit#uploaded"
             }
         }
@@ -735,7 +737,7 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
 
 ```json
 {
-    "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+    "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
     "image": "localhost:30503/knitfab-first-train:v1.0",
     "entrypoint": [
         "python",
@@ -755,7 +757,8 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                 "mode:training",
                 "project:first-knitfab",
                 "type:dataset"
-            ]
+            ],
+            "upstreams": []
         }
     ],
     "outputs": [
@@ -765,14 +768,16 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                 "description:2 layer CNN + 2 layer Affine",
                 "project:first-knitfab",
                 "type:model"
-            ]
+            ],
+            "downstreams": []
         }
     ],
     "log": {
-        "Tags": [
+        "tags": [
             "project:first-knitfab",
             "type:log"
-        ]
+        ],
+        "downstreams": []
     },
     "active": true,
     "resources": {
@@ -796,11 +801,11 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
 ```json
 [
     {
-        "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
+        "runId": "c9441be1-438a-42bd-ab45-61763ea09c1d",
         "status": "running",
-        "updatedAt": "2024-10-23T06:48:07.861+00:00",
+        "updatedAt": "2024-11-19T05:25:23.911+00:00",
         "plan": {
-            "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+            "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
             "image": "localhost:30503/knitfab-first-train:v1.0",
             "entrypoint": [
                 "python",
@@ -822,7 +827,7 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                     "project:first-knitfab",
                     "type:dataset"
                 ],
-                "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
+                "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f"
             }
         ],
         "outputs": [
@@ -833,15 +838,15 @@ knit plan apply ./knitfab-first-train.v1.0.plan.yaml
                     "project:first-knitfab",
                     "type:model"
                 ],
-                "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
+                "knitId": "5dfd676c-9932-42c8-8b49-7c24929200c9"
             }
         ],
         "log": {
-            "Tags": [
+            "tags": [
                 "project:first-knitfab",
                 "type:log"
             ],
-            "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
+            "knitId": "8e35f658-3328-44ae-9905-92983e1d5869"
         }
     }
 ]
@@ -873,15 +878,15 @@ knit run show ${RUN_ID}
 
 ```json
 {
-    "runId": "71720a30-2eb9-498f-b71d-aeaa4d84f77d",
+    "runId": "c9441be1-438a-42bd-ab45-61763ea09c1d",
     "status": "done",
-    "updatedAt": "2024-10-23T07:14:15.732+00:00",
+    "updatedAt": "2024-11-19T05:49:20.525+00:00",
     "exit": {
         "code": 0,
         "message": ""
     },
     "plan": {
-        "planId": "b6ee05b7-5d40-4d52-9f70-5acc5d308ee9",
+        "planId": "da6c4451-4886-4d78-9c20-aede6b288d22",
         "image": "localhost:30503/knitfab-first-train:v1.0",
         "entrypoint": [
             "python",
@@ -903,7 +908,7 @@ knit run show ${RUN_ID}
                 "project:first-knitfab",
                 "type:dataset"
             ],
-            "knitId": "92c84171-16e9-47bb-8088-deee2a981d45"
+            "knitId": "63685b22-f04b-478b-9fa0-9c0a4fd7314f"
         }
     ],
     "outputs": [
@@ -914,15 +919,15 @@ knit run show ${RUN_ID}
                 "project:first-knitfab",
                 "type:model"
             ],
-            "knitId": "9846595a-4429-4b4c-97fc-70662b5a11de"
+            "knitId": "5dfd676c-9932-42c8-8b49-7c24929200c9"
         }
     ],
     "log": {
-        "Tags": [
+        "tags": [
             "project:first-knitfab",
             "type:log"
         ],
-        "knitId": "5e7b3021-bead-4990-8ef4-c73050fd3536"
+        "knitId": "8e35f658-3328-44ae-9905-92983e1d5869"
     }
 }
 ```
@@ -942,11 +947,6 @@ knit data pull -x ${KNIT_ID} ./knitfab/out/model
 
 チュートリアル2: モデルの性能を評価する
 ------------------
-
-### 必要なツール
-
-このセクションでは、新しく `dot` (graphviz) を利用する。
-必要に応じインストールしてほしい。
 
 ### 評価スクリプトの動作確認
 
@@ -1292,10 +1292,19 @@ Accuracy (at 60000 images): 0.95985
 Accuracy: 0.95985
 ```
 
-チュートリアル3: リネージを見渡す
+チュートリアル3: 全体を見渡す
 ---------------
 
-最後に、ここまでの実験によって生成されたリネージを確認しよう。
+最後に、ここまでの実験によって生成してきたリネージや、"プラン" によって構築されたパイプラインを確認しよう。
+
+### 必要なツール
+
+このセクションでは、新しく `dot` (graphviz) を利用する。
+必要に応じインストールしてほしい。
+
+### リネージを見渡す
+
+リネージを確認しよう。
 
 ある "データ" に関するリネージ全体は
 
@@ -1307,9 +1316,31 @@ knit data lineage -n all ${KNIT_ID} | dot -T png -o ./lineage-graph.png
 
 `knit data lineage` は、指定した `${KNIT_ID}` を起点にして dot フォーマットでリネージグラフを書き出すコマンドである。
 
-これを grapphviz の `dot` コマンドに通して、png ファイルとして書き出させると、次のような画像としてリネージグラフを観察できる。
+これを grapphviz の `dot` コマンドに通して、PNG ファイルとして書き出させると、次のような画像としてリネージグラフを観察できる。
 
-![lineage graph](images/lineage.png)
+![lineage graph](images/lineage-graph.png)
+
+"ラン" に対する "データ" の入出力の流れが見て取れるだろう。
+
+### パイプラインを見渡す
+
+これまでのチュートリアルで見てきた通り、Knitfab では、複数の "プラン" の間の依存関係から機械学習タスクパイプラインが構成される。
+
+ある "プラン" に関わるパイプライン全体は
+
+```
+knit plan graph -n all ${PLAN_ID} | dot -T png -o ./plan-graph.png
+```
+
+で調べることができる。
+
+`knit plan graph` は指定した `${PLAN_ID}` を起点にして、dot フォーマットで "プラン" のつながりを示した図である "プラングラフ" を書き出すコマンドである。
+
+これを grapphviz の `dot` コマンドに通して、PNG ファイルとして書き出させると、次のような画像としてプラングラフを観察できる。
+
+![plan-graph](images/plan-graph.png)
+
+リネージグラフが *実施された* 機械学習タスクの流れを "データ" と "ラン" の関係として表現しているのに対して、このプラングラフは今後新しく "データ" が増えた際に *実施されるであろう* 機械学習タスクの流れを、"プラン" の関係として示している。
 
 まとめ
 -----
