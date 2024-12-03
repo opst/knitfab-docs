@@ -588,7 +588,7 @@ resouces:
 knit run find -p ${Content Collage Pipeline の Plan ID}
 ```
 
-> [!TIPS]
+> [!TIP]
 >
 > Content Collage Pipeline にあたる Plan ID は次のようにして調べることができます。
 >
