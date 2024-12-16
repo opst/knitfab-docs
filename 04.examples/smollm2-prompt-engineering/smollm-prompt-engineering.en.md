@@ -107,9 +107,9 @@ docker tag smollm2-evaluation:1.0 ${REPOSITORY}/smollm2-evaluation:1.0
 docker push ${REPOSITORY}/smollm2-evaluation:1.0
 ```
 
-### Plan 定義を記述する
+### Writing the Plan Definition
 
-前節で定義したイメージを利用する Plan を定義します。
+Define the plan using the image created in the previous step.
 
 ```yaml:smollm2-evaluation.plan.yaml
 image: ${REPOSITORY}/smollm2-evaluation:1.0
