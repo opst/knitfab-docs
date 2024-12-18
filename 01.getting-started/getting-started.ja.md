@@ -584,7 +584,7 @@ active: true
 # There can be other resources. For them, ask your administrator.
 
 # (advanced note: These values are passed to container.resource.limits in kubernetes.)
-resouces:
+resources:
 
   # cpu (optional; default = 1):
   #   Specify the CPU resource requirements for this Plan.
@@ -710,7 +710,7 @@ active: true
 # There can be other resources. For them, ask your administrator.
 
 # (advanced note: These values are passed to container.resource.limits in kubernetes.)
-resouces:
+resources:
 
   # cpu (optional; default = 1):
   #   Specify the CPU resource requirements for this Plan.
@@ -1133,7 +1133,7 @@ active: true
 # There can be other resources. For them, ask your administrator.
 
 # (advanced note: These values are passed to container.resource.limits in kubernetes.)
-resouces:
+resources:
 
   # cpu (optional; default = 1):
   #   Specify the CPU resource requirements for this Plan.
@@ -1250,7 +1250,7 @@ active: true
 # There can be other resources. For them, ask your administrator.
 
 # (advanced note: These values are passed to container.resource.limits in kubernetes.)
-resouces:
+resources:
   # cpu (optional; default = 1):
   #   Specify the CPU resource requirements for this plan.
   #   This value means "how many cores" the plan will use.
