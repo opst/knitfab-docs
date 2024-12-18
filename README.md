@@ -18,6 +18,6 @@ This section contains references for Knitfab CLI tool, `knit`.
 
 This section contains manuals to install, operation and extend Knitfab.
 
-#### 04.examples
+### 04.examples
 
 This section contains usage examples of Knitfab.
