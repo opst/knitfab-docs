@@ -213,7 +213,7 @@ log:
 
 active: true
 
-resouces:
+resources:
   cpu: 1
   memory: 1Gi
 
@@ -345,7 +345,7 @@ log:
 
 active: true
 
-resouces:
+resources:
   cpu: 1
   memory: 1Gi
 
@@ -478,7 +478,7 @@ log:
 
 active: true
 
-resouces:
+resources:
   cpu: 1
   memory: 5Gi
 
@@ -661,7 +661,7 @@ log:
 
 active: true
 
-resouces:
+resources:
   cpu: 1
   memory: 1Gi
 
