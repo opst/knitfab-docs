@@ -132,36 +132,36 @@ chmod +x ./installer.sh
 Regarding the downloaded installer,
 
 ```
-./installer.sh --prepare
+./installer.sh --prepare -n ${NAMESPACE}
 ```
+
+`${NAMESPACE}` is an optional parameter that allows you to specify the namespace for the Kubernetes cluster where Knitfab will be installed. Please choose a name according to the Kubernetes naming conventions, which only allow lowercase alphanumeric characters and hyphens ("-"). The name must start and end with an alphanumeric character.
 
 When you run it, the installation settings for Knitfab will be generated in the `./knitfab_install_settings` directory.
 **This configuration is described as "not persisting the information managed by Knitfab".**
 Therefore, if you delete or restart the pods that make up Knitfab, there may be inconsistencies or loss of information.
 It is recommended to use it only temporarily.
 
-#### Installing
-
-Use the created installation settings to actually install Knitfab.
-
-```
-./installer.sh -n ${NAMESPACE} -s ./knitfab_install_settings
-```
-
-`${NAMESPACE}` is an optional parameter that allows you to specify the namespace for the Kubernetes cluster where Knitfab will be installed. Please choose a name according to the Kubernetes naming conventions, which only allow lowercase alphanumeric characters and hyphens ("-"). The name must start and end with an alphanumeric character.
-
-The script will proceed with the installation of the necessary components in order.
-In addition, a directory containing connection settings for this Knitfab will be generated at `./knitfab_install_settings/handouts`.
-
-If the above completes without any errors, the installation is complete.
-
 > [!Note]
 >
 > If you want to use a kubeconfig other than the default kubeconfig, you can provide it with the `--kubeconfig` flag.
 >
 > ```
-> ./installer.sh --kubeconfig ${KUBECONFIG} -n ${NAMESPACE} -s ./knitfab_install_settings
+> ./installer.sh --prepare --kubeconfig ${KUBECONFIG} -n ${NAMESPACE}
 > ```
+
+#### Installing
+
+Use the created installation settings to actually install Knitfab.
+
+```
+./installer.sh --install -s ./knitfab_install_settings
+```
+
+The script will proceed with the installation of the necessary components in order.
+In addition, a directory containing connection settings for this Knitfab will be generated at `./knitfab_install_settings/handouts`.
+
+If the above completes without any errors, the installation is complete.
 
 ### Uninstalling
 
@@ -189,7 +189,7 @@ For example:
 ```
 mkdir -p ~/.local/bin
 
-VERSION=v1.0.0  # or release which you desired
+VERSION=v1.5.1  # or release which you desired
 OS=linux        # or windows, darwin
 ARCH=arm64      # or amd64
 
