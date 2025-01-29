@@ -1,0 +1,583 @@
+### Example
+# Incremetal Train and Manage Email Spam Detection Machine Learning Models with Knitfab
+---
+This example help you build a simple Spam Email Detection with incremental training in Knitfab. With Knitfab you can easily automate and manage the models and their behavior across run.
+
+### Overview
+The following diagram shows model and data nodes to that you will build as an incremental machine learning (ML) jobs in Knitfab. 
+- __Initial Training Data:__ The foundational dataset used to train the very first version of the ML model.
+- __Initial Train:__ The process of training the initial ML model using the provided training data.
+- __Initial Model:__ The first version of the ML model generated after the initial training phase.
+- __New Training Data:__ Fresh data that is used to incrementally improve the existing model. This could include new data points, updated labels, or corrections to existing data.
+- __Incremental Train:__ The process of retraining the existing model with the new training data. This allows the model to learn from new information and potentially improve its performance.
+- __Updated Model:__ The refined version of the machine learning model after undergoing incremental training.
+- __Validate:__ The process of independently assessing the performance of the model on a separate hold-out dataset to ensure its generalization ability and prevent overfitting.
+- __Metrics:__ The quantitative measures used to evaluate the model's performance, such as accuracy, precision, recall, F1-score, etc.
+```mermaid
+flowchart LR
+    A((Initial Training Data)) --> B[Initial Train]
+    B --> C((Initial Model))
+    C --> D[Validate]
+    D --> E((Metrics))
+    F((New Training Data)) --> G[Incremental Train]
+    C --> G
+    G --> H((Updated Model))
+    H --> I[Validate]
+    I --> J((Metrics))
+```
+### Prerequisites
+Before embarking on this example, ensure you have met the following prerequisites:
+
+**Knitfab Setup:**
+
+- **Local Environment:** If you intend to use Knitfab in a local environment, follow the installation instructions provided in [01.getting-started](#../01.getting-started/getting-started.en.md).
+- **AWS Environment:** For utilizing Knitfab on AWS, refer to the documentation available here: https://github.com/opst/knitfab-for-aws/blob/develop/beta/docs/install-guide/install-guide.ja.md (Please note that this documentation is in Japanese)
+
+**Additional Tools:**
+
+- **Knit CLI:** Follow the installation instructions in [01.getting-started](#../01.getting-started/getting-started.en.md) to set up the Knit CLI.
+- **Knitfab Environment Initialization:** Refer to [01.getting-started](#../01.getting-started/getting-started.en.md) for guidance on initializing your Knitfab environment using `knit init`.
+- **Software Installations:** Ensure you have `Docker` installed on your system. Additionally, having `kubectl` installed is optional but recommended.
+
+### Repository
+You can get the necessary files/directories from the repository:
+```bash
+git clone https://github.com/opst/knitfab-docs.git
+```
+The following files and directories can be found within the `04.examples/scam-detection` directory: 
+- **in/dataset:** Contains the dataset use for training and validation.
+- **scipts:** Houses the training and validation Python scripts, as well as the Dockerfile necessary for deploying the Knitfab plan.
+- **plans:** Contains the Knitfab plan YAML templates.
+
+### Task
+- [Step 0 (Optional): Train and validate ML model on local environment.](#step-0-optional-train-and-validate-ml-model-on-local-environment)
+- [Step 1: Build and push docker image to Knifab.](#step-1-build-and-push-docker-image-to-knifab)
+- [Step 2: Initial training.](#step-2-initial-training)
+- [Step 3: Model validation.](#step-3-model-validation)
+- [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
+- [Step 5: Clean up.](#step-5-clean-up)
+
+## Step 0 (Optional): Train and validate ML model on local environment
+You can perform the incremental training of the Naive Bayes Classifier for Spam Email Detection as described in the following procedure. We will use the Python scripts in the `/scripts` directory for this purpose. This example is intended to help you familiar with building and managing ML models in Knitfab, so we will not discuss about the detail processes in python scipts. 
+
+**To train and validate the ML model**
+1. **Initial Training:**
+- Run the script to train the initial model:
+```bash
+python ./scripts/initial-train/initial-train.py \
+       --dataset ./in/dataset/initial \ 
+       --save-to out/model
+```
+- This script trains the model using the initial dataset located at `./in/dataset/initial`.
+- The trained model will be saved as `pipeline.plk` in the `out/model` directory.
+### <span id="step-0-2"></span>
+2. **Model Validation:**
+- Validate the model's performance using the validation dataset:
+```bash
+python ./scripts/validate/validate.py \
+       --dataset ./in/dataset/validate \
+       --save-to out/metrics \
+       --model out/model
+```
+- The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
+### <span id="step-0-3"></span>
+3. **Performance Analysis:**
+- Open the `metrics.json` file and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
+4. **Incremental Training:**
+Run the script with the incremental dataset:
+```bash
+python ./scripts/incremental-train/incremental-train.py \
+       --dataset ./in/dataset/incremental \
+       --model out/model \
+       --save-to out/model
+```
+5. **Re-validation:**
+- Repeat steps [2](#step-0-2) and [3](#step-0-3) to validate the performance of the updated model and analyze the new `metrics.json` file.
+
+## Step 1: Build and push docker image to Knifab
+This step involves creating Docker images for each of the training and validation components of the spam detection model. These images will be subsequently pushed to the Knifab registry for use in the training and validation processes within the Knitfab platform.
+
+**To Build Docker Images**
+1. **Build `spam-detection-initial-train` Image:**
+```bash
+docker build -t spam-detection-initial-train:v1.0 \
+             -f scripts/initial-train/Dockerfile \
+             ./scripts/initial-train
+```
+The `spam-detection-initial-train` image is responsible for training the first version of the model.
+
+2.  **(Optional) Verify `spam-detection-initial-train` Image:**
+```bash
+docker run --rm -it \
+    -v "$(pwd)/in/dataset/initial:/in/dataset" \
+    -v "$(pwd)/out/model:/out/model" \
+    spam-detection-initial-train:v1.0
+```
+This command runs the `spam-detection-initial-train:v1.0` image in an interactive mode.
+- The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
+- This allows you to test the image locally and ensure it functions as expected.
+3. **Build `spam-detection-validate` Image:**
+```bash
+docker build -t spam-detection-validate:v1.0 \
+             -f scripts/validate/Dockerfile \
+             ./scripts/validate
+```
+The `spam-detection-validate` image is used to evaluate the performance of the trained model and output metrics in json format (e.g., accuracy, precision, recall).
+
+4.  **(Optional) Verify `spam-detection-validate` Image:**
+```bash
+docker run --rm -it \
+    -v "$(pwd)/in/dataset/validate:/in/dataset" \
+    -v "$(pwd)/out/model:/in/model" \
+    -v "$(pwd)/out/metrics:/out/metrics" \
+    spam-detection-validate:v1.0
+```
+5. **Build `spam-detection-incremental-train` Image:**
+```bash
+docker build -t spam-detection-incremental-train:v1.0 \
+             -f scripts/incremental-train/Dockerfile \
+             ./scripts/incremental-train
+```
+The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
+
+6.  **(Optional) Verify `spam-detection-incremental-train` image:**
+```bash
+docker run --rm -it \
+    -v "$(pwd)/in/dataset/incremental:/in/dataset" \
+    -v "$(pwd)/out/model:/in/model" \
+    -v "$(pwd)/out/model:/out/model" \
+    spam-detection-incremental-train:v1.0
+```
+
+**To Push Docker Images to Knitfab**
+
+1. **Tag Images with Registry URI:**
+
+Before pushing the images to the Knifab registry, you need to tag them with the correct registry URI. This allows Docker to identify the target registry for the push operation.
+```bash
+docker tag ${docker_image} \
+           ${registry_uri}/${docker_image}
+```
+Replace:
+
+- `${docker_image}` with the name of each built image (e.g., `spam-detection-initial-train:v1.0`, `spam-detection-validate:v1.0`, `spam-detection-incremental-train:v1.0`).
+- `${registry_uri}` with the actual URI of your Knifab registry (e.g., `172.16.39.135:30503`).
+
+2. **Push Images to Knifab Registry:**
+
+Now, push the tagged images to the Knifab registry:
+```bash
+docker tag ${docker_image} \
+           ${registry_uri}/${docker_image}
+```
+Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
+
+## Step 2: Initial training
+This step involves the initial training of the machine learning model using the preprocessed data.
+1. **Push Traning Data to Knitfab:**
+```bash
+knit data push -t mode:initial-train \
+               -t type:dataset \
+               -t project:spam-detection \
+               -n ./in/dataset/initial
+```
+This command pushes the initial training dataset located at `./in/dataset/initial` to the Knitfab platform.
+
+The `-t` flags add tags (`mode:initial-train`, `type:dataset`, `project:spam-detection`) allowing Knitfab to identify the dataset for the later traning process.
+
+2. **Generate YAML tempelate:**
+- Option 1: Create a Blank Template:
+```bash
+knit plan template --scratch > ./plan/spam-detection-initial-train.v1.0.yaml
+```
+This creates a new, empty YAML template file named `spam-detection-initial-train.v1.0.yaml` in the `./plan` directory. You will need to manually populate this template with the necessary configuration details.
+- Option 2: Generate Template from Docker Image:
+```bash
+docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
+    knit plan template > ./plan/spam-detection-initial-train.v1.0.yaml
+```
+This command generates a YAML template based on the Docker image `spam-detection-initial-train:v1.0`.
+\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+\* This approach can help automate some of the configuration process.
+
+3. **Modify YAML Template:**
+- Crucial Modifications:
+  - `image`: 
+    - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
+    - This ensures the image is pulled from the local registry.
+  - `inputs`: 
+    - Define the input dataset by specifying the tags used during the knit data push command: `project:spam-detection`, `type:dataset`, `mode:initial-train`.
+    - This instructs Knitfab to link the correct dataset to the training process.
+  - `outputs`, `log`: 
+    - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
+    - This facilitates better organization and filtering of outputs and logs within the Knitfab system.
+
+- Other Important Considerations:
+  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+
+Ensure the modified YAML template adheres to the structure and content of the YAML file located in the `plan` directory of the cloned Git repository.
+
+4. **Apply the YAML Template:**
+```bash
+initial_train_plan=$(knit plan apply ./plan/spam-detection-initial-train.v1.0.yaml)
+```
+This command applies the YAML template to create a new Knitfab Plan.
+
+- The `initial_train_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+
+5. **Extract the Plan Id:**
+```bash
+initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
+```
+This command extracts the unique Id of the created Plan from the JSON output.
+
+6. **Confirm the Run Status:**
+```bash
+knit run find -p $initial_train_plan_id
+```
+This command displays the training run associated with the specified Plan Id. Wait until the `status` changes to `done` to indicate that the initial training has completed successfully.
+
+7. **Retrieve Model Information:**
+- Get Run Information:
+```bash
+initial_train_run=$(knit run find -p $initial_train_plan_id)
+```
+- Extract Run Outputs:
+```bash
+initial_train_outputs=$(echo "$initial_train_run" | jq -r '.[-1].outputs')
+```
+
+- Get Model Knit Id:
+```bash
+initial_train_model_knit_id=$(echo "$initial_train_outputs" | jq -r '.[0].knitId')
+```
+This series of commands retrieves the Knit Id associated with the trained model artifact generated by the training run.
+
+8. **(Optional) Review the Run Log:**
+- Get Run Id:
+```bash
+initial_train_run_id=$(echo "$initial_train_run" | jq -r '.[-1].runId')
+```
+- Show Run Log:
+```bash
+knit run show --log $initial_train_run_id
+```
+
+9. **(Optional) Download the Model:**
+```bash
+knit data pull -x $initial_train_model_knit_id ./out/model
+```
+This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
+
+## Step 3: Model validation
+After training, we will validate the model to evaluate its performance and check for any issues.
+
+1. **Push Validation Data to Knitfab:**
+```bash
+knit data push -t mode:validate \
+               -t type:dataset \
+               -t project:spam-detection \
+               -n ./in/dataset/validate
+```
+We add tags (`mode:validate`, `type:dataset`, `project:spam-detection`) to help the validate plan identify the dataset.
+
+2. **Generate YAML tempelate:**
+- Option 1: Create a Blank Template:
+```bash
+knit plan template --scratch > ./plan/spam-detection-validate.v1.0.yaml
+```
+- Option 2: Generate Template from Docker Image:
+```bash
+docker save ${registry_uri}/spam-detection-validate:v1.0 | \
+    knit plan template > ./plan/spam-detection-validate.v1.0.yaml
+```
+\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+
+3. **Modify YAML Template:**
+- Crucial Modifications:
+  - `image`: 
+    - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
+  - `inputs`: 
+    - Dataset: Specify the input dataset by defining the following tags:
+      - `project:spam-detection`
+      - `type:dataset`
+      - `mode:validate`
+    - Model: Specify the input model by defining the following tags:
+      - `project:spam-detection`
+      - `type:model`.
+  - `outputs`, `log`: 
+    - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
+
+- Other Important Considerations:
+  - Resource Allocation: Define the required resources for the validation process (e.g., CPU, memory, GPU).
+
+Ensure the modified YAML template adheres to the structure and content of the YAML file located in the `plan` directory of the cloned Git repository.
+
+4. **Apply the YAML Template:**
+```bash
+validate_plan=$(knit plan apply ./plan/spam-detection-validate.v1.0.yaml)
+```
+- The `validate_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+
+5. **Extract the Plan Id:**
+```bash
+validate_plan_id=$(echo "$validate_plan" | jq -r '.planId')
+```
+
+6. **Confirm the Run Status:**
+```bash
+knit run find -p $validate_plan_id
+```
+Wait until the `status` changes to `done` to indicate that the validation has completed successfully.
+
+7. **(Optional) Retrieve Validation Metrics Information:**
+- Get Run Information:
+```bash
+validate_run=$(knit run find -p $validate_plan_id)
+```
+- Extract Run Outputs:
+```bash
+validate_outputs=$(echo "$validate_run" | jq -r '.[-1].outputs')
+```
+
+- Get Validation Metrics Knit Id:
+```bash
+validate_metrics_knit_id=$(echo "$validate_outputs" | jq -r '.[0].knitId')
+```
+
+8. **(Optional) Review the Run Log:**
+- Get Run Id:
+```bash
+validate_run_id=$(echo "$validate_run" | jq -r '.[-1].runId')
+```
+- Show Run Log:
+```bash
+knit run show --log $validate_run_id
+```
+
+9. **(Optional) Download the Metrics:**
+```bash
+knit data pull -x $validate_metrics_knit_id ./out/metric
+```
+This command downloads the validation metrics artifact from the Knitfab platform and stores it in the `./out/metric` directory.
+
+## Step 4: Incremental training and validation
+Once the initial training and validation are complete, we will perform incremental training using new data, followed by further validation of the updated model.
+
+**Train and Update Initial Model with New Data**
+1. **Push New Traning Data to Knitfab:**
+```bash
+knit data push -t mode:incremental-train \
+               -t type:dataset \
+               -t project:spam-detection \
+               -n ./in/dataset/incremental
+```
+We add tags (`mode:incremental-train`, `type:dataset`, `project:spam-detection`) to help the incremental training plan identify the dataset.
+
+2. **Generate YAML tempelate:**
+- Option 1: Create a Blank Template:
+```bash
+knit plan template --scratch > ./plan/spam-detection-incremental-train.v1.0.yaml
+```
+- Option 2: Generate Template from Docker Image:
+```bash
+docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
+    knit plan template > ./plan/spam-detection-incremental-train.v1.0.yaml
+```
+\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+
+3. **Modify YAML Template:**
+- Crucial Modifications:
+  - `image`: 
+    - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
+  - `inputs`: 
+    - Dataset: Specify the input dataset by defining the following tags:
+      - `project:spam-detection`
+      - `type:dataset`
+      - `mode:incremental-train`
+    - Model: Specify the input model by defining the following tags:
+      - `project:spam-detection`
+      - `type:model`.
+      - `mode:incremental-train`
+    <br>
+    > **Important Note:**
+    >
+    > - Ensure the `mode:incremental-train` tag is included in the input model sections.
+    > - Failure to include this tag will result in an error during the Knitfab plan execution.
+  - `outputs`, `log`: 
+    - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
+
+- Other Important Considerations:
+  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+
+Ensure the modified YAML template adheres to the structure and content of the YAML file located in the `plan` directory of the cloned Git repository.
+
+4. **Apply the YAML Template:**
+```bash
+incremental_train_plan=$(knit plan apply ./plan/spam-detection-incremental-train.v1.0.yaml)
+```
+- The `incremental_train_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+
+5. **Extract the Plan Id:**
+```bash
+initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
+```
+This command extracts the unique Id of the created Plan from the JSON output.
+
+6. **Add `mode:incremental-train` Tag to the Initial Model:**
+
+The model generated from the initial training currently lacks the necessary tag for the incremental training process.
+
+To address this, we will execute the following command:
+
+```bash
+knit data tag --add mode:incremental-train $initial_train_model_knit_id
+```
+
+This command will add the required `mode:incremental-train` tag to the initial model, and trigger a new run under the incremental train plan.
+
+7. **Confirm the Run Status:**
+```bash
+knit run find -p $incremental_train_plan_id
+```
+Wait until the `status` changes to `done` to indicate that the incremental training has completed successfully.
+
+8. **Retrieve Model Information:**
+- Get Run Information:
+```bash
+incremental_train_run=$(knit run find -p $incremental_train_plan_id)
+```
+- Extract Run Outputs:
+```bash
+incremental_train_outputs=$(echo "$incremental_train_run" | jq -r '.[-1].outputs')
+```
+
+- Get Model Knit Id:
+```bash
+incremental_train_model_knit_id=$(echo "$incremental_train_outputs" | jq -r '.[0].knitId')
+```
+This series of commands retrieves the Knit Id associated with the trained model artifact generated by the training run.
+
+8. **(Optional) Review the Run Log:**
+- Get Run Id:
+```bash
+incremental_train_run_id=$(echo "$incremental_train_run" | jq -r '.[-1].runId')
+```
+- Show Run Log:
+```bash
+knit run show --log $incremental_train_run_id
+```
+
+9. **(Optional) Download the Model:**
+```bash
+knit data pull -x $incremental_train_model_knit_id ./out/model
+```
+This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
+
+**Validate the Updated Model**
+
+0. **Auto-Run of Validation Plan:**
+
+Knitfab will automatically trigger a new run under the validation plan, recognizing the output model from the incremental training process.
+
+1. **Review the Validation Run and Metrics:**
+
+Repeat steps **6-9** from the ["Model validation"](#step-3-model-validation) section to:
+
+- View the run log of the validation run.
+- Download the metrics artifact for analysis.
+
+## Step 5: Clean up
+**Remove `mode:incremental-train` Tag from Initial Model:**
+
+Knitfab is an automated platform that manages training processes and their associated artifacts.
+
+When a new dataset is registered, the initial model with the tag `mode:incremental-train` will be automatically recognized by the incremental training plan, triggering a new training run.
+
+To prevent this unintended behavior, execute the following command to remove the `mode:incremental-train` tag from the initial model:
+
+```bash
+knit data tag --remove mode:incremental-train $initial_train_model_knit_id
+```
+
+**To Remove a Run:**
+> **Important Note:**
+> - You can only delete a run if it is **already stopped** and there are **no other runs dependent on it**.
+> - Deleting a run will also **permanently delete any artifacts** generated by that run (e.g., models, metrics).
+
+
+> [!Warning]
+>
+> Deleting a run is an **irreversible** action.
+
+```bash
+knit run rm ${run_id}
+```
+Replace `${run_id}` with the unique Id of the run you want to delete (e.g., `$initial_train_run_id`, `$validate_run_id`, `$incremental_train_run_id`).
+
+**To Deactivate a Plan:**
+If you no longer require a registered plan, use the following command to deactivate it:
+
+```bash
+knit plan active no ${plan_id}
+```
+Replace `${plan_id}` with the unique Id of the plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
+
+**To Remove the Uploaded Dataset**
+To remove an uploaded dataset in Knitfab, you must delete the associated upload run.
+
+1. **Find the Dataset Run Id:**
+- List Datasets:
+  - Execute the following command to list all datasets with the tag `project:spam-detection`:
+```bash
+knit data find -t project:spam-detection
+```
+  - Example Output:
+```json
+{
+  "knitId": "de3cec00-d723-40e3-b299-536bacdbbe44",
+  "tags": [
+    "knit#id:de3cec00-d723-40e3-b299-536bacdbbe44",
+    "knit#timestamp:2025-01-27T10:14:28.237+00:00",
+    "mode:initial-train",
+    "name:initial",
+    "project:spam-detection",
+    "type:dataset"
+  ],
+  "upstream": {
+    "mountpoint": {
+      "path": "/upload",
+      "tags": []
+    },
+    "run": {
+      "runId": "596103be-a880-4a02-aea8-adfdbef1020b", 
+      "status": "done",
+      "updatedAt": "2025-01-27T10:14:28.237+00:00",
+      "plan": {
+        "planId": "cde9c9c3-a604-4057-9102-ed5f85d4afc7",
+        "name": "knit#uploaded"
+      }
+    }
+  },
+  ...
+}
+```
+- Locate the Upload Run:
+  - In the output, identify the dataset entry where the `upstream.mountpoint.path` is equal to `/upload`.
+  - Extract the corresponding `upstream.run.runId` value.
+
+2. Remove the Run:
+> [!Warning]
+>
+> Deleting a run is an **irreversible** action. It will permanently delete the run and any associated artifacts, including the uploaded dataset.
+- Execute the following command:
+```bash
+knit run rm ${run_id}
+```
+Replace `${run_id}` with the `runId` obtained in step 1.
+
+### Summary
+This example demonstrates the following:
+
+- **Multi-stage ML Model Training and Validation:** Implementation of a multi-stage workflow, encompassing initial training, incremental training, and subsequent validation, for a simple Spam Email Detection model.
+- **Automated Training and Artifact Management:** Leveraging Knitfab to streamline and automate the entire training process, including efficient management of model versions and associated artifacts across all stages.
