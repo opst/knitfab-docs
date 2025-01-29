@@ -1,6 +1,6 @@
 ### Example
 # Incremetal Train and Manage Spam Email Detection Machine Learning Models with Knitfab
----
+
 This example help you build a simple Spam Email Detection with incremental training in Knitfab. With Knitfab you can easily automate and manage the models and their behavior across run.
 
 ### Overview
@@ -516,6 +516,7 @@ knit run rm ${run_id}
 Replace `${run_id}` with the unique Id of the run you want to delete (e.g., `$initial_train_run_id`, `$validate_run_id`, `$incremental_train_run_id`).
 
 **To Deactivate a Plan:**
+
 If you no longer require a registered plan, use the following command to deactivate it:
 
 ```bash
@@ -523,7 +524,8 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-**To Remove the Uploaded Dataset**
+**To Remove the Uploaded Dataset:**
+
 To remove an uploaded dataset in Knitfab, you must delete the associated upload run.
 
 1. **Find the Dataset Run Id:**
@@ -566,7 +568,7 @@ knit data find -t project:spam-detection
   - In the output, identify the dataset entry where the `upstream.mountpoint.path` is equal to `/upload`.
   - Extract the corresponding `upstream.run.runId` value.
 
-2. Remove the Run:
+2. **Remove the Run:**
 > [!Warning]
 >
 > Deleting a run is an **irreversible** action. It will permanently delete the run and any associated artifacts, including the uploaded dataset.
