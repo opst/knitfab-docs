@@ -44,7 +44,7 @@ You can get the necessary files/directories from the repository:
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
 ```
-The following files and directories can be found within the `04.examples/scam-detection` directory: 
+The following files and directories can be found within the `04.examples/spam-email-detection` directory: 
 - **in/dataset:** Contains the dataset use for training and validation.
 - **scipts:** Houses the training and validation Python scripts, as well as the Dockerfile necessary for deploying the Knitfab Plan.
 - **plans:** Contains the Knitfab Plan YAML templates.
