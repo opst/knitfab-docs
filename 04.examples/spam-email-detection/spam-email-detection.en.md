@@ -10,7 +10,7 @@ The following diagram shows model and data nodes to that you will build as an in
 - __Initial Model:__ The first version of the ML model generated after the initial training phase.
 - __New Training Data:__ Fresh data that is used to incrementally improve the existing model. This could include new data points, updated labels, or corrections to existing data.
 - __Incremental Train:__ The process of retraining the existing model with the new training data. This allows the model to learn from new information and potentially improve its performance.
-- __Updated Model:__ The refined version of the machine learning model after undergoing incremental training.
+- __Updated Model:__ The refined version of the ML model after undergoing incremental training.
 - __Validate:__ The process of independently assessing the performance of the model on a separate hold-out dataset to ensure its generalization ability and prevent overfitting.
 - __Metrics:__ The quantitative measures used to evaluate the model's performance, such as accuracy, precision, recall, F1-score, etc.
 ```mermaid
@@ -51,7 +51,7 @@ The following files and directories can be found within the `04.examples/scam-de
 
 ### Task
 - [Step 0 (Optional): Train and validate ML model on local environment.](#step-0-optional-train-and-validate-ml-model-on-local-environment)
-- [Step 1: Build and push docker image to Knifab.](#step-1-build-and-push-docker-image-to-knifab)
+- [Step 1: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
 - [Step 2: Initial training.](#step-2-initial-training)
 - [Step 3: Model validation.](#step-3-model-validation)
 - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
@@ -96,8 +96,8 @@ python ./scripts/incremental-train/incremental-train.py \
 **5. Re-validation:**
 - Repeat steps [2](#step-0-2) and [3](#step-0-3) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
-## Step 1: Build and push docker image to Knifab
-This step involves creating Docker images for each of the training and validation components of the spam detection model. These images will be subsequently pushed to the Knifab registry for use in the training and validation processes within the Knitfab platform.
+## Step 1: Build and push docker image to Knitfab
+This step involves creating Docker images for each of the training and validation components of the spam email detection model. These images will be subsequently pushed to the Knitfab registry for use in the training and validation processes within the Knitfab platform.
 
 **To Build Docker Images**
 
@@ -157,27 +157,25 @@ docker run --rm -it \
 
 **1. Tag Images with Registry URI:**
 
-Before pushing the images to the Knifab registry, you need to tag them with the correct registry URI. This allows Docker to identify the target registry for the push operation.
+Before pushing the images to the Knitfab registry, you need to tag them with the correct registry URI. This allows Docker to identify the target registry for the push operation.
 ```bash
-docker tag ${docker_image} \
-           ${registry_uri}/${docker_image}
+docker tag ${docker_image} ${registry_uri}/${docker_image}
 ```
 Replace:
 
 - `${docker_image}` with the name of each built image (e.g., `spam-detection-initial-train:v1.0`, `spam-detection-validate:v1.0`, `spam-detection-incremental-train:v1.0`).
-- `${registry_uri}` with the actual URI of your Knifab registry (e.g., `172.16.39.135:30503`).
+- `${registry_uri}` with the actual URI of your Knitfab registry (e.g., `172.16.39.135:30503`).
 
-**2. Push Images to Knifab Registry:**
+**2. Push Images to Knitfab Registry:**
 
-Now, push the tagged images to the Knifab registry:
+Now, push the tagged images to the Knitfab registry:
 ```bash
-docker tag ${docker_image} \
-           ${registry_uri}/${docker_image}
+docker push ${registry_uri}/${docker_image}
 ```
 Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
 
 ## Step 2: Initial training
-This step involves the initial training of the machine learning model using the preprocessed data.
+This step involves the initial training of the ML model using the preprocessed data.
 
 **1. Push Traning Data to Knitfab:**
 ```bash
@@ -202,7 +200,9 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
     knit plan template > ./plan/spam-detection-initial-train.v1.0.yaml
 ```
 This command generates a YAML template based on the Docker image `spam-detection-initial-train:v1.0`.
-\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+
+\* Replace `${registry_uri}` with the actual URI of your Knitfab registry.
+
 \* This approach can help automate some of the configuration process.
 
 **3. Modify YAML Template:**
@@ -296,7 +296,7 @@ knit plan template --scratch > ./plan/spam-detection-validate.v1.0.yaml
 docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     knit plan template > ./plan/spam-detection-validate.v1.0.yaml
 ```
-\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+\* Replace `${registry_uri}` with the actual URI of your Knitfab registry.
 
 **3. Modify YAML Template:**
 - Crucial Modifications:
@@ -390,7 +390,7 @@ knit plan template --scratch > ./plan/spam-detection-incremental-train.v1.0.yaml
 docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     knit plan template > ./plan/spam-detection-incremental-train.v1.0.yaml
 ```
-\* Replace `${registry_uri}` with the actual URI of your Knifab registry.
+\* Replace `${registry_uri}` with the actual URI of your Knitfab registry.
 
 **3. Modify YAML Template:**
 - Crucial Modifications:
@@ -407,7 +407,6 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
       - `mode:incremental-train`
     <br>
     > **Important Note:**
-    >
     > - Ensure the `mode:incremental-train` tag is included in the input model sections.
     > - Failure to include this tag will result in an error during the Knitfab plan execution.
   - `outputs`, `log`: 
