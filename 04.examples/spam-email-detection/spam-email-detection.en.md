@@ -61,6 +61,7 @@ The following files and directories can be found within the `04.examples/scam-de
 You can perform the incremental training of the Naive Bayes Classifier for Spam Email Detection as described in the following procedure. We will use the Python scripts in the `/scripts` directory for this purpose. This example is intended to help you familiar with building and managing ML models in Knitfab, so we will not discuss about the detail processes in python scipts. 
 
 **To train and validate the ML model**
+
 **1. Initial Training:**
 - Run the script to train the initial model:
 ```bash
@@ -83,6 +84,7 @@ python ./scripts/validate/validate.py \
 ### <span id="step-0-3"></span>
 **3. Performance Analysis:**
 - Open the `metrics.json` file and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
+
 **4. Incremental Training:**
 Run the script with the incremental dataset:
 ```bash
@@ -98,6 +100,7 @@ python ./scripts/incremental-train/incremental-train.py \
 This step involves creating Docker images for each of the training and validation components of the spam detection model. These images will be subsequently pushed to the Knifab registry for use in the training and validation processes within the Knitfab platform.
 
 **To Build Docker Images**
+
 **1. Build `spam-detection-initial-train` Image:**
 ```bash
 docker build -t spam-detection-initial-train:v1.0 \
@@ -116,6 +119,7 @@ docker run --rm -it \
 This command runs the `spam-detection-initial-train:v1.0` image in an interactive mode.
 - The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
 - This allows you to test the image locally and ensure it functions as expected.
+
 **3. Build `spam-detection-validate` Image:**
 ```bash
 docker build -t spam-detection-validate:v1.0 \
@@ -174,6 +178,7 @@ Replace `${docker_image}` with the name of each image (including the registry UR
 
 ## Step 2: Initial training
 This step involves the initial training of the machine learning model using the preprocessed data.
+
 **1. Push Traning Data to Knitfab:**
 ```bash
 knit data push -t mode:initial-train \
