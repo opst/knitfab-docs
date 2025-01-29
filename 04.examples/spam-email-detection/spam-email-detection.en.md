@@ -30,13 +30,13 @@ Before embarking on this example, ensure you have met the following prerequisite
 
 **Knitfab Setup:**
 
-- **Local Environment:** If you intend to use Knitfab in a local environment, follow the installation instructions provided in [01.getting-started](../01.getting-started/getting-started.en.md).
+- **Local Environment:** If you intend to use Knitfab in a local environment, follow the installation instructions provided in [01.getting-started](../../01.getting-started/getting-started.en.md).
 - **AWS Environment:** For utilizing Knitfab on AWS, refer to the documentation available here: https://github.com/opst/knitfab-for-aws/blob/develop/beta/docs/install-guide/install-guide.ja.md (Please note that this documentation is in Japanese)
 
 **Additional Tools:**
 
-- **Knit CLI:** Follow the installation instructions in [01.getting-started](#../01.getting-started/getting-started.en.md) to set up the Knit CLI.
-- **Knitfab Environment Initialization:** Refer to [01.getting-started](#../01.getting-started/getting-started.en.md) for guidance on initializing your Knitfab environment using `knit init`.
+- **Knit CLI:** Follow the installation instructions in [01.getting-started](../../01.getting-started/getting-started.en.md) to set up the Knit CLI.
+- **Knitfab Environment Initialization:** Refer to [01.getting-started](../../01.getting-started/getting-started.en.md) for guidance on initializing your Knitfab environment using `knit init`.
 - **Software Installations:** Ensure you have `Docker` installed on your system. Additionally, having `kubectl` installed is optional but recommended.
 
 ### Repository
