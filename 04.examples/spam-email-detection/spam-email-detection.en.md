@@ -1,5 +1,5 @@
 ### Example
-# Incremetal Train and Manage Email Spam Detection Machine Learning Models with Knitfab
+# Incremetal Train and Manage Spam Email Detection Machine Learning Models with Knitfab
 ---
 This example help you build a simple Spam Email Detection with incremental training in Knitfab. With Knitfab you can easily automate and manage the models and their behavior across run.
 
@@ -30,7 +30,7 @@ Before embarking on this example, ensure you have met the following prerequisite
 
 **Knitfab Setup:**
 
-- **Local Environment:** If you intend to use Knitfab in a local environment, follow the installation instructions provided in [01.getting-started](#../01.getting-started/getting-started.en.md).
+- **Local Environment:** If you intend to use Knitfab in a local environment, follow the installation instructions provided in [01.getting-started](../01.getting-started/getting-started.en.md).
 - **AWS Environment:** For utilizing Knitfab on AWS, refer to the documentation available here: https://github.com/opst/knitfab-for-aws/blob/develop/beta/docs/install-guide/install-guide.ja.md (Please note that this documentation is in Japanese)
 
 **Additional Tools:**
