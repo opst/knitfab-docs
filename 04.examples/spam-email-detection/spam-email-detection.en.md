@@ -406,9 +406,11 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
       - `type:model`.
       - `mode:incremental-train`
     <br>
-    > **Important Note:**
-    > - Ensure the `mode:incremental-train` tag is included in the input model sections.
-    > - Failure to include this tag will result in an error during the Knitfab plan execution.
+    
+> **Important Note:**
+> - Ensure the `mode:incremental-train` tag is included in the input model sections.
+> - Failure to include this tag will result in an error during the Knitfab plan execution.
+
   - `outputs`, `log`: 
     - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
 
