@@ -36,10 +36,12 @@ flowchart LR
 To successfully complete this example, ensure you have met the following prerequisites:
 
 **Essential:**
-- **Knitfab Setup:** Follow the installation instructions provided in [03.admin-guide](../../03.admin-guide/admin-guide-installation.en.md).
+- **Knitfab Setup:** 
+  - **Production:** Follow the instructions provided in [03.admin-guide](../../03.admin-guide/admin-guide-installation.en.md) for full installation.
+  - **Experimentation:** Follow the instructions provided in [01.getting-started](../../01.getting-started/getting-started.en.md) for a light weight version.
 - **Knit CLI:** Follow the installation instructions in [01.getting-started](../../01.getting-started/getting-started.en.md) to set up the Knit CLI.
-- **Knitfab Environment Initialization:** Refer to [01.getting-started](../../01.getting-started/getting-started.en.md) for guidance on initializing your Knitfab environment using `knit init`.
-- **`Docker`**: Required for building and pushing images to the Knitfab platform.
+- **Knit Command Initialization:** Refer to [01.getting-started Initializing Knit Command](../../01.getting-started/getting-started.en.md#initializing-knit-command) for guidance on initializing Knit command using `knit init`.
+- **`Docker` Installation**: Required for building and pushing images to the Knitfab platform.
 
 **Optional:**
 - `kubectl` (recommended): Provides additional flexibility for debugging and interacting with Knitfab Kubernetes clusters.
@@ -68,7 +70,7 @@ This step involves creating Docker images for each component of the spam email d
 >
 > This example is intended to help you familiarize with building and managing ML models in Knitfab, so we will not discuss the content of Python scripts and Dockerfile.
 
-**To Build Docker Images**
+#### To Build Docker Images:
 
 **1. Build `spam-detection-initial-train` Image:**
 ```bash
@@ -94,10 +96,10 @@ docker build -t spam-detection-incremental-train:v1.0 \
 ```
 The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
 
-**To Verify Docker Images (Optional)**
+#### To Verify Docker Images (Optional):
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#push-images))
+> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#to-push-docker-images-to-knitfab))
 
 **1. Initial Training:**
 ```bash
@@ -110,7 +112,7 @@ This command runs the `spam-detection-initial-train:v1.0` image in an interactiv
 - The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
 - This allows you to test the image locally and generate the first version of the model.
 
-### <span id="step-0-2"></span>
+#### <span id="step-0-2"></span>
 **2. Model Validation:**
 ```bash
 docker run --rm -it \
@@ -143,8 +145,7 @@ docker run --rm -it \
 
 Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
-### <span id="push-images"></span>
-**To Push Docker Images to Knitfab**
+#### To Push Docker Images to Knitfab:
 
 **1. Tag Images with Registry URI:**
 
@@ -155,7 +156,7 @@ docker tag ${docker_image} ${registry_uri}/${docker_image}
 Replace:
 
 - `${docker_image}` with the name of each built image (e.g., `spam-detection-initial-train:v1.0`, `spam-detection-validate:v1.0`, `spam-detection-incremental-train:v1.0`).
-- `${registry_uri}` with the actual URI of your Knitfab registry (e.g., `172.16.39.135:30503`).
+- `${registry_uri}` with the actual URI of your Knitfab registry (e.g., `192.0.2.1:30503`).
 
 **2. Push Images to Knitfab Registry:**
 
@@ -205,8 +206,8 @@ This command generates a YAML template based on the Docker image `spam-detection
 
     Example:
     ```YAML
-    # Replace 172.16.39.135
-    image: "172.16.39.135:30503/spam-detection-initial-train:v1.0"
+    # Replace 192.0.2.1
+    image: "192.0.2.1:30503/spam-detection-initial-train:v1.0"
     # With localhost
     image: "localhost:30503/spam-detection-initial-train:v1.0"
     ```
@@ -338,8 +339,8 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
 
     Example:
     ```YAML
-    # Replace 172.16.39.135
-    image: "172.16.39.135:30503/spam-detection-validate:v1.0"
+    # Replace 192.0.2.1
+    image: "192.0.2.1:30503/spam-detection-validate:v1.0"
     # With localhost
     image: "localhost:30503/spam-detection-validate:v1.0"
     ```
@@ -437,7 +438,7 @@ This command downloads the validation metrics artifact from the Knitfab platform
 ## Step 4: Incremental training and validation
 Once the initial training and validation are complete, we will perform incremental training using new data, followed by further validation of the updated model.
 
-**Train and Update Initial Model with New Data**
+#### Train and Update Initial Model with New Data:
 
 **1. Push New Traning Data to Knitfab:**
 ```bash
@@ -467,8 +468,8 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 
     Example:
     ```YAML
-    # Replace 172.16.39.135
-    image: "172.16.39.135:30503/spam-detection-incremental-train:v1.0"
+    # Replace 192.0.2.1
+    image: "192.0.2.1:30503/spam-detection-incremental-train:v1.0"
     # With localhost
     image: "localhost:30503/spam-detection-incremental-train:v1.0"
     ```
@@ -586,7 +587,7 @@ knit data pull -x $incremental_train_model_knit_id ./out/model
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
 
-**Validate the Updated Model**
+#### Validate the Updated Model:
 
 **0. Auto-Run of Validation Plan:**
 
@@ -600,7 +601,7 @@ Repeat steps **6-9** from the ["Model validation"](#step-3-model-validation) sec
 - Download the metrics artifact for analysis.
 
 ## Step 5: Clean up
-**Remove `mode:incremental-train` Tag from Initial Model:**
+#### Remove `mode:incremental-train` Tag from Initial Model:
 
 Knitfab is an automated platform that manages training processes and their associated artifacts.
 
@@ -612,7 +613,7 @@ To prevent this unintended behavior, execute the following command to remove the
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
 
-**To Remove a Run:**
+#### To Remove a Run:
 
 > [!Caution]
 >
@@ -628,7 +629,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
-**To Deactivate a Plan:**
+#### To Deactivate a Plan:
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -637,7 +638,7 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-**To Remove the Uploaded Dataset:**
+#### To Remove the Uploaded Dataset:
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
@@ -698,7 +699,7 @@ This example demonstrates the following:
 - **Automated Training and Artifact Management:** Leveraging Knitfab to streamline and automate the entire training process, including efficient management of model versions and associated artifacts across all stages.
 
 ### Troubleshooting
-**Problem:**
+#### Problem:
 Knitfab Run is stuck in "starting" status and doesn't progress.
 ```json
 {
@@ -728,7 +729,7 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
   - **Local Registry:** If you're using a local Docker registry, ensure the `image` field in your Plan YAML uses `localhost` for the registry URI:
 
   <br>
-  
+
   ```YAML
   image: "localhost:30503/spam-detection-initial-train:v1.0"
   ```
@@ -750,7 +751,7 @@ knit run stop --fail ${run_id}
   - [Step 3: Model validation.](#step-3-model-validation)
   - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
 
-**Problem:**
+#### Problem:
 Error `Plan's tag dependency makes cycle` when applying an incremental train Plan.
 
 **Error Messages:**
