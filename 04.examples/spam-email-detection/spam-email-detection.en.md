@@ -634,13 +634,13 @@ knit run stop --fail ${run_id}
 (Replace `${run_id}` with your actual Run Id, e.g., `64b5a7ae-5c85-48f1-b785-955c1709174a`)
 - **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
 - **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
-- **Apply a new Plan:** Refer to the relevant section in based on the type of training you're doing:
+- **Apply a new Plan:** Refer to the relevant section based on the type of training you're doing:
   - [Step 2: Initial training.](#step-2-initial-training)
   - [Step 3: Model validation.](#step-3-model-validation)
   - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
 
 **Problem:**
-Error `Plan's tag dependency makes cycle` when applying an incremental train Plan.**
+Error `Plan's tag dependency makes cycle` when applying an incremental train Plan.
 
 **Error Messages:**
 ```json
