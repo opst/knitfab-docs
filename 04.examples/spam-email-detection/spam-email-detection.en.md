@@ -589,3 +589,73 @@ This example demonstrates the following:
 
 - **Multi-stage ML Model Training and Validation:** Implementation of a multi-stage workflow, encompassing initial training, incremental training, and subsequent validation, for a simple Spam Email Detection model.
 - **Automated Training and Artifact Management:** Leveraging Knitfab to streamline and automate the entire training process, including efficient management of model versions and associated artifacts across all stages.
+
+### Troubleshooting
+**Problem:**
+Knitfab Run is stuck in "starting" status and doesn't progress.
+```json
+{
+        "runId": "64b5a7ae-5c85-48f1-b785-955c1709174a",
+        "status": "starting",
+        "updatedAt": "2025-01-30T01:01:03.589+00:00",
+        ...
+}
+```
+**Debugging Steps:**
+
+**1. Inspect the Kubernetes Pods:**
+```bash
+kubectl -n knitfab get po
+```
+This command lists all pods in the `knitfab` namespace. Look for the pod associated with your Run Id (`64b5a7ae-5c85-48f1-b785-955c1709174a` in this example).
+
+**2. Analyze Pod Status:**
+
+Pay close attention to the `STATUS` column in the output.  You might see something like this:
+
+| NAME | READY | STATUS | RESTARTS | AGE |
+|---|---|---|---|---| 
+| worker-run-64b5a7ae-5c85-48f1-b785-955c1709174a-nzhpq | 1/2 | ImagePullBackOff | 0 | 101s |
+
+- **`ImagePullBackOff` Error**: This indicates that Kubernetes can't pull the Docker image required for your run.
+  - **Local Registry:** If you're using a local Docker registry, ensure the `image` field in your Plan YAML uses `localhost` for the registry URI:
+  ```YAML
+  image: "localhost:30503/spam-detection-initial-train:v1.0"
+  ```
+  - **Registry Credentials:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
+
+**3. Reapply the Plan:** 
+
+After fixing the image pull issue, you'll likely need to:
+- **Stop the current Run:** 
+```bash
+knit run stop --fail ${run_id}
+```
+(Replace `${run_id}` with your actual Run Id, e.g., `64b5a7ae-5c85-48f1-b785-955c1709174a`)
+- **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
+- **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
+- **Apply a new Plan:** Refer to the relevant section in based on the type of training you're doing:
+  - [Step 2: Initial training.](#step-2-initial-training)
+  - [Step 3: Model validation.](#step-3-model-validation)
+  - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
+
+**Problem:**
+Error `Plan's tag dependency makes cycle` when applying an incremental train Plan.**
+
+**Error Messages:**
+```json
+{
+    "message": "plan spec conflics with others\n caused by:@ github.com/opst/knitfab/pkg/domain/plan/db/postgres.planDependencyIsCyclic \"/work/pkg/domain/plan/db/postgres/plan.go\" l846 \u003c- @ github.com/opst/knitfab/pkg/domain/plan/db/postgres.planDependencyIsCyclic.func1 \"/work/pkg/domain/plan/db/postgres/plan.go\" l830 \u003c- plan spec is conflicting with other plan: plan's tag dependency makes cycle"
+}
+```
+
+**Solution:** 
+Add tag `mode:incremental-train` to the `path:/in/model` entry in your Plan YAML template.
+```YAML
+inputs:
+  - path: "/in/model"
+    tags:
+      - "project:spam-detection"
+      - "type:model"
+      - "mode:incremental-train"
+``` 
