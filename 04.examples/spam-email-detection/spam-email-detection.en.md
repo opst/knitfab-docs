@@ -727,6 +727,8 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
 - **`ImagePullBackOff` Error**: This indicates that Kubernetes can't pull the Docker image required for your run.
   - **Local Registry:** If you're using a local Docker registry, ensure the `image` field in your Plan YAML uses `localhost` for the registry URI:
 
+  <br>
+  
   ```YAML
   image: "localhost:30503/spam-detection-initial-train:v1.0"
   ```
