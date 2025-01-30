@@ -233,25 +233,27 @@ This command generates a YAML template based on the Docker image `spam-detection
     - This ensures the image is pulled from the local registry.
   - `inputs`: 
     - Define the input dataset by specifying the tags used during the knit data push command to the `path:"/in/dataset"`: `project:spam-detection`, `type:dataset`, `mode:initial-train`.
+
     ```YAML
     # Add tags used during the knit data push command.
     inputs:
-    - path: /in/dataset
-      tags:
-        - project:spam-detection
-        - type:dataset
-        - mode:initial-train
+      - path: /in/dataset
+        tags:
+          - project:spam-detection
+          - type:dataset
+          - mode:initial-train
     ```
     - This instructs Knitfab to link the correct dataset to the training process.
   - `outputs`, `log`: 
     - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
+
     ```YAML
     # outputs
     outputs:
-    - path: "/out/model"
-      tags:
-        - "project:spam-detection"
-        - "type:model"
+      - path: "/out/model"
+        tags:
+          - "project:spam-detection"
+          - "type:model"
     
     # log
     log:
@@ -352,6 +354,13 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
 - Crucial Modifications:
   - `image`: 
     - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
+
+    ```YAML
+    # Replace 172.16.39.135
+    image: "172.16.39.135:30503/spam-detection-validate:v1.0"
+    # With localhost
+    image: "localhost:30503/spam-detection-validate:v1.0"
+    ```
   - `inputs`: 
     - Dataset: Specify the input dataset by defining the following tags to `path:"/in/dataset"`:
       - `project:spam-detection`
@@ -360,13 +369,36 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     - Model: Specify the input model by defining the following tags to `path:"/in/model"`:
       - `project:spam-detection`
       - `type:model`.
+
+    ```YAML
+    inputs:
+      - path: "/in/dataset"
+        tags:
+          - "project:spam-detection"
+          - "type:dataset"
+          - "mode:validate"
+      - path: "/in/model"
+        tags:
+          - "project:spam-detection"
+          - "type:model"
+    ```
   - `outputs`, `log`: 
     - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
 
+    ```YAML
+    outputs:
+      - path: "/out/metrics"
+        tags:
+          - "project:spam-detection"
+          - "type:metrics"
+    log:
+      tags:
+        - "type:log"
+        - "project:spam-detection"
+    ```
 - Other Important Considerations:
   - Resource Allocation: Define the required resources for the validation process (e.g., CPU, memory, GPU).
-
-Ensure the modified YAML template adheres to the structure and content of the YAML file located in the `plans` directory of the cloned Git repository.
+  - YAML Structure: Double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
 **4. Apply the YAML Template:**
 ```bash
@@ -446,6 +478,13 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 - Crucial Modifications:
   - `image`: 
     - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the `image` field with `localhost`.
+
+    ```YAML
+    # Replace 172.16.39.135
+    image: "172.16.39.135:30503/spam-detection-incremental-train:v1.0"
+    # With localhost
+    image: "localhost:30503/spam-detection-incremental-train:v1.0"
+    ```
   - `inputs`: 
     - Dataset: Specify the input dataset by defining the following tags to `path:"/in/dataset"`:
       - `project:spam-detection`
@@ -455,6 +494,20 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
       - `project:spam-detection`
       - `type:model`.
       - `mode:incremental-train`
+    
+    ```YAML
+    inputs:
+      - path: "/in/dataset"
+        tags:
+          - "project:spam-detection"
+          - "type:dataset"
+          - "mode:incremental-train"
+      - path: "/in/model"
+        tags:
+          - "project:spam-detection"
+          - "type:model"
+          - "mode:incremental-train"
+    ```
 
 > **Important Note:**
 > - Ensure the `mode:incremental-train` tag is included in the `path:"/in/model"`.
@@ -463,10 +516,21 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
   - `outputs`, `log`: 
     - Add the following project-related tag to the outputs and log sections: `project:spam-detection`
 
+    ```YAML
+    outputs:
+      - path: "/out/model"
+        tags:
+          - "project:spam-detection"
+          - "type:model"
+    log:
+      tags:
+        - "type:log"
+        - "project:spam-detection"
+    ```
+
 - Other Important Considerations:
   - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
-
-Ensure the modified YAML template adheres to the structure and content of the YAML file located in the `/plans` directory of the cloned Git repository.
+  - YAML Structure: Double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
 **4. Apply the YAML Template:**
 ```bash
@@ -569,7 +633,7 @@ knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```bash
 knit run rm ${run_id}
 ```
-Replace `${run_id}` with the unique Id of the Run you want to delete (e.g., `$initial_train_run_id`, `$validate_run_id`, `$incremental_train_run_id`).
+Replace `${run_id}` with the unique Id of the Run  (e.g., `$incremental_train_run_id` → `$validate_run_id` → `$initial_train_run_id`).
 
 **To Deactivate a Plan:**
 
