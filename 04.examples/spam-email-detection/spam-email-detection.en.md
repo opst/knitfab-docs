@@ -93,6 +93,7 @@ docker build -t spam-detection-incremental-train:v1.0 \
 The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
 
 **To Verify Docker Images (Optional)**
+> Note: If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#push-images))
 
 **1. Initial Training:**
 ```bash
@@ -114,7 +115,7 @@ docker run --rm -it \
     -v "$(pwd)/out/metrics:/out/metrics" \
     spam-detection-validate:v1.0
 ```
-The command runs `spam-detection-validate:v1.0` image to evaluate the initial model.
+The command runs `spam-detection-validate:v1.0` image to evaluate the initial model using the validation dataset.
 
 The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
 
@@ -124,7 +125,7 @@ Open the `metrics.json` file and analyze the model's performance metrics (e.g., 
 
 **4. Incremental Training:**
 
-Next, we will update the initial model with new training data.
+Next, we will incrementally update the initial model with new training data.
 
 ```bash
 docker run --rm -it \
@@ -138,6 +139,7 @@ docker run --rm -it \
 
 Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
+### <span id="push-images"></span>
 **To Push Docker Images to Knitfab**
 
 **1. Tag Images with Registry URI:**
