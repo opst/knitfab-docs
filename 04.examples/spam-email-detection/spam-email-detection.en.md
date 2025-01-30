@@ -42,7 +42,6 @@ To successfully complete this example, ensure you have met the following prerequ
 - **`Docker`**: Required for building and pushing images to the Knitfab platform.
 
 **Optional:**
-- `Python 3.11`: Required if you intend to do [Step 0 (Optional): Train and validate ML model on local environment.](#step-0-optional-train-and-validate-ml-model-on-local-environment)
 - `kubectl` (recommended): Provides additional flexibility for debugging and interacting with Knitfab Kubernetes clusters.
 
 ### Repository
@@ -56,61 +55,16 @@ Once cloned, navigate to the `04.examples/spam-email-detection` directory. You w
 - **plans:** Contains the Knitfab Plan YAML templates.
 
 ### Task
-- [Step 0 (Optional): Train and validate ML model on local environment.](#step-0-optional-train-and-validate-ml-model-on-local-environment)
 - [Step 1: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
 - [Step 2: Initial training.](#step-2-initial-training)
 - [Step 3: Model validation.](#step-3-model-validation)
 - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
 - [Step 5: Clean up.](#step-5-clean-up)
 
-## Step 0 (Optional): Train and validate ML model on local environment
-You can perform the incremental training of the Naive Bayes Classifier for Spam Email Detection as described in the following procedure. We will use the Python scripts in the `/scripts` directory for this purpose. This example is intended to help you familiarize with building and managing ML models in Knitfab, so we will not discuss the detailed processes in Python scripts.
-
-**To install required libraries:**
-
-Execute the following command to install `pandas`, `scikit-learn`, and `joblib`:
-```bash
-pip install pandas scikit-learn joblib
-```
-
-**To train and validate the ML model:**
-
-**1. Initial Training:**
-- Run the script to train the initial model:
-```bash
-python ./scripts/initial-train/initial-train.py \
-       --dataset ./in/dataset/initial \ 
-       --save-to out/model
-```
-- This script trains the model using the initial dataset located at `./in/dataset/initial`.
-- The trained model will be saved as `pipeline.plk` in the `out/model` directory.
-### <span id="step-0-2"></span>
-**2. Model Validation:**
-- Validate the model's performance using the validation dataset:
-```bash
-python ./scripts/validate/validate.py \
-       --dataset ./in/dataset/validate \
-       --save-to out/metrics \
-       --model out/model
-```
-- The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
-### <span id="step-0-3"></span>
-**3. Performance Analysis:**
-- Open the `metrics.json` file and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
-
-**4. Incremental Training:**
-Run the script with the incremental dataset:
-```bash
-python ./scripts/incremental-train/incremental-train.py \
-       --dataset ./in/dataset/incremental \
-       --model out/model \
-       --save-to out/model
-```
-**5. Re-validation:**
-- Repeat steps [2](#step-0-2) and [3](#step-0-3) to validate the performance of the updated model and analyze the new `metrics.json` file.
-
 ## Step 1: Build and push docker image to Knitfab
 This step involves creating Docker images for each component of the spam email detection model (initial training, validation, and incremental training). These images will be pushed to the Knitfab registry for use within the Knitfab platform.
+
+> Note: This example is intended to help you familiarize with building and managing ML models in Knitfab, so we will not discuss the content of Python scripts and Dockerfile.
 
 **To Build Docker Images**
 
@@ -122,7 +76,25 @@ docker build -t spam-detection-initial-train:v1.0 \
 ```
 The `spam-detection-initial-train` image is responsible for training the first version of the model.
 
-**2. (Optional) Verify `spam-detection-initial-train` Image:**
+**2. Build `spam-detection-validate` Image:**
+```bash
+docker build -t spam-detection-validate:v1.0 \
+             -f scripts/validate/Dockerfile \
+             ./scripts/validate
+```
+The `spam-detection-validate` image is used to evaluate the performance of the trained model and output metrics in json format (e.g., accuracy, precision, recall).
+
+**3. Build `spam-detection-incremental-train` Image:**
+```bash
+docker build -t spam-detection-incremental-train:v1.0 \
+             -f scripts/incremental-train/Dockerfile \
+             ./scripts/incremental-train
+```
+The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
+
+**To Verify Docker Images (Optional)**
+
+**1. Verify `spam-detection-initial-train` Image:**
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/initial:/in/dataset" \
@@ -133,15 +105,8 @@ This command runs the `spam-detection-initial-train:v1.0` image in an interactiv
 - The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
 - This allows you to test the image locally and ensure it functions as expected.
 
-**3. Build `spam-detection-validate` Image:**
-```bash
-docker build -t spam-detection-validate:v1.0 \
-             -f scripts/validate/Dockerfile \
-             ./scripts/validate
-```
-The `spam-detection-validate` image is used to evaluate the performance of the trained model and output metrics in json format (e.g., accuracy, precision, recall).
-
-**4. (Optional) Verify `spam-detection-validate` Image:**
+### <span id="step-0-2"></span>
+**2. Verify `spam-detection-validate` Image:**
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/validate:/in/dataset" \
@@ -149,15 +114,11 @@ docker run --rm -it \
     -v "$(pwd)/out/metrics:/out/metrics" \
     spam-detection-validate:v1.0
 ```
-**5. Build `spam-detection-incremental-train` Image:**
-```bash
-docker build -t spam-detection-incremental-train:v1.0 \
-             -f scripts/incremental-train/Dockerfile \
-             ./scripts/incremental-train
-```
-The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
 
-**6. (Optional) Verify `spam-detection-incremental-train` image:**
+**3. Performance Analysis:**
+- Open the `metrics.json` file located in `out/metrics` directory and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
+
+**4. Verify `spam-detection-incremental-train` image:**
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/incremental:/in/dataset" \
@@ -165,6 +126,9 @@ docker run --rm -it \
     -v "$(pwd)/out/model:/out/model" \
     spam-detection-incremental-train:v1.0
 ```
+
+**5. Re-validation:**
+- Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
 **To Push Docker Images to Knitfab**
 
@@ -223,7 +187,9 @@ This command generates a YAML template based on the Docker image `spam-detection
 **3. Modify YAML Template:**
 - Crucial Modifications:
   - `image`: 
-    - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the `image` field with `localhost`.
+    - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the `image` field with `localhost`. 
+
+    Example:
     ```YAML
     # Replace 172.16.39.135
     image: "172.16.39.135:30503/spam-detection-initial-train:v1.0"
@@ -355,6 +321,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
   - `image`: 
     - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
 
+    Example:
     ```YAML
     # Replace 172.16.39.135
     image: "172.16.39.135:30503/spam-detection-validate:v1.0"
@@ -479,6 +446,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
   - `image`: 
     - If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the `image` field with `localhost`.
 
+    Example:
     ```YAML
     # Replace 172.16.39.135
     image: "172.16.39.135:30503/spam-detection-incremental-train:v1.0"
