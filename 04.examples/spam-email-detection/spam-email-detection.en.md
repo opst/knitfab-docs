@@ -64,7 +64,7 @@ Once cloned, navigate to the `04.examples/spam-email-detection` directory. You w
 ## Step 1: Build and push docker image to Knitfab
 This step involves creating Docker images for each component of the spam email detection model (initial training, validation, and incremental training). These images will be pushed to the Knitfab registry for use within the Knitfab platform.
 
-> ![Note]
+> [!Note]
 >
 > This example is intended to help you familiarize with building and managing ML models in Knitfab, so we will not discuss the content of Python scripts and Dockerfile.
 
@@ -95,7 +95,7 @@ docker build -t spam-detection-incremental-train:v1.0 \
 The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
 
 **To Verify Docker Images (Optional)**
-> ![Note]
+> [!Note]
 > 
 > If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#push-images))
 
@@ -726,9 +726,11 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
 
 - **`ImagePullBackOff` Error**: This indicates that Kubernetes can't pull the Docker image required for your run.
   - **Local Registry:** If you're using a local Docker registry, ensure the `image` field in your Plan YAML uses `localhost` for the registry URI:
+
   ```YAML
   image: "localhost:30503/spam-detection-initial-train:v1.0"
   ```
+
   - **Registry Credentials:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
 
 **3. Reapply the Plan:** 
