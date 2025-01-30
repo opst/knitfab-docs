@@ -94,7 +94,7 @@ The `spam-detection-incremental-train` image will retrain the existing model wit
 
 **To Verify Docker Images (Optional)**
 
-**1. Verify `spam-detection-initial-train` Image:**
+**1. Initial Training:**
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/initial:/in/dataset" \
@@ -103,10 +103,10 @@ docker run --rm -it \
 ```
 This command runs the `spam-detection-initial-train:v1.0` image in an interactive mode.
 - The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
-- This allows you to test the image locally and ensure it functions as expected.
+- This allows you to test the image locally and generate the first version of the model.
 
 ### <span id="step-0-2"></span>
-**2. Verify `spam-detection-validate` Image:**
+**2. Model Validation:**
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/validate:/in/dataset" \
@@ -114,11 +114,18 @@ docker run --rm -it \
     -v "$(pwd)/out/metrics:/out/metrics" \
     spam-detection-validate:v1.0
 ```
+The command runs `spam-detection-validate:v1.0` image to evaluate the initial model.
+
+The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
 
 **3. Performance Analysis:**
-- Open the `metrics.json` file located in `out/metrics` directory and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
 
-**4. Verify `spam-detection-incremental-train` image:**
+Open the `metrics.json` file and analyze the model's performance metrics (e.g., accuracy, precision, recall). This will help you assess the effectiveness of the initial model.
+
+**4. Incremental Training:**
+
+Next, we will update the initial model with new training data.
+
 ```bash
 docker run --rm -it \
     -v "$(pwd)/in/dataset/incremental:/in/dataset" \
@@ -128,7 +135,8 @@ docker run --rm -it \
 ```
 
 **5. Re-validation:**
-- Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
+
+Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
 **To Push Docker Images to Knitfab**
 
