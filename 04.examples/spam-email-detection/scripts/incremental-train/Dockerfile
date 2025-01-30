@@ -2,7 +2,7 @@ FROM python:3.11
 
 WORKDIR /work
 
-RUN pip install pandas scikit-learn 
+RUN pip install pandas scikit-learn joblib
 COPY . .
 
 ENTRYPOINT [ "python", "-u", "incremental-train.py" ]
