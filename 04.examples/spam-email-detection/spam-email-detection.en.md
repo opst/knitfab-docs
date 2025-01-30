@@ -601,7 +601,7 @@ knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```bash
 knit run rm ${run_id}
 ```
-Replace `${run_id}` with the unique Id of the Run  (e.g., `$incremental_train_run_id` → `$validate_run_id` → `$initial_train_run_id`).
+Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
 **To Deactivate a Plan:**
 
