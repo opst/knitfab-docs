@@ -17,7 +17,7 @@ args = parser.parse_args()
 os.makedirs(args.save_to, exist_ok=True)
 
 DATA_PATH = args.dataset / 'validation_data.csv'
-MODEL_PATH = args.model / 'pipeline.plk'
+MODEL_PATH = args.model / 'pipeline.pkl'
 METRICS_PATH = args.save_to / 'metrics.json'
 
 def prepare_data(data):

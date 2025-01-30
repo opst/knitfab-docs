@@ -14,8 +14,8 @@ args = parser.parse_args()
 os.makedirs(args.save_to.parent, exist_ok=True)
 
 DATA_PATH = args.dataset / 'train_data.csv'
-IN_MODEL_PATH = args.model / 'pipeline.plk'
-OUT_MODEL_PATH = args.save_to / 'pipeline.plk'
+IN_MODEL_PATH = args.model / 'pipeline.pkl'
+OUT_MODEL_PATH = args.save_to / 'pipeline.pkl'
 
 def prepare_data(data):
     # Drop unnecessary columns if they exist
