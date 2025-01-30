@@ -39,7 +39,7 @@ To successfully complete this example, ensure you have met the following prerequ
 - **Knitfab Setup:** 
   - **Production:** Follow the instructions provided in [03.admin-guide](../../03.admin-guide/admin-guide-installation.en.md) for full installation.
   - **Experimentation:** Follow the instructions provided in [01.getting-started](../../01.getting-started/getting-started.en.md) for a light weight version.
-- **Knit CLI:** Follow the installation instructions in [01.getting-started](../../01.getting-started/getting-started.en.md) to set up the Knit CLI.
+- **Knit CLI:** Follow the installation instructions in [01.getting-started CLI Tool: knit](../../01.getting-started/getting-started.en.md#cli-tool-knit) to set up the Knit CLI.
 - **Knit Command Initialization:** Refer to [01.getting-started Initializing Knit Command](../../01.getting-started/getting-started.en.md#initializing-the-knit-command) for guidance on initializing Knit command using `knit init`.
 - **`Docker` Installation**: Required for building and pushing images to the Knitfab platform.
 
