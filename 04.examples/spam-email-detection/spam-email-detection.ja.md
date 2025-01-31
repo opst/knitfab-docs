@@ -36,7 +36,7 @@ flowchart LR
 ```
 
 ### 前提条件
-本書の事例を正常に動作するために、次の前提条件を満たしているかをご確認しましょう。
+本書の事例を正常に動作するために、次の前提条件を満たしているかをご確認します。
 
 **必須:**
 - **Knitfabのセットアップ:**
@@ -55,7 +55,7 @@ flowchart LR
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
 ```
-クローンが完了したら、`04.examples/spam-email-detection`ディレクトリ内にあるファイルをご確認しましょう。
+クローンが完了したら、`04.examples/spam-email-detection`ディレクトリ内にあるファイルを確認します。
 - **in/dataset:** 学習と検証に使用するデータセットが含まれています。
 - **scripts:** 学習と検証のPythonスクリプト、およびKnitfab Plan の登録に必要なDockerfileが格納されています。
 - **plans:** Knitfab Plan の YAML ひな型が含まれています。
@@ -116,7 +116,7 @@ docker run --rm -it \
 
 このコマンドは、`spam-detection-initial-train:v1.0` イメージをロカール環境で実行します。
 
-- `-v` フラグが初期データセット（`in/dataset/initial`）と出力ディレクトリ（`out/model`）を含むホストディレクトリをコンテナに関連付けます。
+- `-v` フラグが初期データセット（`in/dataset/initial`）と出力ディレクトリ（`out/model`）をコンテナに関連付けます。
 - これにより、イメージの動作確認ができ、初期版のモデルが生成されます。
 
 #### <span id="step-0-2"></span>
@@ -134,7 +134,7 @@ docker run --rm -it \
 
 **3. 性能分析:**
 
-`metrics.json` ファイルからモデルの性能メトリクス（例：精度、適合率、再現率）を分析し、初期モデルの有効性を評価します。
+`metrics.json` ファイルからモデルの性能指標（例：精度、適合率、再現率）を分析し、初期モデルの有効性を評価します。
 
 **4. 増分学習:**
 
@@ -169,7 +169,7 @@ docker tag ${docker_image} ${registry_uri}/${docker_image}
 
 **2. イメージをKnitfabレジストリへプッシュ:**
 
-次に、タグ付けされたイメージをKnitfabレジストリにプッシュします。
+次に、タグ付きのイメージをKnitfabレジストリにプッシュします。
 ```bash
 docker push ${registry_uri}/${docker_image}
 ```
@@ -196,7 +196,7 @@ YAML ひな型を生成するには、2 つの選択があります。
 ```bash
 knit plan template --scratch > ./plans/spam-detection-initial-train.v1.0.yaml
 ```
-これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい空の YAML ひな型が作成されます。ひな型には必要な構成要素を追記してください。
+これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい空の YAML ひな型が作成されます。ひな型には必要な構成要素を追記します。
 
 - 選択②：Dockerイメージからひな型を生成する
 ```bash
@@ -205,14 +205,14 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
 ```
 このコマンドは、`Docker` イメージ`spam-detection-initial-train:v1.0` に基づいて YAML ひな型を生成します。
 
-\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えしましょう。
+\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えします。
 
 \* コマンドが Docker イメージを解析して、ひな型の一部分が記入済みです。
 
 **3. YAML ひな型の追記:**
 - 重要な追記点：
   - `image`：
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えしましょう。
+    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えします。
     
     例：
     ```YAML
@@ -224,7 +224,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
     - これにより、Knitfab はローカルレジストリからイメージをプルするという意味合いになります。
 
   - `inputs`：
-    - `knit data push`コマンド中に使用されたタグ（`project:spam-detection`、`type:dataset`、`mode:initial-train`）を`path:"/in/dataset"` にも指定してください。
+    - `knit data push`コマンド中に使用されたタグ（`project:spam-detection`、`type:dataset`、`mode:initial-train`）を`path:"/in/dataset"` にも指定します。
       
     <br>
 
@@ -237,10 +237,10 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
           - type:dataset
           - mode:initial-train
     ```
-    - これは、Knitfab が学習プロセスを正しいデータセットと関連付けるためである。
+    - これは、Knitfab が学習プロセスを正しいデータセットと関連付けるためです。
 
   - `outputs`、`log`：
-    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加しましょう。
+    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加します。
 
     <br>
 
@@ -258,7 +258,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
       - これにより、Knitfab 内での出力とログの整理と検索が容易になります。
 
 - その他の重要な考慮事項：
-  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義してください。
+  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義します。
   - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
 
 **4. YAML ひな型の登録:**
@@ -281,7 +281,7 @@ YAML ひな型を登録した後、Knitfab は学習 Plan を実行するため�
 ```bash
 knit run find -p $initial_train_plan_id
 ```
-このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマンドを定期的に実行し、`status` が `done` に変わるまで待ちましょう。`done` に変わると Run が正常終了になります。
+このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマンドを定期的に実行し、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
 **7. モデル情報の取得:**
 
@@ -332,7 +332,7 @@ knit data push -t mode:validate \
                -n ./in/dataset/validate
 ```
 
-検証 Plan がデータセットを識別できるように、タグ（`mode:validate`、`type:dataset`、`project:spam-detection`）を追加しましょう。
+検証 Plan がデータセットを識別できるように、タグ（`mode:validate`、`type:dataset`、`project:spam-detection`）を追加します。
 
 **2. YAML ひな型の生成:**
 
@@ -345,13 +345,13 @@ knit plan template --scratch > ./plans/spam-detection-validate.v1.0.yaml
 docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     knit plan template > ./plans/spam-detection-validate.v1.0.yaml
 ```
-\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えましょう。
+\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えます。
 
 **3. YAML ひな型の追記:**
 
 - 重要な追記点：
   - `image`：
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えしましょう。
+    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えします。
     
     例：
     ```YAML
@@ -363,11 +363,11 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     - これにより、Knitfab はローカルレジストリからイメージをプルするという意味合いになります。
     
   - `inputs`：
-    - データセット: `path:"/in/dataset"`に次のタグを定義してください。
+    - データセット: `path:"/in/dataset"`に次のタグを定義します。
       - `project:spam-detection`
       - `type:dataset`
       - `mode:validate`
-    - モデル: `path:"/in/model"` に次のタグを定義してください。
+    - モデル: `path:"/in/model"` に次のタグを定義します。
       - `project:spam-detection`
       - `type:model`
       
@@ -387,7 +387,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     ```
 
   - `outputs`、`log`：
-    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加しましょう。
+    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加します。
 
     <br>
 
@@ -404,7 +404,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     ```
 
 - その他の重要な考慮事項：
-  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義してください。
+  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義します。
   - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
 
 **4. YAML ひな型の登録:**
@@ -422,7 +422,7 @@ validate_plan_id=$(echo "$validate_plan" | jq -r '.planId')
 ```bash
 knit run find -p $validate_plan_id
 ```
-コマンドを定期的に実行し、`status` が `done` に変わるまで待ちましょう。`done` に変わると Run が正常終了になります。
+コマンドを定期的に実行し、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
 **7. （任意）検証指標の取得:**
 
@@ -467,7 +467,7 @@ knit data push -t mode:incremental-train \
                -t project:spam-detection \
                -n ./in/dataset/incremental
 ```
-増分学習 Plan がデータセットを識別できるように、タグ（`mode:incremental-train`、`type:dataset`、`project:spam-detection`）を追加しましょう。
+増分学習 Plan がデータセットを識別できるように、タグ（`mode:incremental-train`、`type:dataset`、`project:spam-detection`）を追加します。
 
 **2. YAML ひな型の生成:**
 - 選択①：空のひな型を作成する
@@ -479,13 +479,13 @@ knit plan template --scratch > ./plans/spam-detection-incremental-train.v1.0.yam
 docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     knit plan template > ./plans/spam-detection-incremental-train.v1.0.yaml
 ```
-\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えしましょう。
+\* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えします。
 
 **3. YAML ひな型の追記:**
 
 - 重要な追記点：
   - `image`：
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えしましょう。
+    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えします。
     
     例：
     ```YAML
@@ -497,11 +497,11 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     - これにより、Knitfab はローカルレジストリからイメージをプルするという意味合いになります。
     
   - `inputs`：
-    - データセット: `path:"/in/dataset"`に次のタグを定義してください。
+    - データセット: `path:"/in/dataset"`に次のタグを定義します。
       - `project:spam-detection`
       - `type:dataset`
       - `mode:incremental-train`
-    - モデル: `path:"/in/model"` に次のタグを定義してください。
+    - モデル: `path:"/in/model"` に次のタグを定義します。
       - `project:spam-detection`
       - `type:model`
       - `mode:incremental-train`
@@ -527,7 +527,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 > - タグ不足で、Knitfab Plan 実行する際にエラーが発生することがあります。
 
   - `outputs`、`log`：
-    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加しましょう。
+    - `outputs` および `log` 項目に、プロジェクト関連タグ (`project:spam-detection`) を追加します。
 
     <br>
 
@@ -544,7 +544,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     ```
 
 - その他の重要な考慮事項：
-  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義してください。
+  - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義します。
   - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
 
 **4. YAML ひな型の登録:**
@@ -572,7 +572,7 @@ knit data tag --add mode:incremental-train $initial_train_model_knit_id
 ```bash
 knit run find -p $incremental_train_plan_id
 ```
-コマンドを定期的に実行し、`status` が `done` に変わるまで待ちましょう。`done` に変わると Run が正常終了になります。
+コマンドを定期的に実行し、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
 **8. モデル情報の取得:**
 
@@ -613,7 +613,7 @@ Knitfabは、増分学習からの出力したモデルを認識し、検証Plan
 
 1. 検証 Run と指標レポートの確認:
 
-[モデル検証](#ステップ-3-モデル検証)の手順6〜9を再実行し、以下のことを確認しましょう。
+[モデル検証](#ステップ-3-モデル検証)の手順6〜9を再実行し、以下のことを確認します。
 - 検証 Run のログ
 - 指標レポート
 
@@ -623,7 +623,7 @@ Knitfab は、学習プロセスとそれに関連付けられたリネージを
 
 そのため、新しいデータセットが登録されると、`mode:incremental-train` タグが付いた初期版のモデルが増分学習 Plan によって認識され、新しい Run が勝手に実行されます。
 
-この意図しない動作を防ぐために、次のコマンドを実行して、初期版のモデルから `mode:incremental-train` タグを削除しましょう。
+この意図しない動作を防ぐために、次のコマンドを実行して、初期版のモデルから `mode:incremental-train` タグを削除します。
 
 ```bash
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
@@ -644,7 +644,7 @@ knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 knit run rm ${run_id}
 ```
 
-`${run_id}`を、`$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id` の順に、Run の一意の Id に置き換えてください。
+`${run_id}`を、`$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id` の順に、Run の一意の Id に置き換えます。
 
 #### 5-2. Plan の非活性化：
 
@@ -707,7 +707,7 @@ knit data find -t project:spam-detection
 ```bash
 knit run rm ${run_id}
 ```
-`${run_id}` を手順1で取得した `runId` に置き換えてください。
+`${run_id}` を手順1で取得した `runId` に置き換えます。
 
 ### まとめ
 本書の事例は、以下のことを示しました。
