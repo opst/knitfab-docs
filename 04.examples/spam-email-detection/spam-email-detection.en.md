@@ -282,7 +282,6 @@ initial_train_run=$(knit run find -p $initial_train_plan_id)
 ```bash
 initial_train_outputs=$(echo "$initial_train_run" | jq -r '.[-1].outputs')
 ```
-
 - Get Model Knit Id:
 ```bash
 initial_train_model_knit_id=$(echo "$initial_train_outputs" | jq -r '.[0].knitId')
@@ -413,7 +412,6 @@ validate_run=$(knit run find -p $validate_plan_id)
 ```bash
 validate_outputs=$(echo "$validate_run" | jq -r '.[-1].outputs')
 ```
-
 - Get Validation Metrics Knit Id:
 ```bash
 validate_metrics_knit_id=$(echo "$validate_outputs" | jq -r '.[0].knitId')
@@ -533,9 +531,8 @@ incremental_train_plan=$(knit plan apply ./plans/spam-detection-incremental-trai
 
 **5. Extract the Plan Id:**
 ```bash
-initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
+incremental_train_plan_id=$(echo "$incremental_train_plan" | jq -r '.planId')
 ```
-This command extracts the unique Id of the created Plan from the JSON output.
 
 **6. Add `mode:incremental-train` Tag to the Initial Model:**
 
