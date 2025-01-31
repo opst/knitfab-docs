@@ -600,8 +600,8 @@ Repeat steps **6-9** from the ["Model validation"](#step-3-model-validation) sec
 - View the Run log of the validation Run.
 - Download the metrics artifact for analysis.
 
-## Step 5: Clean up
-#### 5-1. Remove `mode:incremental-train` Tag from Initial Model:
+
+#### 4-3. Remove `mode:incremental-train` Tag from Initial Model:
 
 Knitfab is an automated platform that manages training processes and their associated artifacts.
 
@@ -612,8 +612,8 @@ To prevent this unintended behavior, execute the following command to remove the
 ```bash
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
-
-#### 5-2. To Remove a Run:
+## Step 5: Clean up
+#### 5-1. To Remove a Run:
 
 > [!Caution]
 >
@@ -629,7 +629,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
-#### 5-3. To Deactivate a Plan:
+#### 5-2. To Deactivate a Plan:
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -638,7 +638,7 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-#### 5-4. To Remove the Uploaded Dataset:
+#### 5-3. To Remove the Uploaded Dataset:
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
