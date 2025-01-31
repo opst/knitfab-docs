@@ -169,14 +169,14 @@ docker tag ${docker_image} ${registry_uri}/${docker_image}
 
 **2. イメージをKnitfabレジストリへプッシュ:**
 
-次に、タグ付きのイメージをKnitfabレジストリにプッシュします。
+次に、タグ付きのイメージを Knitfab レジストリにプッシュします。
 ```bash
 docker push ${registry_uri}/${docker_image}
 ```
 `${docker_image}` を、前の手順でタグ付けした各イメージの名前（レジストリ URI を含む）に置き換えます。
 
 ## ステップ 2： 初期学習
-この手順では、準備したデータセットを使用してMLモデルの初期学習を行います。
+この手順では、準備したデータセットを使用して ML モデルの初期学習を行います。
 
 **1. 学習データを Knitfab へプッシュ:**
 ```bash
@@ -187,9 +187,10 @@ knit data push -t mode:initial-train \
 ```
 このコマンドは、`./in/dataset/initial`にある初期学習データセットを Knitfab にプッシュします。
 
-`-t`フラグは、タグ（`mode:initial-train`、`type:dataset`、`project:spam-detection`）を追加することで、後述の学習プロセスで Knitfab がデータセットを識別できるようになります。
+`-t` フラグは、タグ（`mode:initial-train`、`type:dataset`、`project:spam-detection`）を追加することで、後述の学習プロセスで Knitfab がデータセットを識別できるようになります。
 
 **2. YAML ひな型の生成:**
+
 YAML ひな型を生成するには、2 つの選択があります。
 
 - 選択①：空のひな型を作成する
@@ -198,12 +199,12 @@ knit plan template --scratch > ./plans/spam-detection-initial-train.v1.0.yaml
 ```
 これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい空の YAML ひな型が作成されます。ひな型には必要な構成要素を追記します。
 
-- 選択②：Dockerイメージからひな型を生成する
+- 選択②：Docker イメージからひな型を生成する
 ```bash
 docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
     knit plan template > ./plans/spam-detection-initial-train.v1.0.yaml
 ```
-このコマンドは、`Docker` イメージ`spam-detection-initial-train:v1.0` に基づいて YAML ひな型を生成します。
+このコマンドは、`Docker` イメージ `spam-detection-initial-train:v1.0` に基づいて YAML ひな型を生成します。
 
 \* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えます。
 
@@ -212,7 +213,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
 **3. YAML ひな型の追記:**
 - 重要な追記点：
   - `image`：
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えます。
+    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えます。
     
     例：
     ```YAML
@@ -224,7 +225,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
     - これにより、Knitfab はローカルレジストリからイメージをプルするという意味合いになります。
 
   - `inputs`：
-    - `knit data push`コマンド中に使用されたタグ（`project:spam-detection`、`type:dataset`、`mode:initial-train`）を`path:"/in/dataset"` にも指定します。
+    - `knit data push` コマンド中に使用されたタグ（`project:spam-detection`、`type:dataset`、`mode:initial-train`）を `path:"/in/dataset"` にも指定します。
       
     <br>
 
@@ -259,7 +260,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
 
 - その他の重要な考慮事項：
   - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義します。
-  - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
+  - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにある YAML ファイルを参照してください。
 
 **4. YAML ひな型の登録:**
 ```bash
@@ -269,7 +270,7 @@ initial_train_plan=$(knit plan apply ./plans/spam-detection-initial-train.v1.0.y
 
 `initial_train_plan` 変数にはコマンドの出力として作成された Plan の詳細が格納されています。
 
-**5. Plan Idの抽出:**
+**5. Plan Id の抽出:**
 ```bash
 initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
 ```
@@ -300,7 +301,7 @@ initial_train_outputs=$(echo "$initial_train_run" | jq -r '.[-1].outputs')
 initial_train_model_knit_id=$(echo "$initial_train_outputs" | jq -r '.[0].knitId')
 ```
 
-**8.（任意）Runログの確認:**
+**8.（任意）Run ログの確認:**
 
 学習中にログを確認したい場合は、次のコマンドを使用できます。
 - Run Id の取得：
@@ -460,7 +461,7 @@ knit data pull -x $validate_metrics_knit_id ./out/metric
 初期学習と検証が完了したら、新しいデータを使用して増分学習を実行し、その後、更新されたモデルのさらなる検証を行います。
 
 #### 4-1. 新しいデータを用いた初期モデルの学習と更新：
-**1. 新しい学習データをKnitfabへプッシュ:**
+**1. 新しい学習データを Knitfab へプッシュ:**
 ```bash
 knit data push -t mode:incremental-train \
                -t type:dataset \
@@ -474,7 +475,7 @@ knit data push -t mode:incremental-train \
 ```bash
 knit plan template --scratch > ./plans/spam-detection-incremental-train.v1.0.yaml
 ```
-- 選択②：Dockerイメージからひな型を生成する
+- 選択②：Docker イメージからひな型を生成する
 ```bash
 docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     knit plan template > ./plans/spam-detection-incremental-train.v1.0.yaml
@@ -485,7 +486,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 
 - 重要な追記点：
   - `image`：
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えます。
+    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えます。
     
     例：
     ```YAML
@@ -545,7 +546,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 
 - その他の重要な考慮事項：
   - 計算資源割り当て：学習プロセスに必要な資源（例：CPU、メモリ、GPU）を追加に定義します。
-  - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
+  - YAML構造：変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにある YAML ファイルを参照してください。
 
 **4. YAML ひな型の登録:**
 ```bash
@@ -591,7 +592,7 @@ incremental_train_model_knit_id=$(echo "$incremental_train_outputs" | jq -r '..k
 この一連のコマンドは、増分学習 Run によって生成されたモデルに関連付けられている Knit Id を取得します。
 
 **9.（任意）Run ログの確認:**
-- Run Idの取得：
+- Run Id の取得：
 ```bash
 incremental_train_run_id=$(echo "$incremental_train_run" | jq -r '.[-1].runId')
 ```
@@ -609,7 +610,7 @@ knit data pull -x $incremental_train_model_knit_id./out/model
 #### 4-2. 増分モデルの検証：
 **0. 検証 Plan の自動実行:**
 
-Knitfabは、増分学習からの出力したモデルを認識し、検証Plan の基に新しい Run を自動的に実行します。
+Knitfab は、増分学習からの出力したモデルを認識し、検証Plan の基に新しい Run を自動的に実行します。
 
 **1. 検証 Run と指標レポートの確認:**
 
@@ -617,7 +618,7 @@ Knitfabは、増分学習からの出力したモデルを認識し、検証Plan
 - 検証 Run のログ
 - 指標レポート
 
-#### 4-3. 初期版のモデルからmode:incremental-trainタグを削除する
+#### 4-3. 初期版のモデルから `mode:incremental-train` タグを削除する
 
 Knitfab は、学習プロセスとそれに関連付けられたリネージを自動的に管理する MLOps ツールです。
 
@@ -630,7 +631,7 @@ knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
 
 ## ステップ 5： 片付け
-#### 5-1. Runの削除：
+#### 5-1. Run の 削除：
 > [!Caution]
 > 
 > - Run が**すでに停止**していて、**下流に他の Run がない**場合に限り、Run を削除できます。
@@ -638,13 +639,13 @@ knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 
 > [!Warning]
 >
-> Runの削除は**非可逆**の操作です。
+> Run の 削除は**非可逆**の操作です。
 
 ```bash
 knit run rm ${run_id}
 ```
 
-`${run_id}`を、`$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id` の順に、Run の一意の Id に置き換えます。
+`${run_id}` を、`$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id` の順に、Run の一意の Id に置き換えます。
 
 #### 5-2. Plan の非活性化：
 
@@ -652,12 +653,12 @@ knit run rm ${run_id}
 ```bash
 knit plan active no ${plan_id}
 ```
-`${plan_id}`を、非活性化したい Plan の一意の Id（例：`$initial_train_plan_id`、`$validate_plan_id`、`$incremental_train_plan_id`）に置き換えてくだい。
+`${plan_id}` を、非活性化したい Plan の一意の Id（例：`$initial_train_plan_id`、`$validate_plan_id`、`$incremental_train_plan_id`）に置き換えてくだい。
 
 #### 5-3. アップロードされたデータセットの削除：
 Knitfabでアップロードされたデータセットを削除するには、関連付けられたアップロード Run を削除する必要があります。
 
-**1. データセットRun Idの検索:**
+**1. データセット Run Id の検索:**
 
 - データセット一覧の取得：
   - 次のコマンドを実行して、タグ `project:spam-detection` が付いたすべてのデータセットを取得します。
@@ -715,3 +716,58 @@ knit run rm ${run_id}
 - **多段階 ML モデルの学習と検証:** 簡単ななスパムメール検知モデルの初期学習、増分学習、および後続の検証を含む、多段階ワークフローを実装しました。
 - **学習とリネージ管理の自動化**: Knitfab を活用して、学習プロセスを自動化し、実験ごとに入出力と関連リネージを管理しました。
 
+### トラブルシューティング
+#### 問題1：
+Knitfab Run が `starting` で停止し、進行しない。
+```json
+{
+        "runId": "64b5a7ae-5c85-48f1-b785-955c1709174a",
+        "status": "starting",
+        "updatedAt": "2025-01-30T01:01:03.589+00:00",
+        ...
+}
+```
+
+**デバッグ手順：**
+
+**1. Kubernetes Pod の検査:**
+```bash
+kubectl -n knitfab get po
+```
+このコマンドは、`knitfab` 名前空間内のすべての Pod をリストします。この例の Run Id（`64b5a7ae-5c85-48f1-b785-955c1709174a`）に関連付けられた Pod を探します。
+
+**2. Pod ステータスの分析:**
+
+出力の `STATUS` 列に注意してください。次のようなものが表示されます。
+| NAME | READY | STATUS | RESTARTS | AGE |
+|---|---|---|---|---| 
+| worker-run-64b5a7ae-5c85-48f1-b785-955c1709174a-nzhpq | 1/2 | ImagePullBackOff | 0 | 101s |
+
+- `ImagePullBackOff` エラー: これは、Kubernetes がRun に必要な Docker イメージをプルできないことを示します。
+
+  - **ローカルレジストリ:** ローカルレジストリを使用している場合は、Plan YAML の `image` 項目がレジストリ URI を `localhost` に設定しているか確認してください。
+
+  <br>
+
+  ```YAML
+  image: "localhost:30503/spam-detection-initial-train:v1.0"
+  ```
+
+  - **レジストリ認証情報:** リモートレジストリ（Docker Hubなど）を使用している場合は、Knitfab Kubernetes　クラスタにイメージをプルするために必要な認証情報（例：ユーザー名/パスワード、アクセストークン）が設定されることを確認してください。
+
+3. Plan の再登録：
+
+イメージプルの問題を修正した後、Plan の再登録が必要となる場合があります。そのとき、以下の手順に従ってください。
+
+- 現在のRunの停止:
+```bash
+knit run stop --fail ${run_id}
+```
+（`${run_id}` を実際の Run Id（例：64b5a7ae-5c85-48f1-b785-955c1709174a）に置き換えます）
+
+- （任意）Runの削除: [ステップ5：片付け](#ステップ-5-片付け)の「Runの削除」の手順に従ってください。
+- 古いPlanの非活性化: [ステップ5：片付け](#ステップ-5-片付け)の「Planの非活性化」の手順に従ってください。
+- 新しいPlanの登録: 実行している学習の種類に応じて、関連セクションを参照してください。
+  - [ステップ 2： 初期学習](#ステップ-2-初期学習)
+  - [ステップ 3： モデル検証](#ステップ-3-モデル検証)
+  - [ステップ 4： 増分学習と検証](#ステップ-4-増分学習と検証)
