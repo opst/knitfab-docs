@@ -43,7 +43,7 @@ flowchart LR
   - **プロダクションの場合:** [03.admin-guide](../../03.admin-guide/admin-guide-installation.ja.md)に記載されている手順に従って、インストールを実行します。
   - **実験の場合:** 簡易版については、[01.getting-started: Knitfab（簡易版） をローカル環境にインストールする](../../01.getting-started/getting-started.ja.md#Knitfab簡易版-をローカル環境にインストールする)に記載されている手順に従ってください。
 - **Knit CLI:** [01.getting-started: CLI ツール: knit](../../01.getting-started/getting-started.ja.md#cli-ツール-knit)のインストール手順に従って、Knit CLIを設定します。
-- **Knitコマンド初期化:** knit initを使用してKnitコマンドを初期化する方法については、[01.getting-started: knit コマンドの初期化](../../01.getting-started/getting-started.en.md#knit-コマンドの初期化)を参照してください。
+- **Knitコマンド初期化:** knit initを使用してKnitコマンドを初期化する方法については、[01.getting-started: knit コマンドの初期化](../../01.getting-started/getting-started.ja.md#knit-コマンドの初期化)を参照してください。
 - **`Docker`インストール:** イメージをビルドしてKnitfabプラットフォームにプッシュするために必要です。
 
 **任意:**
