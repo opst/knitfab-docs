@@ -104,7 +104,7 @@ docker build -t spam-detection-incremental-train:v1.0 \
 #### 1-2. （任意）Docker イメージを動作確認する
 > [!Note]
 >
-> ビルドしたイメージに自信がある場合は、Knitfab へのプッシュに進んでください。（[Docker イメージを Knitfab へプッシュする](#Docker-イメージを-Knitfab-へプッシュする)）
+> ビルドしたイメージに自信がある場合は、Knitfab へのプッシュに進んでください。（[Docker イメージを Knitfab へプッシュする](#1-3-Docker-イメージを-Knitfab-へプッシュする)）
 
 **1. 初期学習:**
 ```bash
