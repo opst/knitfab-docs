@@ -745,7 +745,7 @@ kubectl -n knitfab get po
 |---|---|---|---|---| 
 | worker-run-64b5a7ae-5c85-48f1-b785-955c1709174a-nzhpq | 1/2 | ImagePullBackOff | 0 | 101s |
 
-`ImagePullBackOff` エラー: これは、Kubernetes がRun に必要な Docker イメージをプルできないことを示します。以下の手順に従い、問題点を確認してください
+`ImagePullBackOff` エラー: これは、Kubernetes がRun に必要な Docker イメージをプルできないことを示します。以下の手順に従い、問題点を確認してください。
 
   - **ローカルレジストリ:** ローカルレジストリを使用している場合は、Plan YAML の `image` 項目がレジストリ URI を `localhost` に設定しているか確認してください。
 
