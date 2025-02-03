@@ -722,7 +722,7 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
 |---|---|---|---|---| 
 | worker-run-64b5a7ae-5c85-48f1-b785-955c1709174a-nzhpq | 1/2 | ImagePullBackOff | 0 | 101s |
 
-- **`ImagePullBackOff` Error**: This indicates that Kubernetes can't pull the Docker image required for your run.
+**`ImagePullBackOff` Error**: This indicates that Kubernetes can't pull the Docker image required for your run. Follow the steps that match the type of your resitry.
   - **Local Registry:** If you're using a local Docker registry, ensure the `image` field in your Plan YAML uses `localhost` for the registry URI:
 
   <br>
@@ -731,7 +731,7 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
   image: "localhost:30503/spam-detection-initial-train:v1.0"
   ```
 
-  - **Registry Credentials:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
+  - **Remote Registry:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
 
 **3. Reapply the Plan:** 
 
