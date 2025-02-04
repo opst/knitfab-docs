@@ -54,7 +54,8 @@ flowchart LR
 
 
 ### リポジトリ
-本書で使用されるファイルとディレクトリは、GitHub の `knitfab-docs` リポジトリからをクローンすることができます。
+本書で使用されるファイルとディレクトリは、GitHub の `knitfab-docs` リポジトリからをクローンできます。
+
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
 ```
