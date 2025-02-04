@@ -191,15 +191,15 @@ knit data push -t mode:initial-train \
 
 **2. YAML ひな型の生成:**
 
-YAML ひな型を生成するには、2 つの選択があります。
+YAML ひな型を生成するには、2 つの選択肢があります。
 
-- 選択①：空のひな型を作成する
+- 選択肢①：空のひな型を作成する
 ```bash
 knit plan template --scratch > ./plans/spam-detection-initial-train.v1.0.yaml
 ```
 これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい空の YAML ひな型が作成されます。ひな型には必要な構成要素を追記します。
 
-- 選択②：Docker イメージからひな型を生成する
+- 選択肢②：Docker イメージからひな型を生成する
 ```bash
 docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
     knit plan template > ./plans/spam-detection-initial-train.v1.0.yaml
@@ -337,11 +337,11 @@ knit data push -t mode:validate \
 
 **2. YAML ひな型の生成:**
 
-- 選択①：空のひな型を作成する
+- 選択肢①：空のひな型を作成する
 ```bash
 knit plan template --scratch > ./plans/spam-detection-validate.v1.0.yaml
 ```
-- 選択②：Dockerイメージからひな型を生成する
+- 選択肢②：Dockerイメージからひな型を生成する
 ```bash
 docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     knit plan template > ./plans/spam-detection-validate.v1.0.yaml
@@ -473,11 +473,11 @@ knit data push -t mode:incremental-train \
 増分学習 Plan がデータセットを識別できるように、タグ（`mode:incremental-train`、`type:dataset`、`project:spam-detection`）を追加します。
 
 **2. YAML ひな型の生成:**
-- 選択①：空のひな型を作成する
+- 選択肢①：空のひな型を作成する
 ```bash
 knit plan template --scratch > ./plans/spam-detection-incremental-train.v1.0.yaml
 ```
-- 選択②：Docker イメージからひな型を生成する
+- 選択肢②：Docker イメージからひな型を生成する
 ```bash
 docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     knit plan template > ./plans/spam-detection-incremental-train.v1.0.yaml
