@@ -319,7 +319,8 @@ knit run show --log $initial_train_run_id
 
 **9.（任意）モデルの保存:**
 
-学習済みのモデルをロカールに保存したい場合は、次のコマンドを使用して Knitfab からダウンロードできます。
+学習済みのモデルをローカルに保存したい場合は、次のコマンドを使用して Knitfab からダウンロードできます。
+
 ```bash
 knit data pull -x $initial_train_model_knit_id ./out/model
 ```
