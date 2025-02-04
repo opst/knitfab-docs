@@ -166,7 +166,7 @@ docker run --rm -it \
 docker tag ${docker_image} ${registry_uri}/${docker_image}
 ```
 
-置換：
+プレースホルダを値で置き換えてください:
 
 - `${docker_image}` をビルドされた各イメージの名前（例：`spam-detection-initial-train:v1.0`、`spam-detection-validate:v1.0`、`spam-detection-incremental-train:v1.0`）に置き換えてください。
 - `${registry_uri}` を、Knitfab レジストリの実際の URI（例：`192.0.2.1:30503`）に置き換えてください。
