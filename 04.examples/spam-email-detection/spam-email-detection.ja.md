@@ -50,7 +50,8 @@ flowchart LR
 
 **任意:**
 
-- **kubectl（推奨）：** Knitfab Kubernetes クラスタのデバッグなどに用いられます。
+- **kubectl（推奨）：** Knitfab Kubernetes クラスタのデバッグなどに用います。
+
 
 ### リポジトリ
 本書で使用されるファイルとディレクトリは、GitHub の `knitfab-docs` リポジトリからをクローンすることができます。
