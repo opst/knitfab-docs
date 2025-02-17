@@ -12,7 +12,7 @@ The following diagram outlines the key components and steps involved:
 - __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we'll use GPT-2.
 - __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the 20 Newsgroups dataset from scikit-learn.
 - __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.
-- __Evaluation Dataset:__ A held-out subset of the 20 Newsgroups dataset used for LLM-as-a-judge validation.
+- __Evaluation Dataset:__ A held-out subset of the 20 Newsgroups dataset used for LLM-as-a-judge evaluation.
 - __Metrics:__ Custom metrics designed to evaluate LLM outputs.
 
 **Process:**
@@ -21,11 +21,11 @@ The following diagram outlines the key components and steps involved:
 
 ```mermaid
 flowchart LR
-    A((LLM)) --> C[Train]
-    B((Train Dataset)) --> C
+    A((Base Model)) --> C[Train]
+    B((Training Dataset)) --> C
     C --> D((Fine-tuned Model))
     D --> F[Evaluate]
-    E((Evaluate Dataset)) --> F
+    E((Evaluation Dataset)) --> F
     F --> G((Metrics)) 
 ```
 ### Prerequisites
@@ -59,9 +59,9 @@ Once cloned, navigate to the `04.examples/news-classification` directory. You wi
 ### Task
 - [Step 0: Define the training and evaluation tasks.](#step-0-define-the-training-and-evaluation-tasks)
 - [Step 1: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
-- [Step 2: Initial training.](#step-2-initial-training)
-- [Step 3: Model validation.](#step-3-model-validation)
-- [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
+- [Step 2: Fine-tuning.](#step-2-fine-tuning)
+- [Step 3: Set up Ollama for LLM-as-a-Judge evaluation.](#step-3-set-up-ollama-for-llm-as-a-judge-evaluation)
+- [Step 4: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
 - [Step 5: Clean up.](#step-5-clean-up)
 
 ## Step 0: Define the training and evaluation tasks
@@ -112,6 +112,13 @@ quant_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.float16,
     bnb_4bit_use_double_quant=True,
 )
+```
+- Reduces model size using quantization for efficiency.
+- "NormalFloat4" (NF4) helps minimize the accuracy loss.
+- `torch.float16` (half-precision floating point) allows for faster computations than full precision (float32) while still maintaining reasonable accuracy.
+- Double quantization can further reduce memory usage.
+
+```python
 self.model = AutoModelForSequenceClassification.from_pretrained(
     self.args.base_model,
     num_labels=self.num_labels,
@@ -119,8 +126,8 @@ self.model = AutoModelForSequenceClassification.from_pretrained(
     device_map=args.device,
 )
 ```
-- Reduces model size using quantization for efficiency.
-- Ensures the model is loaded onto the specified device (`cuda/cpu`).
+- Load a pre-trained model for sequence classification.
+- Specify the number of output labels for the classification task, the quantization config and the device (`cpu/cuda`)
 
 ### 3. Load and Preprocess Datasets
 
@@ -141,7 +148,8 @@ def load_eval_datasets(self) -> None:
     raw_eval_dataset = fetch_20newsgroups(subset="test")
     self.eval_dataset = self.prepare_datasets(raw_eval_dataset)
 ```
-- Loads tran and test data subset from the `fetch_20newsgroups` dataset.
+- Loads train and test data subset from the `fetch_20newsgroups` dataset.
+
 ```python
 def prepare_datasets(self, dataset: Any) -> Dataset:
     def tokenize(examples):
@@ -191,6 +199,7 @@ training_args = TrainingArguments(
 - Defines core training parameters, including batch size, learning rate, weight decay, and gradient accumulation.
 - Implements mixed precision (`fp16`) for optimized training efficiency.
 - Uses a cosine learning rate scheduler with a warm-up ratio of `0.1`.
+- Specify a dedicated directory to organize project's outputs, such as trained models and log files.
 
 ```python
 peft_config = LoraConfig(
@@ -243,6 +252,8 @@ self.save_results()
 - Saves model checkpoints and metrics for later use.
 
 ### 0-2: LLM-as-a-judge Evaluation
+
+This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
 ### 1. Parse Arguments
 
@@ -398,7 +409,11 @@ This command runs the `news-classification-train:v1.0` image in an interactive m
 - This allows you to test the image locally and generate the fine-tuned model.
 
 ### 2. Configuring a Local LLM using Ollama:
-This example uses a local LLM for LLM-as-a-judge evaluation. You can optionally configure an OpenAI API key as described in the documentation: `https://docs.confident-ai.com/docs/metrics-introduction#using-openai`. Alternatively, if you prefer to use your own custom model, follow the setup instructions here: `https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm`.
+> [!Note]
+> 
+> This example uses a local LLM for LLM-as-a-judge evaluation. 
+> You can optionally configure an OpenAI API key as described in the documentation: `https://docs.confident-ai.com/docs/metrics-introduction#using-openai`. 
+> Alternatively, if you prefer to use your own custom model, follow the setup instructions here: `https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm`.
 
 #### Create a Docker Network:
 ```bash
@@ -464,7 +479,7 @@ docker push ${registry_uri}/${docker_image}
 ```
 Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
 
-## Step 2: Fine-tuning
+## Step 2: Fine-tuning.
 This step involves the fine-tuning of the LLM for news classification.
 
 ### 1. Generate YAML tempelate:
@@ -502,8 +517,6 @@ This command generates a YAML template based on the Docker image `news-classific
 
   - `inputs`, `outputs`, `log`: 
     Add the following tags to the `inputs`, `outputs` and `log` sections:
-    
-    <br>
 
     ```YAML
     inputs:
@@ -547,7 +560,13 @@ This command sends the YAML template to the Knitfab API, which creates a new Pla
 
 The output of the command, which is stored in the `train_plan` variable, is a JSON object containing details about the created Plan.
 
-### 4. Push Configuration File to Knitfab:
+### 4. Extract the Plan Id:
+```bash
+train_plan_id=$(echo "$train_plan" | jq -r '.planId')
+```
+This command extracts the unique Id of the created Plan from the JSON output.
+
+### 5. Push Configuration File to Knitfab:
 ```bash
 knit data push -t type:config \
                -t project:news-classification \
@@ -557,19 +576,13 @@ This command pushes the configuration files located at `./configs` to the Knitfa
 
 The `-t` flags add tags (e.g., `type:config`, `project:news-classification`) that Knitfab uses to identify and associate configurations with generated Plans.
 
-### 5. Extract the Plan Id:
-```bash
-train_plan_id=$(echo "$train_plan" | jq -r '.planId')
-```
-This command extracts the unique Id of the created Plan from the JSON output.
-
 ### 6. Confirm the Run Status:
 
-After applying the YAML template, Knitfab will initiate a Run to execute the training plan. You can monitor the status of this Run using the following command:
+After pushing the configuration file, Knitfab will initiate a Run to execute the training plan. You can monitor the status of this Run using the following command:
 ```bash
 knit run find -p $train_plan_id
 ```
-This command displays the training Run associated with the specified Plan Id. Periodically execute the command and wait until the `status` changes to `done` to indicate that the initial training has completed successfully.
+This command displays the training Run associated with the specified Plan Id. Periodically execute the command and wait until the `status` changes to `done` to indicate that the fine-tuning has completed successfully.
 
 ### 7. Retrieve Model Information:
 
@@ -607,7 +620,7 @@ knit data pull -x $train_model_knit_id ./out
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 3: Set up Ollama for LLM-as-a-Judge Evaluation
+## Step 3: Set up Ollama for LLM-as-a-Judge evaluation.
 This step deploys and configures Ollama, the application that will serve as the foundation for our LLM-as-a-judge evaluation process.
 > [!Note]
 > 
@@ -690,7 +703,7 @@ To deploy the Ollama application, execute the following commands:
 kubectl apply -f ollama/ollama-deployment.yaml
 kubectl apply -f ollama/ollama-service.yaml
 ```
-## Step 4: LLM-as-a-judge evaluation
+## Step 4: LLM-as-a-judge evaluation.
 After fine-tuning, we will evaluate the model performance and check for any issues.
 
 ### 1. Generate YAML tempelate:
@@ -719,8 +732,6 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
     ```
   - `inputs`, `outputs`, `log`: 
     Add the following tags to the `inputs`, `outputs` and `log` sections:
-    
-    <br>
     
     ```YAML
     inputs:
@@ -778,9 +789,9 @@ evaluate_plan_id=$(echo "$evaluate_plan" | jq -r '.planId')
 ```bash
 knit run find -p $evaluate_plan_id
 ```
-Wait until the `status` changes to `done` to indicate that the validation has completed successfully.
+Wait until the `status` changes to `done` to indicate that the evaluation has completed successfully.
 
-### 6. (Optional) Retrieve Validation Metrics Information:
+### 6. (Optional) Retrieve Evaluation Metrics Information:
 - Get Run Information:
 ```bash
 evaluate_run=$(knit run find -p $evaluate_plan_id)
@@ -789,7 +800,7 @@ evaluate_run=$(knit run find -p $evaluate_plan_id)
 ```bash
 evaluate_outputs=$(echo "$evaluate_run" | jq -r '.[-1].outputs')
 ```
-- Get Validation Metrics Knit Id:
+- Get Evaluation Metrics Knit Id:
 ```bash
 evaluate_metrics_knit_id=$(echo "$evaluate_outputs" | jq -r '.[0].knitId')
 ```
@@ -942,6 +953,5 @@ knit run stop --fail ${run_id}
 - **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
 - **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
 - **Apply a new Plan:** Refer to the relevant section based on the type of training you're doing:
-  - [Step 2: Initial training.](#step-2-initial-training)
-  - [Step 3: Model validation.](#step-3-model-validation)
-  - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
+  - [Step 2: Fine-tuning.](#step-2-fine-tuning)
+  - [Step 4: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
