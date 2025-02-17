@@ -71,7 +71,7 @@ def create_classifier(model_path: str, num_labels: int, device: str):
             model=model,
             tokenizer=tokenizer,
             device=device,
-            max_length=970
+            max_length=1024
         )
     except Exception as e:
         raise RuntimeError(f"Failed to create classifier: {e}")
@@ -83,34 +83,30 @@ def map_category(label: str, categories: List[str]) -> str:
     except (ValueError, IndexError):
         return "Unknown"
     
-def get_test_cases(model_path: str, device: str, num_samples: int, num_labels:int) -> List[LLMTestCase]:
+def get_test_cases(model_path: str, device: str, num_samples: int, num_labels: int) -> List[LLMTestCase]:
     raw_eval_dataset = fetch_20newsgroups(subset='test')
     categories = raw_eval_dataset.target_names
-    
+
     data = raw_eval_dataset.data[:num_samples]
     target = raw_eval_dataset.target[:num_samples]
 
+    prompts = [f"### [HUMAN] Classify this news article: '{text}'\n" for text in data]
+    
     classifier = create_classifier(model_path, num_labels, device)
-    
-    test_cases = []
-    for text, category_idx in zip(data, target):
-        try:
-            expected_category = categories[category_idx]
-            prompt = f"### [HUMAN] Classify this news article: '{text}'\n"
-            
-            actual_output = classifier(prompt)[0]["label"]
-            actual_output = map_category(actual_output, categories)
+    batch_results = classifier(prompts, truncation=True, max_length=1024, batch_size=1)
 
-            test_case = LLMTestCase(
-                input=text,
-                actual_output=actual_output,
-                expected_output=expected_category,
-            )
-            test_cases.append(test_case)
-        except Exception as e:
-            print(f"Error processing test case: {e}")
-            continue
-    
+    test_cases = []
+    for text, category_idx, result in zip(data, target, batch_results):
+        expected_category = categories[category_idx]
+        actual_output = map_category(result["label"], categories)
+
+        test_case = LLMTestCase(
+            input=text,
+            actual_output=actual_output,
+            expected_output=expected_category,
+        )
+        test_cases.append(test_case)
+
     return test_cases
 
 class TestGPT2Model:

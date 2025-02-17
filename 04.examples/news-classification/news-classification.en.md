@@ -288,7 +288,7 @@ return pipeline(
     model=model,
     tokenizer=tokenizer,
     device=device,
-    max_length=970
+    max_length=1024
 )
 ```
 - Initializes a classification pipeline with the given model and tokenizer.
@@ -311,19 +311,19 @@ categories = raw_eval_dataset.target_names
 data = raw_eval_dataset.data[:num_samples]
 target = raw_eval_dataset.target[:num_samples]
 
+prompts = [f"### [HUMAN] Classify this news article: '{text}'\n" for text in data]
+
 classifier = create_classifier(model_path, num_labels, device)
+batch_results = classifier(prompts, truncation=True, max_length=1024, batch_size=1)
 ```
 - Retrieves `num_samples` from the dataset.
 - Uses the trained classifier to predict categories for each test sample.
 
 ```python
-for text, category_idx in zip(data, target):
+test_cases = []
+for text, category_idx, result in zip(data, target, batch_results):
     expected_category = categories[category_idx]
-    prompt = f"### [HUMAN] Classify this news article: '{text}'\n"
-    
-    actual_output = classifier(prompt)[0]["label"]
-    actual_output = map_category(actual_output, categories)
-    
+    actual_output = map_category(result["label"], categories)
     test_case = LLMTestCase(
         input=text,
         actual_output=actual_output,
@@ -331,7 +331,6 @@ for text, category_idx in zip(data, target):
     )
     test_cases.append(test_case)
 ```
-- Formats input samples for classification.
 - Compares predicted category (`actual_output`) with ground truth (`expected_category`).
 - Stores results as test cases for evaluation.
 
@@ -452,11 +451,11 @@ docker run --rm -it --gpus all --network ollama-net\
 ```
 - The command runs `news-classification-evaluate:v1.0` image and connects the container to the `ollama-net` network.
 - The image evaluate the fine-tuned model using the defined custom metric and `test` subset of the `20 Newsgroups` dataset.
-- The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
+- The evaluation metrics will be saved as a JSON file named `deepeval-result.json` in the `out` directory.
 
 ### 3. Performance Analysis:
 
-Review the `metrics.json` file to analyze the model's performance based on the defined custom metrics. This analysis will allow you to evaluate the effectiveness of your fine-tuning. Consider whether the current custom metrics adequately reflect your specific requirements, and redefine them if necessary.
+Review the `deepeval-result.json` file to analyze the model's performance based on the defined custom metrics. This analysis will allow you to evaluate the effectiveness of your fine-tuning. Consider whether the current custom metrics adequately reflect your specific requirements, and redefine them if necessary.
 
 ### 1-3. To Push Docker Images to Knitfab:
 
