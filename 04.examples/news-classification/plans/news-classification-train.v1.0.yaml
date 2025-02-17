@@ -1,0 +1,31 @@
+annotations: []
+
+image: "localhost:30503/news-classification-train:v1.0"
+
+entrypoint: ["python", "-u", "train.py"]
+
+args: ["--config-file", "/configs/train-config.json"]
+
+inputs:
+  - path: "/configs"
+    tags:
+      - "type:config"
+      - "project:news-classification"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "type:model"
+      - "project:news-classification"
+
+log:
+  tags:
+    - "type:log"
+    - "project:news-classification"
+
+active: true
+
+resources:
+  cpu: 1
+  memory: 10Gi
+  nvidia.com/gpu: "1"

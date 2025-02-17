@@ -1,0 +1,6 @@
+{
+    "save_to": "/out",
+    "device": "auto",
+    "num_sample": 100,
+    "threshold": 0.8
+}

@@ -1,0 +1,36 @@
+annotations: []
+
+image: "localhost:30503/news-classification-evaluate:v1.0"
+
+entrypoint: ["python", "-u", "evaluate.py"]
+
+args: ["--config-file", "/configs/evaluate-config.json"]
+
+inputs:
+  - path: "/configs"
+    tags:
+      - "type:config"
+      - "project:news-classification"
+  
+  - path: "/in"
+    tags:
+      - "type:model"
+      - "project:news-classification"
+
+outputs:
+  - path: "/out"
+    tags:
+      - "type:metrics"
+      - "project:news-classification"
+
+log:
+  tags:
+    - "type:log"
+    - "project:news-classification"
+
+active: true
+
+resources:
+  cpu: 1
+  memory: 10Gi
+  nvidia.com/gpu: "1"
