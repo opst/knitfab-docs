@@ -57,16 +57,16 @@ Once cloned, navigate to the `04.examples/news-classification` directory. You wi
 - **plans:** Contains the Knitfab Plan YAML templates.
 
 ### Task
-- [Step 0: Define the training and evaluation tasks.](#step-0-define-the-training-and-evaluation-tasks)
-- [Step 1: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
-- [Step 2: Fine-tuning.](#step-2-fine-tuning)
-- [Step 3: Set up Ollama for LLM-as-a-Judge evaluation.](#step-3-set-up-ollama-for-llm-as-a-judge-evaluation)
-- [Step 4: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
-- [Step 5: Clean up.](#step-5-clean-up)
+- [Step 1: Define the training and evaluation tasks.](#step-0-define-the-training-and-evaluation-tasks)
+- [Step 2: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
+- [Step 3: Fine-tuning.](#step-2-fine-tuning)
+- [Step 4: Set up Ollama for LLM-as-a-Judge evaluation.](#step-3-set-up-ollama-for-llm-as-a-judge-evaluation)
+- [Step 5: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
+- [Step 6: Clean up.](#step-5-clean-up)
 
-## Step 0: Define the training and evaluation tasks
+## Step 1: Define the training and evaluation tasks
 
-### 0-1: Define Training Task
+### 1-1: Define Training Task
 
 This section provides an in-depth explanation of the logic implemented in `train.py` for fine-tuning a news classification model. The script follows a structured pipeline that includes argument parsing, model preparation, dataset processing, training, and evaluation. Each component is designed to facilitate easy customization and optimization.
 
@@ -251,7 +251,7 @@ self.save_results()
 - Evaluates performance on test data.
 - Saves model checkpoints and metrics for later use.
 
-### 0-2: LLM-as-a-judge Evaluation
+### 1-2: LLM-as-a-judge Evaluation
 
 This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
@@ -370,10 +370,10 @@ def run_test(self):
 - Runs evaluation tests on the trained model.
 - Stores results in a JSON file for analysis.
 
-## Step 1: Build and push docker image to Knitfab
+## Step 2: Build and push docker image to Knitfab
 This step involves creating Docker images for the training and evaluation of the LLM. These images will be pushed to the Knitfab registry for use within the Knitfab platform.
 
-### 1-1. To Build Docker Images:
+### 2-1. To Build Docker Images:
 
 ### 1. Build `news-classification-train` Image:
 ```bash
@@ -391,7 +391,7 @@ docker build -t news-classification-evaluate:v1.0 \
 ```
 The `news-classification-evaluate` image is used to evaluate the performance of the fine-tuned model with LLM-as-a-judge.
 
-### 1-2. (Optional) To Verify Docker Images:
+### 2-2. (Optional) To Verify Docker Images:
 > [!Note]
 > 
 > If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#to-push-docker-images-to-knitfab))
@@ -457,7 +457,7 @@ docker run --rm -it --gpus all --network ollama-net\
 
 Review the `deepeval-result.json` file to analyze the model's performance based on the defined custom metrics. This analysis will allow you to evaluate the effectiveness of your fine-tuning. Consider whether the current custom metrics adequately reflect your specific requirements, and redefine them if necessary.
 
-### 1-3. To Push Docker Images to Knitfab:
+### 2-3. To Push Docker Images to Knitfab:
 
 ### 1. Tag Images with Registry URI:
 
@@ -478,7 +478,7 @@ docker push ${registry_uri}/${docker_image}
 ```
 Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
 
-## Step 2: Fine-tuning.
+## Step 3: Fine-tuning.
 This step involves the fine-tuning of the LLM for news classification.
 
 ### 1. Generate YAML tempelate:
@@ -619,7 +619,7 @@ knit data pull -x $train_model_knit_id ./out
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 3: Set up Ollama for LLM-as-a-Judge evaluation.
+## Step 4: Set up Ollama for LLM-as-a-Judge evaluation.
 This step deploys and configures Ollama, the application that will serve as the foundation for our LLM-as-a-judge evaluation process.
 > [!Note]
 > 
@@ -702,7 +702,7 @@ To deploy the Ollama application, execute the following commands:
 kubectl apply -f ollama/ollama-deployment.yaml
 kubectl apply -f ollama/ollama-service.yaml
 ```
-## Step 4: LLM-as-a-judge evaluation.
+## Step 5: LLM-as-a-judge evaluation.
 After fine-tuning, we will evaluate the model performance and check for any issues.
 
 ### 1. Generate YAML tempelate:
@@ -820,8 +820,8 @@ knit data pull -x $evaluate_metrics_knit_id ./out
 ```
 This command downloads the evaluation metrics artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 5: Clean up
-#### 5-1. To Remove a Run:
+## Step 6: Clean up
+#### 6-1. To Remove a Run:
 
 > [!Caution]
 >
@@ -837,7 +837,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$evaluate_run_id` → `$train_run_id`.
 
-#### 5-2. To Deactivate a Plan:
+#### 6-2. To Deactivate a Plan:
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -846,7 +846,7 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$train_plan_id`, `$evaluate_plan_id`).
 
-#### 5-3. To Remove the Uploaded Dataset:
+#### 6-3. To Remove the Uploaded Dataset:
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
