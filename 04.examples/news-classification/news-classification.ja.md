@@ -43,7 +43,7 @@ flowchart LR
 - **`Docker` インストール:** イメージをビルドして Knitfab にプッシュするために必要です。
 - **LLM 評価器**: LLM-as-a-Judge 評価には、LLM が評価器として設定する必要があります。次の 3 つのオプションの中から 1 つを選んで設定してください。
 
-  - **Ollama を使用したローカル LLM**: [ollama/ollama-setup.ja.md](ollama/ollama-setup.ja.md) の手順に従って、Docker および Kubernetes に Ollama を構成してください。
+  - **Ollama を使用したローカル LLM（推奨）**: [ollama/ollama-setup.ja.md](ollama/ollama-setup.ja.md) の手順に従って、Docker および Kubernetes に Ollama を構成してください。
   - **OpenAI**: https://docs.confident-ai.com/docs/metrics-introduction#using-openai ドキュメントの説明に従って OpenAI API キーを構成してください。
   - **カスタムモデル**: 独自のカスタムモデルを使用する場合、https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm に記載されている手順に従ってください。
 
@@ -120,8 +120,8 @@ quant_config = BitsAndBytesConfig(
 )
 ```
 - 効率のために量子化を使用してモデルサイズを削減します。
-- "NormalFloat4" (NF4) は、精度損失を最小限に抑えるのに役立ちます。
-- `torch.float16`（半精度浮動小数点数）は、妥当な精度を維持しながら、全精度（float32）よりも高速な計算を可能にします。
+- `NormalFloat4 (NF4)` は、精度損失を最小限に抑えるのに役立ちます。
+- `torch.float16`（半精度浮動小数点数）は、妥当な精度を維持しながら、全精度（`float32`）よりも高速な計算を可能にします。
 - 二重量子化により、メモリ使用量をさらに削減できます。
 
 ```python
@@ -171,8 +171,8 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
     dataset = Dataset.from_pandas(df_cleaned)
     return dataset.map(tokenize, batched=True)
 ```
-- 生データを DataFrame 形式に構造化します。
-- Transformer で読み込んだモデルの入力形式に、データをトークン化します。
+- 生データを `DataFrame` 形式に構造化します。
+- `Transformer` で読み込んだモデルの入力形式に、データをトークン化します。
 
 ### 4. 学習パラメータの設定
 `setup_trainer` 関数は、適切なハイパーパラメータとモデル構成を使用して `SFTTrainer` を初期化します。
@@ -202,7 +202,7 @@ training_args = TrainingArguments(
 )
 ```
 - バッチサイズ、学習率、重み減衰、勾配累積など、主要な学習パラメータを定義します。
-- 学習を効率化するために、混合精度 (fp16) を実装します。
+- 学習を効率化するために、混合精度 (`fp16`) を実装します。
 - ウォームアップ比率 `0.1` 、とコサイン学習率スケジューラを使用します。
 - 学習済みモデルやログファイルなど、プロジェクトの出力を整理するための専用ディレクトリを指定します。
 
@@ -215,7 +215,7 @@ peft_config = LoraConfig(
     task_type="SEQ_CLS",
 )
 ```
-- 効率的な微調整のために LoRA (Low-Rank Adaptation) を実装します。
+- 効率的な微調整のために `LoRA (Low-Rank Adaptation)` を実装します。
 - 正則化とモデルパフォーマンスのバランスを取るために、ドロップアウト値とランク値を設定します。
 
 ```python
@@ -304,7 +304,7 @@ return pipeline(
 `get_test_cases` 関数は、`20 Newsgroups` データセットからテストサンプルを取得し、評価の準備をします。
 
 #### 主要な機能
-- 20 Newsgroups データセットを取得します。
+- `20 Newsgroups` データセットを取得します。
 - 数値ラベルをカテゴリ名にマッピングします。
 - 期待の分類出力と実際の分類出力を持つテストケースを生成します。
 
@@ -835,7 +835,7 @@ Knitfab Run が `starting` で停止し、進行しない。
 }
 ```
 
-**デバッグ手順：**
+#### デバッグ手順:
 
 ### 1. Kubernetes Pod の検査:
 ```bash

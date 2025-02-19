@@ -4,15 +4,15 @@
 This guide walks you through fine-tuning a large language model (LLM) for classification using Knitfab. Discover how Knitfab automates the fine-tuning process and how you can leverage the LLM-as-a-judge approach for efficient, human-like evaluation.
 
 ### Overview
-Fine-tuning LLMs involves optimizing multiple parameters to achieve optimal performance for a specific task—a process that can quickly become overwhelming. Knitfab provides robust management of training artifacts, facilitating seamless experimentation with different configurations. Additionally, we'll explore LLM-as-a-judge, an innovative evaluation method that delivers human-like assessment quality while reducing costs and time.
+Fine-tuning LLMs involves optimizing multiple parameters to achieve optimal performance for a specific task - a process that can quickly become overwhelming. Knitfab provides robust management of training artifacts, facilitating seamless experimentation with different configurations. Additionally, we'll explore LLM-as-a-judge, an innovative evaluation method that delivers human-like assessment quality while reducing costs and time.
 
 The following diagram outlines the key components and steps involved:
 
 **Components:**
-- __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we will use GPT-2.
-- __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the 20 Newsgroups dataset from scikit-learn.
-- __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.
-- __Evaluation Dataset:__ A held-out subset of the 20 Newsgroups dataset used for LLM-as-a-judge evaluation.
+- __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we will use `GPT-2`.
+- __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the `20 Newsgroups` dataset from `scikit-learn`.
+- __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.`
+- __Evaluation Dataset:__ A held-out subset of the `20 Newsgroups` dataset used for LLM-as-a-judge evaluation.
 - __LLM as Evaluator:__ A LLM model for LLM-as-a-judge evaluation.
 - __Metrics:__ Custom metrics designed to evaluate LLM outputs.
 
@@ -43,7 +43,7 @@ To successfully complete this example, ensure you have met the following prerequ
 - **`Docker` Installation**: Required for building and pushing images to the Knitfab platform.
 - **LLM as Evaluator**: For LLM-as-a-Judge evaluation, you'll need an LLM.  Three options are available:
 
-  - **Local LLM with Ollama**: Set up Ollama on Docker and Kubernetes by following the instructions in [ollama/ollama-setup.en.md](ollama/ollama-setup.en.md).
+  - **Local LLM with Ollama (Recommended)**: Set up Ollama on Docker and Kubernetes by following the instructions in [ollama/ollama-setup.en.md](ollama/ollama-setup.en.md).
   - **OpenAI**: Configure an OpenAI API key as described in the documentation: https://docs.confident-ai.com/docs/metrics-introduction#using-openai.
   - **Custom Model**: To use your own custom model, follow the setup instructions provided here: https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm.
 
@@ -120,8 +120,8 @@ quant_config = BitsAndBytesConfig(
 )
 ```
 - Reduces model size using quantization for efficiency.
-- "NormalFloat4" (NF4) helps minimize the accuracy loss.
-- `torch.float16` (half-precision floating point) allows for faster computations than full precision (float32) while still maintaining reasonable accuracy.
+- `NormalFloat4 (NF4)` helps minimize the accuracy loss.
+- `torch.float16` (half-precision floating point) allows for faster computations than full precision (`float32`) while still maintaining reasonable accuracy.
 - Double quantization can further reduce memory usage.
 
 ```python
@@ -141,7 +141,7 @@ The `prepare_datasets` method converts raw datasets into tokenized datasets, sui
 
 #### Key Functionalities
 - Loads data from the `fetch_20newsgroups` dataset.
-- Cleans text by removing empty or NaN entries.
+- Cleans text by removing empty or `NaN` entries.
 - Tokenizes text for input to the model.
 
 #### Code Breakdown
@@ -171,8 +171,8 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
     dataset = Dataset.from_pandas(df_cleaned)
     return dataset.map(tokenize, batched=True)
 ```
-- Converts raw text into structured DataFrame format.
-- Applies tokenization to ensure compatibility with Transformer models.
+- Converts raw text into structured `DataFrame` format.
+- Applies tokenization to ensure compatibility with `Transformer` models.
 
 ### 4. Configure Training Parameters
 
@@ -216,7 +216,7 @@ peft_config = LoraConfig(
     task_type="SEQ_CLS",
 )
 ```
-- Implements `LoRA` (Low-Rank Adaptation) for efficient parameter tuning.
+- Implements `LoRA (Low-Rank Adaptation)` for efficient parameter tuning.
 - Sets dropout and rank values to balance regularization and model performance.
 
 ```python
@@ -617,7 +617,7 @@ This command downloads the trained model artifact from the Knitfab platform and 
 
 > [!Caution]
 >
-> The following steps are based on the Local LLM with Ollama setup described in `ollama/set-up-ollama.en.md`. If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
+> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
 
 After fine-tuning, we will evaluate the model performance and check for any issues.
 
@@ -831,15 +831,15 @@ Knitfab Run is stuck in "starting" status and doesn't progress.
         ...
 }
 ```
-**Debugging Steps:**
+#### Debugging Steps:
 
-**1. Inspect the Kubernetes Pods:**
+### 1. Inspect the Kubernetes Pods:
 ```bash
 kubectl -n knitfab get po
 ```
 This command lists all pods in the `knitfab` namespace. Look for the pod associated with your Run Id (`64b5a7ae-5c85-48f1-b785-955c1709174a` in this example).
 
-**2. Analyze Pod Status:**
+### 2. Analyze Pod Status:
 
 Pay close attention to the `STATUS` column in the output.  You might see something like this:
 
@@ -858,7 +858,7 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
 
   - **Remote Registry:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
 
-**3. Reapply the Plan:** 
+### 3. Reapply the Plan:
 
 After fixing the image pull issue, you'll likely need to:
 - **Stop the current Run:** 
