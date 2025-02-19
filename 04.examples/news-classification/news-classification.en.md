@@ -9,39 +9,46 @@ Fine-tuning LLMs involves optimizing multiple parameters to achieve optimal perf
 The following diagram outlines the key components and steps involved:
 
 **Components:**
-- __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we'll use GPT-2.
+- __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we will use GPT-2.
 - __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the 20 Newsgroups dataset from scikit-learn.
 - __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.
 - __Evaluation Dataset:__ A held-out subset of the 20 Newsgroups dataset used for LLM-as-a-judge evaluation.
+- __LLM as Evaluator:__ A LLM model for LLM-as-a-judge evaluation.
 - __Metrics:__ Custom metrics designed to evaluate LLM outputs.
 
 **Process:**
 - __Train:__ Fine-tune the base LLM on the training dataset to classify news articles.
-- __Evaluate:__ Assess the performance of the fine-tuned model using the defined custom metrics and the evaluation dataset.
+- __LLM-as-a-judge Evaluate:__ Assess the performance of the fine-tuned model using the defined custom metrics and the evaluation dataset.
 
 ```mermaid
 flowchart LR
     A((Base Model)) --> C[Train]
     B((Training Dataset)) --> C
     C --> D((Fine-tuned Model))
-    D --> F[Evaluate]
-    E((Evaluation Dataset)) --> F
-    F --> G((Metrics)) 
+    D --> G[LLM-as-a-judge Evaluate]
+    E((Evaluation Dataset)) --> G
+    F((LLM as Evaluator)) --> G
+    G --> H((Metrics)) 
 ```
 ### Prerequisites
 To successfully complete this example, ensure you have met the following prerequisites:
 
 **Essential:**
-- **GPU:** This example is designed for GPU execution.  Running it on a CPU is inefficient and will result in significantly longer processing times.
+- **GPU:** This example is designed for GPU execution. Running it on a CPU is inefficient and will result in significantly longer processing times.
 - **Knitfab Setup:** 
   - **Production:** Follow the instructions provided in [03.admin-guide](../../03.admin-guide/admin-guide-installation.en.md) for full installation.
   - **Experimentation:** Follow the instructions provided in [01.getting-started: Installing Knitfab on a local environment](../../01.getting-started/getting-started.en.md#installing-knitfab-on-a-local-environment) for a light weight version.
 - **Knit CLI:** Follow the installation instructions in [01.getting-started: CLI Tool: knit](../../01.getting-started/getting-started.en.md#cli-tool-knit) to set up the Knit CLI.
 - **Knit Command Initialization:** Refer to [01.getting-started: Initializing Knit Command](../../01.getting-started/getting-started.en.md#initializing-the-knit-command) for guidance on initializing Knit command using `knit init`.
 - **`Docker` Installation**: Required for building and pushing images to the Knitfab platform.
+- **LLM as Evaluator**: For LLM-as-a-Judge evaluation, you'll need an LLM.  Three options are available:
+
+  - **Local LLM with Ollama**: Set up Ollama on Docker and Kubernetes by following the instructions in [ollama/ollama-setup.en.md](ollama/ollama-setup.en.md).
+  - **OpenAI**: Configure an OpenAI API key as described in the documentation: https://docs.confident-ai.com/docs/metrics-introduction#using-openai.
+  - **Custom Model**: To use your own custom model, follow the setup instructions provided here: https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm.
 
 **Optional:**
-- `kubectl` (recommended): Provides additional flexibility for debugging and interacting with Knitfab Kubernetes clusters.
+- **`kubectl`**: Required if you choose to use a local LLM with Ollama for LLM-as-a-Judge evaluation.
 
 ### Repository
 To access the files and directories used in this example, clone the `knitfab-docs` repository from GitHub:
@@ -57,18 +64,17 @@ Once cloned, navigate to the `04.examples/news-classification` directory. You wi
 - **plans:** Contains the Knitfab Plan YAML templates.
 
 ### Task
-- [Step 1: Define the training and evaluation tasks.](#step-0-define-the-training-and-evaluation-tasks)
-- [Step 2: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
-- [Step 3: Fine-tuning.](#step-2-fine-tuning)
-- [Step 4: Set up Ollama for LLM-as-a-Judge evaluation.](#step-3-set-up-ollama-for-llm-as-a-judge-evaluation)
-- [Step 5: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
-- [Step 6: Clean up.](#step-5-clean-up)
+- [Step 1: Define the training and evaluation tasks.](#step-1-define-the-training-and-evaluation-tasks)
+- [Step 2: Build and push docker image to Knitfab.](#step-2-build-and-push-docker-image-to-knitfab)
+- [Step 3: Fine-tuning.](#step-3-fine-tuning)
+- [Step 4: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
+- [Step 5: Clean up.](#step-5-clean-up)
 
 ## Step 1: Define the training and evaluation tasks
 
-### 1-1: Define Training Task
+### 1-1. Define Training Task
 
-This section provides an in-depth explanation of the logic implemented in `train.py` for fine-tuning a news classification model. The script follows a structured pipeline that includes argument parsing, model preparation, dataset processing, training, and evaluation. Each component is designed to facilitate easy customization and optimization.
+This section provides an in-depth explanation of the logic implemented in `scripts/train/train.py` for fine-tuning a news classification model. The script follows a structured pipeline that includes argument parsing, model preparation, dataset processing, training, and evaluation. Each component is designed to facilitate easy customization and optimization.
 
 ### 1. Parse Arguments
 
@@ -251,9 +257,9 @@ self.save_results()
 - Evaluates performance on test data.
 - Saves model checkpoints and metrics for later use.
 
-### 1-2: LLM-as-a-judge Evaluation
+### 1-2. LLM-as-a-judge Evaluation
 
-This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
+This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class in `scripts/evaluate/evaluate.py` processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
 This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
@@ -264,8 +270,8 @@ The `parse_arguments` function handles command-line arguments for configuring th
 #### Key Functionalities
 - `--config-file`: Path to a configuration JSON file. If provided, settings in this file override command-line arguments.
 - `--model-path`: Path to the fine-tuned model. Defaults to `./in/model`.
-- `--save-to`: Directory where evaluation results and logs will be stored. Defaults to `./out`.
-- `--device`: Specifies the hardware for inference (`cuda` or `cpu`). Defaults to `auto`.
+- `--save-to`: Directory where evaluation results will be stored. Defaults to `./out`.
+- `--device`: Specifies the hardware for inference (`cuda` or `cpu`). Defaults to `cuda`.
 - `--num-samples`: Number of test samples to evaluate. Defaults to `100`.
 - `--threshold`: Deepeval test threshold for performance measurement. Defaults to `0.8`.
 
@@ -294,7 +300,7 @@ return pipeline(
 )
 ```
 - Initializes a classification pipeline with the given model and tokenizer.
-- Ensures maximum sequence length does not exceed `970` tokens.
+- Ensures maximum sequence length does not exceed `1024` tokens.
 
 ### 3. Generate Test Cases
 
@@ -318,7 +324,7 @@ prompts = [f"### [HUMAN] Classify this news article: '{text}'\n" for text in dat
 classifier = create_classifier(model_path, num_labels, device)
 batch_results = classifier(prompts, truncation=True, max_length=1024, batch_size=1)
 ```
-- Retrieves `num_samples` from the dataset.
+- Retrieves test data up to `num_samples` from the dataset.
 - Uses the trained classifier to predict categories for each test sample.
 
 ```python
@@ -386,6 +392,15 @@ docker build -t news-classification-train:v1.0 \
 The `news-classification-train` image is responsible for fine-tuning of the model.
 
 ### 2. Build `news-classification-evaluate` Image:
+#### Modify the Dockerfile:
+To configure the LLM as Evaluator for the LLM-as-a-Judge process, modify the command line within your Dockerfile. Consult the documentation provided in the [Prerequisites](#prerequisites) section for specific instructions and requirements.
+```docker
+# Modify the command (e.g., base-url, api-key) to set your LLM as Evaluator
+RUN deepeval set-local-model --model-name=llama3.2 \
+    --base-url="http://ollama:11434/v1/" \
+    --api-key="ollama"
+```
+#### Build Docker Image:
 ```bash
 docker build -t news-classification-evaluate:v1.0 \
              -f scripts/evaluate/Dockerfile \
@@ -396,7 +411,7 @@ The `news-classification-evaluate` image is used to evaluate the performance of 
 ### 2-2. (Optional) To Verify Docker Images:
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#to-push-docker-images-to-knitfab))
+> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#2-3-to-push-docker-images-to-knitfab))
 
 ### 1. Run the Fine-tune Image:
 ```bash
@@ -409,41 +424,15 @@ This command runs the `news-classification-train:v1.0` image in an interactive m
 - The `-v` flags mount the host directories containing the config files (`/configs`) and the output directory (`/out`) into the container.
 - This allows you to test the image locally and generate the fine-tuned model.
 
-### 2. Configuring a Local LLM using Ollama:
-> [!Note]
-> 
-> This example uses a local LLM for LLM-as-a-judge evaluation. 
-> You can optionally configure an OpenAI API key as described in the documentation: `https://docs.confident-ai.com/docs/metrics-introduction#using-openai`. 
-> Alternatively, if you prefer to use your own custom model, follow the setup instructions here: `https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm`.
-
-#### Create a Docker Network:
-```bash
-docker network create ollama-net
-```
-This command creates a Docker network named `ollama-net`, which will allow the Ollama container to communicate with other containers on the same network.
-
-#### Run the Ollama Docker Container:
-```bash
-docker run -d --gpus all --network ollama-net \ 
-           -v ollama:/root/.ollama -p 11434:11434 \
-           --name ollama ollama/ollama
-```
-This command runs the Ollama Docker image in detached mode (`-d`).
-
-- `--gpus all`: This option makes all available GPUs accessible to the container. If you want to specify particular GPUs, consult the Docker documentation.
-- `--network ollama-net`: This connects the container to the `ollama-net` network.
-- `-v ollama:/root/.ollama`: This mounts a Docker volume named `ollama` to the `/root/.ollama` directory inside the container. This ensures that your Ollama models and data are persisted even if the container is stopped or removed.
-- `-p 11434:11434`: This maps port `11434` on the host machine to port `11434` in the container, which is the default port Ollama uses.
-- `--name ollama`: This assigns the name ollama to the container, making it easier to manage.
-- `ollama/ollama`: This specifies the Docker image to use.
-
-#### Pull the Llama 3.2 Model:
-```bash
-docker exec -it ollama ollama pull llama3.2
-```
-This command executes the `ollama pull llama3.2` command inside the running ollama container to download the Llama 3.2 model.  The `-it` flags provide an interactive terminal session within the container.
-
 ### 2. Model Evaluation with LLM-as-a-judge:
+> [!Warning]
+> 
+> These steps require a pre-existing LLM to function as the evaluator in the LLM-as-a-Judge process. Please review the [Prerequisites](#prerequisites) section for resource requirements and installation instructions.
+
+> [!Caution]
+>
+> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
+
 ```bash
 docker run --rm -it --gpus all --network ollama-net\
     -v "$(pwd)/configs:/configs" \
@@ -451,7 +440,7 @@ docker run --rm -it --gpus all --network ollama-net\
     -v "$(pwd)/out/model:/in/model" \
     news-classification-evaluate:v1.0
 ```
-- The command runs `news-classification-evaluate:v1.0` image and connects the container to the `ollama-net` network.
+- The command runs `news-classification-evaluate:v1.0` image and connects the container to the `ollama-net` network where the Ollama app is running. If you are not using Ollama, you can omit the `--network` option.
 - The image evaluate the fine-tuned model using the defined custom metric and `test` subset of the `20 Newsgroups` dataset.
 - The evaluation metrics will be saved as a JSON file named `deepeval-result.json` in the `out` directory.
 
@@ -621,90 +610,15 @@ knit data pull -x $train_model_knit_id ./out
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 4: Set up Ollama for LLM-as-a-Judge evaluation.
-This step deploys and configures Ollama, the application that will serve as the foundation for our LLM-as-a-judge evaluation process.
-> [!Note]
+## Step 4: LLM-as-a-judge evaluation.
+> [!Warning]
 > 
-> If you plan to use a different LLM for evaluation, skip this step and configure your chosen LLM to ensure it's accessible during the evaluation Run.
+> As with Step 2, the evaluation task requires access to an LLM to serve as the evaluator in the LLM-as-a-Judge process. Please refer to the [Prerequisites](#prerequisites) section for resource requirements and installation instructions.
 
-### 1. Define Deployment and Service resources:
-Create two YAML files, one for the Deployment and one for the Service, with the following content. Save these files, for example, as `ollama-deployment.yaml` and `ollama-service.yaml` respectively. These files define how your Ollama application will be deployed and accessed within your Kubernetes cluster.
-
-- `ollama-deployment.yaml`
-
-```YAML
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ollama
-  namespace: knitfab
-  labels:
-    app: ollama
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ollama
-  template:
-    metadata:
-      labels:
-        app: ollama
-    spec:
-      containers:
-        - name: ollama
-          image: ollama/ollama
-          resources:
-            requests:
-              cpu: "4"
-              memory: "5Gi"
-              nvidia.com/gpu: 1
-            limits:
-              cpu: "4"
-              memory: "5Gi"
-              nvidia.com/gpu: 1
-          ports:
-            - containerPort: 11434
-          lifecycle:
-            postStart:
-              exec:
-                command: ["sh", "-c", "ollama pull llama3.2"]
-```
-
-- `ollama-service.yaml`
-```YAML
-apiVersion: v1
-kind: Service
-metadata:
-  name: ollama
-  namespace: knitfab
-spec:
-  selector:
-    app: ollama
-  ports:
-    - protocol: TCP
-      port: 11434
-      targetPort: 11434
-  type: ClusterIP
-```
-For simplicity, in this example, we'll deploy the Ollama Deployment and Service into the same namespace as Knitfab.
-### 2. Deploy Ollama application:
-> [!Note]
-> 
-> **Important Note Regarding GPU Access:** If you have only one GPU available in your Kubernetes cluster, you'll need to enable GPU sharing features like Time-Slicing or Multi-Instance GPU (MIG) to allow multiple Pods, including your Ollama Pod, to access it concurrently.  Without these features, your Ollama Deployment might fail or be unable to utilize the GPU.
+> [!Caution]
 >
-> For detailed instructions on configuring GPU sharing, please consult the official NVIDIA documentation:
->
-> - [GPU Sharing](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html)
-> - [Multi-Instance GPU (MIG)](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-operator-mig.html)
->
-> Once you've addressed any GPU sharing requirements (if applicable), you can proceed with deploying the Ollama application.
+> The following steps are based on the Local LLM with Ollama setup described in `ollama/set-up-ollama.en.md`. If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
 
-To deploy the Ollama application, execute the following commands:
-```bash
-kubectl apply -f ollama/ollama-deployment.yaml
-kubectl apply -f ollama/ollama-service.yaml
-```
-## Step 5: LLM-as-a-judge evaluation.
 After fine-tuning, we will evaluate the model performance and check for any issues.
 
 ### 1. Generate YAML tempelate:
@@ -760,6 +674,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 > [!Note]
 > 
 > To ensure the evaluation dynamically recognizes the output model from the training process, we will *not* define the `in/model` within the configuration file. Instead, we will explicitly define `in/model` within the Plan YAML template.
+
   - resources: 
   Define the required CPU, Memory, and GPU resources
 
@@ -822,8 +737,8 @@ knit data pull -x $evaluate_metrics_knit_id ./out
 ```
 This command downloads the evaluation metrics artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 6: Clean up
-#### 6-1. To Remove a Run:
+## Step 5: Clean up
+### 5-1. To Remove a Run:
 
 > [!Caution]
 >
@@ -839,7 +754,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$evaluate_run_id` → `$train_run_id`.
 
-#### 6-2. To Deactivate a Plan:
+### 5-2. To Deactivate a Plan:
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -848,11 +763,11 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$train_plan_id`, `$evaluate_plan_id`).
 
-#### 6-3. To Remove the Uploaded Dataset:
+### 5-3. To Remove the Uploaded Dataset:
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
-**1. Find the Dataset Run Id:**
+### 1. Find the Dataset Run Id:
 - List Datasets:
   - Execute the following command to list all datasets with the tag `project:news-classification`:
 ```bash
@@ -889,7 +804,7 @@ knit data find -t project:news-classification
   - In the output, identify the dataset entry where the `upstream.mountpoint.path` is equal to `/upload`.
   - Extract the corresponding `upstream.run.runId` value.
 
-**2. Remove the Run:**
+### 2. Remove the Run:
 > [!Warning]
 >
 > Deleting a Run is an **irreversible** action. It will permanently delete the Run and any associated artifacts, including the uploaded dataset.
@@ -954,5 +869,5 @@ knit run stop --fail ${run_id}
 - **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
 - **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
 - **Apply a new Plan:** Refer to the relevant section based on the type of training you're doing:
-  - [Step 2: Fine-tuning.](#step-2-fine-tuning)
+  - [Step 3: Fine-tuning.](#step-3-fine-tuning)
   - [Step 4: LLM-as-a-judge evaluation.](#step-4-llm-as-a-judge-evaluation)
