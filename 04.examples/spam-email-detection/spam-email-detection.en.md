@@ -99,7 +99,7 @@ The `spam-detection-incremental-train` image will retrain the existing model wit
 #### 1-2. (Optional) To Verify Docker Images:
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#to-push-docker-images-to-knitfab))
+> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#1-3-to-push-docker-images-to-knitfab))
 
 **1. Initial Training:**
 ```bash
