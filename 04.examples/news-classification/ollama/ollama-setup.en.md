@@ -1,13 +1,15 @@
 ### Instruction
 # Configuring a Local LLM with Ollama for LLM-as-a-Judge Evaluation
-This guide details how to set up a local Large Language Model (LLM) using Ollama for LLM-as-a-Judge evaluation. We will focus on using this setup to evaluate a fine-tuned GPT-2 model for news classification. This local LLM setup allows for both local testing and integration into a Knitfab processing pipeline.
+This guide demonstrates how to set up a local Large Language Model (LLM) using Ollama for LLM-as-a-Judge evaluation. By running the LLM locally within Ollama, you can use it as the evaluator in your LLM-as-a-Judge process. This setup facilitates both local testing and seamless integration into a Knitfab evaluation pipeline.
 
 ### Overview
 #### What is LLM-as-a-Judge?
-LLM-as-a-Judge leverages the capabilities of LLMs to evaluate other AI models. This approach offers near human-quality assessment while significantly reducing costs and time. In our news classification example, we use an LLM-as-a-Judge to assess the performance of a fine-tuned GPT-2 model in categorizing news articles.
+LLM-as-a-Judge utilizes the power of Large Language Models (LLMs) to assess the performance of other AI models. This innovative approach provides near human-level evaluation while offering substantial cost and time savings compared to traditional methods. 1 
+
+For example, in our news classification case study, LLM-as-a-Judge was used to evaluate a fine-tuned GPT-2 model. Instead of relying solely on traditional metrics, the LLM was prompted to assess the model's performance by evaluating the relevance of the predicted news category to the actual category, expressed in natural language. This allowed for a more nuanced and qualitative assessment of the model's accuracy.
 
 #### Setting up Ollama
-This guide covers configuring a local LLM as the evaluator using Ollama.  We will walk through deploying Ollama using Docker for local testing and Kubernetes for integration within Knitfab.  This allows you to validate the LLM-as-a-Judge evaluation locally before deploying it to your production environment.
+This guide covers configuring a local LLM as the evaluator using Ollama. We will walk through deploying Ollama using Docker for local testing and Kubernetes for integration within Knitfab. This allows you to validate the LLM-as-a-Judge evaluation locally before deploying it to your production environment.
 
 We'll cover two deployment scenarios:
 
@@ -17,7 +19,7 @@ We'll cover two deployment scenarios:
 ### Prerequisites
 To successfully complete this instruction, ensure you have met the following prerequisites:
 
-- **GPU:** Ollama relies on GPUs for efficient operation.  CPU-only operation is extremely slow and impractical for real-world use.
+- **GPU:** Ollama relies on GPUs for efficient operation. CPU-only operation is extremely slow and impractical for real-world use.
 - **`Docker`**: Essential for local setup and testing of the LLM-as-a-Judge functionality.
 - **Knitfab Kubenetes cluster access**: You'll need appropriate permissions to deploy Ollama to the Knitfab Kubernetes cluster. Contact your administrator for assistance.
 - **`kubectl`**: This command-line tool is necessary for deploying Ollama to your Knitfab Kubernetes cluster.
@@ -35,7 +37,7 @@ Once cloned, navigate to the `04.examples/news-classification/ollama` directory.
 - [Task 2: Deploy Ollama to Kubenetes.](#step-2-deploy-ollama-app-to-kubenetes)
 
 ## Task 1: Deploy Ollama to a Docker Container.
-This step involves setting up Ollama in a Docker container to verify the `news-classification-evaluate:v1.0` image before deploying it to Knitfab. This allows for local testing and validation of the LLM-as-a-Judge functionality.
+This section involves setting up Ollama in a Docker container to verify the LLM-as-a-judge evaluation image ( e.g., `news-classification-evaluate:v1.0` for the news classification case study) before deploying it to Knitfab. This allows for local testing and validation of the LLM-as-a-Judge functionality.
 
 ### 1. Create a Docker Network:
 ```bash
@@ -65,7 +67,7 @@ docker exec -it ollama ollama pull llama3.2
 This command executes the `ollama pull llama3.2` command inside the running ollama container to download the Llama 3.2 model.  The `-it` flags provide an interactive terminal session within the container.
 
 ## Task 2: Deploy Ollama to Kubernetes
-This step deploys and configures Ollama within your Kubernetes cluster. This deployment enables evaluation tasks running on Knitfab to access the local LLM and utilize it as the evaluator for LLM-as-a-Judge evaluations.
+This section deploys and configures Ollama within your Kubernetes cluster. This deployment enables evaluation tasks running on Knitfab to access the local LLM and utilize it as the evaluator for LLM-as-a-Judge evaluations.
 
 ### 1. Define Deployment and Service resources:
 > [!Note]
