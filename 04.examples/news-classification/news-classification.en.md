@@ -428,7 +428,7 @@ This command runs the `news-classification-train:v1.0` image in an interactive m
 
 > [!Caution]
 >
-> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt the solution accordingly.
+> The following steps are based on the Local LLM with Ollama setup described in [ollama/ollama-setup.en.md](ollama/ollama-setup.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt the solution accordingly.
 
 ```bash
 docker run --rm -it --gpus all --network ollama-net\
