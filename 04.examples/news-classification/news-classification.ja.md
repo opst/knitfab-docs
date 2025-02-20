@@ -1,18 +1,18 @@
 ### 例
 # Knitfab での LLM の微調整によるニュース分類
 
-本書では、Knitfab を使用して一般大規模言語モデル (LLM) を微調整することにより、分類の学習を示します。事例通して、Knitfab が微調整実験の入力と出力、および履歴の管理を自動化しながら、LLM-as-a-judge を用いて効率的に人間のような評価ができるようになります。
+本書では、Knitfab を使用した一般大規模言語モデル (LLM) を微調整することにより、モデルがニュースといった特定の文書分類性能を向上することを示します。事例通して、Knitfab が微調整実験の入力と出力、および履歴の管理を自動化しながら、LLM-as-a-judge を用いて効率的に人間のような評価ができるようになります。
 
 ### 概要
-LLM の微調整というのは、特定のタスクに対して最適なパフォーマンスを得るために複数な超母数の調整が必要です。その複雑なプロセスを手伝ってくれるのは Knitfab が学習成果物の自動管理と、さまざまな構成での実験を容易にするためです。さらに、革新的な評価方法である LLM-as-a-judge を用いることにより人間のような評価品質をいじできながらコストの削減も可能になります。
+LLM の微調整というのは、特定のタスクに対して処理性能と判断性能を高めるために複数な超母数を調整する工程です。しかしながら、複雑な超母数によりLLM の微調整が早くとも手ごたえなくなります。そこで、 Knitfab は学習工程だけではなく学習の入出力、成果物まで自動管理を手伝うことで、さまざまな構成設定での実験が容易になります。さらに、革新的な評価方法である LLM-as-a-judge を用いることにより人間のような評価品質を維持できながらコストの削減も可能になります。本事例では、このニュース分類微調整から LLM-as-a-judge 評価の一連まで Knitfab 上の実装を体験し、機械学習自動管理プラットフォームとして Knitfab の強さと容易さを理解できます。
 
 ワークフローの主要なコンポーネントとプロセスの概要を図にて示します。
 
 **コンポーネント:**
 - __基底モデル:__ 微調整に使用される事前学習済み LLM。この例では、`GPT-2` を採用します。
-- __学習データセット:__ モデルのニュース分類微調整みに使用されるデータセット。`scikit-learn` の `20 Newsgroups` データセットを活用します。
-- __微調整済みモデル:__ ニュース分類に特化した微調整済モデル。
-- __評価データセット:__ LLM-as-a-judge 評価に使用される `20 Newsgroups` データセットの一部。
+- __学習データセット:__ モデルのニュース分類微調整に使用されるデータセット。`scikit-learn` の `20 Newsgroups` データセットを活用します。
+- __微調整済みモデル:__ ニュース分類に特化した微調整済みモデル。
+- __評価データセット:__ LLM-as-a-judge 評価に使用される `20 Newsgroups` データセットの `test` サブセット。
 - __LLM 評価器:__ LLM-as-a-judge 評価のための LLM。
 - __指標:__ LLLM-as-a-judge 評価のためのカスタム指標。
 
@@ -31,10 +31,10 @@ flowchart LR
     G --> H((指標)) 
 ```
 ### 前提条件
-本書の事例を正常に動作するために、次の前提条件を満たしているかを確認してください。
+本事例を正常に動作するために、次の前提条件を満たしているかを確認してください。
 
 **必須:**
-- **GPU:** 本例は GPU での実行を想定して設計されています。そのため、CPU で実行した場合、非効率で処理時間が大幅に長くなります。
+- **GPU:** 本例は GPU での実行を想定して設計されています。そのため、CPU での実行は非効率で処理時間が大幅に長くなります。
 - **Knitfabのセットアップ:**
   - **プロダクション向けの場合:** [03.admin-guide](../../03.admin-guide/admin-guide-installation.ja.md)に記載されている手順に従って、インストールを実行します。
   - **実験向けの場合:** 簡易版については、[01.getting-started: Knitfab（簡易版） をローカル環境にインストールする](../../01.getting-started/getting-started.ja.md#Knitfab簡易版-をローカル環境にインストールする)に記載されている手順に従ってください。
@@ -55,7 +55,7 @@ flowchart LR
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
 ```
-クローンが完了したら、`04.examples/news-classification`ディレクトリ内にあるファイルを確認してください。
+クローンが完了したら、`04.examples/news-classification` ディレクトリ内にあるファイルを確認してください。
 - **scripts:** このディレクトリには、モデルの学習と登録に必要なファイルが含まれています。
   - モデルの学習と評価のための Python スクリプト (`train.py`、`evaluate.py`)。
   - 必要なすべての Python パッケージを管理する `requirements.txt`。
@@ -74,11 +74,11 @@ git clone https://github.com/opst/knitfab-docs.git
 
 ### 1-1. 学習タスクの定義
 
-本章では、`train.py` にニュース分類微調整のロジックを説明します。スクリプトは引数指定、モデル準備、データ処理、学習、と評価を構造化したパイプラインに従い、各コンポーネントの構成変更と最適化を容易にする設計を取っています。
+本章では、`scripts/train/train.py` にニュース分類微調整のロジックを説明します。スクリプトは引数指定、モデル準備、データ処理、学習、と評価を構造化したパイプラインに従い、各コンポーネントの構成変更と最適化を容易にする設計を取っています。
 
 ### 1. 引数指定
 
-`parse_arguments` 関数は、学習タスクに必要な引数を受け取ります。さまざまなパラメータを任意に指定できるため、モデルの微調整に柔軟的に変更できます。
+`parse_arguments` 関数は、学習タスクに必要な引数を受け取ります。さまざまな母数を任意に指定できるため、モデルの微調整に柔軟的に変更できます。
 
 #### 主要な機能
 - `--config-file`: 構成ファイルのパス。指定された場合、既定引数を上書きます。
@@ -172,13 +172,13 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
     return dataset.map(tokenize, batched=True)
 ```
 - 生データを `DataFrame` 形式に構造化します。
-- `Transformer` で読み込んだモデルの入力形式に、データをトークン化します。
+- データを `Transformer` で読み込んだ基底モデルの入力形式にトークン化します。
 
-### 4. 学習パラメータの設定
-`setup_trainer` 関数は、適切なハイパーパラメータとモデル構成を使用して `SFTTrainer` を初期化します。
+### 4. 学習超母数の設定
+`setup_trainer` 関数は、適切な超母数とモデル構成を使用して `SFTTrainer` を初期化します。
 
 #### 主要な機能
-- `TrainingArguments` を使用して学習パラメータを定義します。
+- `TrainingArguments` を使用して学習超母数を定義します。
 - 微調整を効率化するために `LoraConfig` を構成します。
 - `DataCollatorWithPadding` を使用してさまざまな文章を同じ固定長に変換します。
 
@@ -201,7 +201,7 @@ training_args = TrainingArguments(
     logging_strategy="steps",
 )
 ```
-- バッチサイズ、学習率、重み減衰、勾配累積など、主要な学習パラメータを定義します。
+- バッチサイズ、学習率、重み減衰、勾配累積など、主要な学習超母数を定義します。
 - 学習を効率化するために、混合精度 (`fp16`) を実装します。
 - ウォームアップ比率 `0.1` 、とコサイン学習率スケジューラを使用します。
 - 学習済みモデルやログファイルなど、プロジェクトの出力を整理するための専用ディレクトリを指定します。
@@ -216,7 +216,7 @@ peft_config = LoraConfig(
 )
 ```
 - 効率的な微調整のために `LoRA (Low-Rank Adaptation)` を実装します。
-- 正則化とモデルパフォーマンスのバランスを取るために、ドロップアウト値とランク値を設定します。
+- 正則化とモデル分類性能の均衡を保つために、脱落値とランク値を設定します。
 
 ```python
 collator = DataCollatorWithPadding(tokenizer=self.tokenizer, padding="max_length")
@@ -235,14 +235,14 @@ self.trainer = SFTTrainer(
 )
 ```
 - 構成済みのモデル、学習引数、データセット、およびトークナイザーを使用して `SFTTrainer` を初期化します。
-- すべての要素を組み合わせて、微調整プロセスを効率的に実行します。
+- すべての要素を組み合わせて、分類微調整を効率的に実行します。
 
 ### 5. モデルの学習と評価
 
-`run` 関数は、環境のセットアップから結果の保存まで、学習プロセス全体を調整します。
+`run` 関数は、環境設定から結果の保存まで、学習プロセス全体を調整します。
 
 #### 主要な機能
-- データセットを読み込み、トレーナーを初期化します。
+- データセットを読み込み、学習器を初期化します。
 - 学習と評価を実装します。
 - 学習済みモデルと評価指標を保存します。
 
@@ -253,23 +253,23 @@ self.eval_results = self.trainer.evaluate()
 self.save_results()
 ```
 - データセットを用いてモデルを学習させます。
-- 評価データよりパフォーマンスを評価します。
+- 評価データより分類性能を評価します。
 - 後工程のために、モデルと指標を保存します。
 
 ### 1-2. LLM-as-a-judge 評価
 
-本章は、ニュース分類微調整済みのモデルを評価するために、LLM を使用した評価パイプラインを紹介します。 `TestGPT2Model` クラスは、定義したテストケースとカテゴリ精度指標に従ってモデルを評価し、パフォーマンスレポートを生成します。この自動化されたアプローチにより、一貫したベンチマークが保証され、モデルの精度を向上させるのに役立ちます。
+本章では、ニュース分類微調整済みのモデルを評価するために、LLM を使用した評価パイプラインを紹介します。`scripts/evaluate/evaluate.py` の `TestGPT2Model` クラスは、定義したテストケースとニュースカテゴリ分類精度指標に従ってモデルを評価し、分類性能レポートを生成します。これにより、モデル間に一貫した水準点で比較でき、モデルの精度向上を統一な方向性に従います。
 
 ### 1. 引数指定
 
-`parse_arguments` 関数は、評価プロセスの必要な引数を処理します。さまざまなパラメータを任意に指定できるため、モデルの微調整に柔軟的に変更で来ます。
+`parse_arguments` 関数は、評価プロセスの必要な引数を処理します。さまざまな母数を任意に指定できるため、モデルの微調整に柔軟的に変更で来ます。
 
 #### 主要な機能
 - `--config-file`: 構成ファイルのパス。指定された場合、既定引数を上書きます。
 - `--model-path`: 微調整済みモデルへのパス。既定値は `./in/model` です。
 - `--save-to`: 評価結果が保存されるディレクトリです。既定値は `./out` です。
 - `--device`: 学習が実施されるハードウェア (`cuda` または `cpu`) を定義します。既定値は `cuda` です。
-- `--num-samples`: 評価に利用するテストサンプルの数。既定値は `100` です。
+- `--num-samples`: 評価のために `test` サブセットから引き抜くサンプル数。既定値は `100` です。
 - `--threshold`: Deepeval パフォーマンス評価のしきい値。既定値は `0.8` です。
 
 構成ファイルとコマンドラインの両方で因数を指定した場合、構成ファイルの設定内容が優先されます。
@@ -279,9 +279,9 @@ self.save_results()
 `create_classifier` 関数は、評価対象の分類モデルを初期化します。
 
 #### 主要な機能
-- `AutoModelForSequenceClassification` を使用して、ファインチューニング済みモデルを読み込みます。
+- `AutoModelForSequenceClassification` を使用して、微調整済みモデルを読み込みます。
 - `AutoProcessor` を使用して、トークナイザーを取得します。
-- 効率的なテキスト分類のために `transformers.pipeline` を使用します。
+- 効率的な文書分類のために `transformers.pipeline` を使用します。
 
 #### コード解析
 ```python
@@ -301,11 +301,11 @@ return pipeline(
 
 ### 3. テストケースの生成
 
-`get_test_cases` 関数は、`20 Newsgroups` データセットからテストサンプルを取得し、評価の準備をします。
+`get_test_cases` 関数は、`20 Newsgroups` データセットから `test` サブセットを取得し、評価の準備をします。
 
 #### 主要な機能
 - `20 Newsgroups` データセットを取得します。
-- 数値ラベルをカテゴリ名にマッピングします。
+- 数値ラベルをニュースカテゴリ名にマッピングします。
 - 期待の分類出力と実際の分類出力を持つテストケースを生成します。
 
 #### コード解析
@@ -321,8 +321,8 @@ prompts = [f"### [HUMAN] Classify this news article: '{text}'\n" for text in dat
 classifier = create_classifier(model_path, num_labels, device)
 batch_results = classifier(prompts, truncation=True, max_length=1024, batch_size=1)
 ```
-- データセットから `num_samples` までテストデータを取得します。
-- 学習済み分類器を使用して、各テストデータのカテゴリを予測します。
+- `test` サブセットから `num_samples` までテストサンプルを取得します。
+- 学習済み分類器を使用して、各テストサンプルのニュースカテゴリを予測します。
 
 ```python
 test_cases = []
@@ -336,17 +336,16 @@ for text, category_idx, result in zip(data, target, batch_results):
     )
     test_cases.append(test_case)
 ```
-- 予測されたカテゴリ (`actual_output`) を正解 (`expected_category`) と比較します。
+- 予測されたニュースカテゴリ (`actual_output`) を正解 (`expected_category`) と比較します。
 - 評価用のテストケースとして保存します。
 
 ### 4. モデルパフォーマンスの評価
 
-`TestGPT2Model` クラスは、`deepeval` フレームワークを使用してモデルを評価します。
+`TestGPT2Model` クラスは、`deepeval` という LLM-as-a-judge フレームワークを使用してモデルを評価します。
 
 #### 主要な機能
-- 分類パフォーマンスの `CategoryPrecision` 指標を定義します。
-- `deepeval.evaluate` を使用して評価を実行します。
-- 評価結果を保存します。
+- 分類性能の `CategoryPrecision` 指標を定義します。
+- `deepeval.evaluate` を使用して評価を実施し、結果を保存します。
 
 #### コード解析
 ```python
@@ -376,7 +375,7 @@ def run_test(self):
 - 評価結果を JSON ファイルに保存します。
 
 ## ステップ 2: Docker イメージをビルドして Knitfab にプッシュする
-この手順では、ニュース分類微調整の学習と評価の Docker イメージを作成し、Knitfab レジストリにプッシュします。
+本章では、ニュース分類微調整の学習と評価の Docker イメージを作成し、Knitfab レジストリにプッシュします。
 
 ### 2-1. Docker イメージをビルドする
 ### 1. `news-classification-train` イメージのビルド:
@@ -390,7 +389,7 @@ docker build -t news-classification-train:v1.0 \
 ### 2. `news-classification-evaluate` イメージのビルド:
 
 #### Dockerfile の変更:
-`Dockerfile` 内のコマンドラインを変更して LLM-as-a-Judge プロセスの LLM 評価器を設定する必要があります。LLM 評価器の詳細設定については、[前提条件](#前提条件)に記載されているドキュメントを参照してください。
+`Dockerfile` 内のコマンドラインを変更して LLM-as-a-Judge の LLM 評価器を設定する必要があります。LLM 評価器の詳細設定については、[前提条件](#前提条件)に記載されているドキュメントを参照してください。
 
 ```docker
 # LLM 評価器を設定するには、コマンド（base-url、api-keyなど）を変更してください。
@@ -426,11 +425,11 @@ docker run --rm -it --gpus all \
 ### 2. LLM-as-a-judge を使用したモデル評価:
 > [!Warning]
 > 
-> 次の手順から LLM-as-a-Judge プロセスの評価器して事前に LLM の設定が求められています。設定手順などについては、[前提条件](#前提条件)をご確認してください。
+> 次の手順から LLM-as-a-Judge の評価器して事前に LLM の設定が求められています。設定手順などについては、[前提条件](#前提条件)をご確認してください。
 
 > [!Caution]
 >
-> 次の手順は、[ollama/set-up-ollama.ja.md](ollama/set-up-ollama.ja.md) に説明されている Ollama を使用したローカル LLM の構成に基づいています。別の LLM 評価器を使用する場合、それに応じて手順を変更してください。
+> 次の手順は、[ollama/set-up-ollama.ja.md](ollama/set-up-ollama.ja.md) 資料に説明されている Ollama を使用したローカル LLM の構成に基づいています。別の LLM 評価器を使用する場合、それに応じて手順を変更してください。
 
 ```bash
 docker run --rm -it --gpus all --network ollama-net\
@@ -445,7 +444,7 @@ docker run --rm -it --gpus all --network ollama-net\
 
 ### 3. パフォーマンス分析:
 
-`deepeval-result.json` ファイルを確認して、定義されたカスタム指標に基づいてモデルの性能を分析します。カスタム指標が期待要件を適切に反映しているかどうかを検討し、必要に応じて再定義してください。
+`deepeval-result.json` ファイルを確認して、定義されたカスタム指標に基づいてモデルの性能を分析します。カスタム指標が期待要件を適切に反映しているかどうかを検討し、必要に応じて調整・再定義してください。
 
 ### 2-3. Docker イメージを Knitfab へプッシュする
 
@@ -469,7 +468,7 @@ docker push ${registry_uri}/${docker_image}
 `${docker_image}` を、前の手順でタグ付けした各イメージの名前（レジストリ URI を含む）に置き換えてください。
 
 ## ステップ 3: ニュース分類の微調整
-本章では、LLM のニュース分類微調整を行います。
+本章では、Knitfab 上 LLM のニュース分類微調整を行います。
 
 ### 1. YAML ひな型の生成:
 
@@ -613,13 +612,9 @@ knit data pull -x $train_model_knit_id ./out
 ## ステップ 4: LLM-as-a-judge 評価
 > [!Warning]
 > 
-> 次の手順から LLM-as-a-Judge プロセスの評価器して事前に LLM の設定が求められています。設定手順などについては、[前提条件](#前提条件)を再度ご確認してください。
+> 次の手順から LLM-as-a-Judge の評価器して事前に LLM の設定が求められています。設定手順などについては、[前提条件](#前提条件)を再度ご確認してください。
 
-> [!Caution]
->
-> 次の手順は、[ollama/set-up-ollama.ja.md](ollama/set-up-ollama.ja.md) に説明されている Ollama を使用したローカル LLM の構成に基づいています。別の LLM 評価器を使用する場合、それに応じて手順の設定も変更してください。
-
-この手順では、ニュース分類微調整済み LLM のパフォーマンスを評価します。
+本章では、ニュース分類微調整済み LLM の分類性能を LLM-as-a-judge より評価します。
 
 ### 1. YAML ひな型の生成:
 YAML ひな型を生成するには、2 つの選択肢があります。
@@ -698,7 +693,7 @@ evaluate_plan=$(knit plan apply ./plans/news-classification-evaluate.v1.0.yaml)
 ```
 - `evaluate_plan` 変数にはコマンドの出力として作成された Plan の詳細が格納されています。
 
-- 構成ファイルは以前の手順より Knitfab にプッシュされているため、`evaluate_plan` の基に Run が自動的に生成され実行されます。
+- 構成ファイルは前章にて Knitfab にプッシュされているため、`evaluate_plan` の基に Run が自動的に生成され実行されます。
 
 ### 4. Plan Id の抽出:
 ```bash
@@ -712,7 +707,7 @@ knit run find -p $evaluate_plan_id
 ```
 `status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
-### 6.（任意）検証指標の取得:
+### 6.（任意）評価指標の取得:
 
 - Run 情報の取得:
 ```bash
@@ -722,7 +717,7 @@ evaluate_run=$(knit run find -p $evaluate_plan_id)
 ```bash
 evaluate_outputs=$(echo "$evaluate_run" | jq -r '.[-1].outputs')
 ```
-- 検証指標レポートの Knit Id の取得:
+- 評価指標レポートの Knit Id の取得:
 ```bash
 evaluate_metrics_knit_id=$(echo "$evaluate_outputs" | jq -r '.[0].knitId')
 ```
@@ -741,7 +736,7 @@ knit run show --log $evaluate_run_id
 ```bash
 knit data pull -x $evaluate_metrics_knit_id ./out
 ```
-このコマンドは、検証指標レポートを Knitfab からダウンロードし、`./out` ディレクトリに保存します。
+このコマンドは、評価指標レポートを Knitfab からダウンロードし、`./out` ディレクトリに保存します。
 
 ## ステップ 5： 片付け
 ### 5-1. Run の 削除：
@@ -874,6 +869,6 @@ knit run stop --fail ${run_id}
 
 - （任意）Runの削除: [ステップ5：片付け](#ステップ-5-片付け)の「Runの削除」の手順に従ってください。
 - 古いPlanの非活性化: [ステップ5：片付け](#ステップ-5-片付け)の「Planの非活性化」の手順に従ってください。
-- 新しいPlanの登録: 実行している学習・検証に応じて、該当する手順を参照してください。
+- 新しいPlanの登録: 実行している学習・評価に応じて、該当する手順を参照してください。
   - [ステップ 3: ニュース分類の微調整](#ステップ-3-ニュース分類の微調整)
   - [ステップ 4: LLM-as-a-judge 評価](#ステップ-4-LLM-as-a-judge-評価)

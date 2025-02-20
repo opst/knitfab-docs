@@ -4,14 +4,14 @@
 This guide walks you through fine-tuning a large language model (LLM) for classification using Knitfab. Discover how Knitfab automates the fine-tuning process and how you can leverage the LLM-as-a-judge approach for efficient, human-like evaluation.
 
 ### Overview
-Fine-tuning LLMs involves optimizing multiple parameters to achieve optimal performance for a specific task - a process that can quickly become overwhelming. Knitfab provides robust management of training artifacts, facilitating seamless experimentation with different configurations. Additionally, we'll explore LLM-as-a-judge, an innovative evaluation method that delivers human-like assessment quality while reducing costs and time.
-
+Fine-tuning Large Language Models (LLMs) requires careful optimization of numerous parameters, a complex process that can easily become unmanageable. Knitfab simplifies this complexity by providing robust management of all training artifacts, from initial input data to final model outputs. This streamlined approach facilitates experimentation with diverse configurations, enabling efficient fine-tuning. Furthermore, we'll explore the innovative concept of "LLM-as-a-judge," a promising evaluation technique that offers human-quality assessments while significantly reducing both cost and time. This example will walk through the complete process, from fine-tuning an LLM for news classification to evaluating its performance using an LLM-as-a-judge, all within the Knitfab platform. This demonstration will highlight the power and seamless functionality of Knitfab as a comprehensive machine learning management platform.
+ 
 The following diagram outlines the key components and steps involved:
 
 **Components:**
 - __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we will use `GPT-2`.
 - __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the `20 Newsgroups` dataset from `scikit-learn`.
-- __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.`
+- __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.
 - __Evaluation Dataset:__ A held-out subset of the `20 Newsgroups` dataset used for LLM-as-a-judge evaluation.
 - __LLM as Evaluator:__ A LLM model for LLM-as-a-judge evaluation.
 - __Metrics:__ Custom metrics designed to evaluate LLM outputs.
@@ -41,7 +41,7 @@ To successfully complete this example, ensure you have met the following prerequ
 - **Knit CLI:** Follow the installation instructions in [01.getting-started: CLI Tool: knit](../../01.getting-started/getting-started.en.md#cli-tool-knit) to set up the Knit CLI.
 - **Knit Command Initialization:** Refer to [01.getting-started: Initializing Knit Command](../../01.getting-started/getting-started.en.md#initializing-the-knit-command) for guidance on initializing Knit command using `knit init`.
 - **`Docker` Installation**: Required for building and pushing images to the Knitfab platform.
-- **LLM as Evaluator**: For LLM-as-a-Judge evaluation, you'll need an LLM.  Three options are available:
+- **LLM as Evaluator**: For LLM-as-a-Judge evaluation, you'll need an LLM. Three options are available:
 
   - **Local LLM with Ollama (Recommended)**: Set up Ollama on Docker and Kubernetes by following the instructions in [ollama/ollama-setup.en.md](ollama/ollama-setup.en.md).
   - **OpenAI**: Configure an OpenAI API key as described in the documentation: https://docs.confident-ai.com/docs/metrics-introduction#using-openai.
@@ -261,8 +261,6 @@ self.save_results()
 
 This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class in `scripts/evaluate/evaluate.py` processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
-This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
-
 ### 1. Parse Arguments
 
 The `parse_arguments` function handles command-line arguments for configuring the evaluation process. Users can specify parameters to override default settings, ensuring flexibility in model evaluation.
@@ -344,12 +342,11 @@ for text, category_idx, result in zip(data, target, batch_results):
 
 ### 4. Evaluate Model Performance
 
-The `TestGPT2Model` class manages the evaluation process using the `deepeval` framework.
+The `TestGPT2Model` class manages the LLM-as-a-judge evaluation process using the `deepeval` framework.
 
 #### Key Functionalities
 - Defines `CategoryPrecision` metric for classification performance.
-- Runs evaluations using `deepeval.evaluate`.
-- Saves evaluation results to disk.
+- Runs evaluations using `deepeval.evaluate` and saves results to disk.
 
 #### Code Breakdown
 ```python
@@ -379,7 +376,7 @@ def run_test(self):
 - Stores results in a JSON file for analysis.
 
 ## Step 2: Build and push docker image to Knitfab
-This step involves creating Docker images for the training and evaluation of the LLM. These images will be pushed to the Knitfab registry for use within the Knitfab platform.
+This section involves creating Docker images for the training and evaluation of the LLM. These images will be pushed to the Knitfab registry for use within the Knitfab platform.
 
 ### 2-1. To Build Docker Images:
 
@@ -431,7 +428,7 @@ This command runs the `news-classification-train:v1.0` image in an interactive m
 
 > [!Caution]
 >
-> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
+> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt the solution accordingly.
 
 ```bash
 docker run --rm -it --gpus all --network ollama-net\
@@ -470,7 +467,7 @@ docker push ${registry_uri}/${docker_image}
 Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
 
 ## Step 3: Fine-tuning.
-This step involves the fine-tuning of the LLM for news classification.
+This step involves the fine-tuning of the LLM for news classification on Knitfab.
 
 ### 1. Generate YAML tempelate:
 
@@ -615,11 +612,7 @@ This command downloads the trained model artifact from the Knitfab platform and 
 > 
 > As with Step 2, the evaluation task requires access to an LLM to serve as the evaluator in the LLM-as-a-Judge process. Please refer to the [Prerequisites](#prerequisites) section for resource requirements and installation instructions.
 
-> [!Caution]
->
-> The following steps are based on the Local LLM with Ollama setup described in [ollama/set-up-ollama.en.md](ollama/set-up-ollama.en.md). If you plan to use a different LLM as your evaluator, you will need to adapt accordingly.
-
-After fine-tuning, we will evaluate the model performance and check for any issues.
+After fine-tuning, we will evaluate the model performance with LLM-as-a-judge.
 
 ### 1. Generate YAML tempelate:
 - Option 1: Create a Blank Template:
