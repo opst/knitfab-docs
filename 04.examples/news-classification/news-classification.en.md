@@ -368,7 +368,7 @@ def run_test(self):
 - Stores results in a JSON file for analysis.
 
 ## Step 3: Build Docker images
-This section involves creating Docker images for the fine-tuning and evaluation of the LLM. These images will be pushed to the Knitfab registry for use within the Knitfab platform.
+This section involves creating Docker images for the fine-tuning and evaluation of the LLM. 
 
 **1. Build `news-classification-train` Image:**
 ```bash
@@ -438,6 +438,7 @@ docker run --rm -it --gpus all --network ollama-net\
 Review the `deepeval-result.json` file to analyze the model's performance based on the defined custom metrics. This analysis will allow you to evaluate the effectiveness of your fine-tuning. Consider whether the current custom metrics adequately reflect your specific requirements, and redefine them if necessary.
 
 ## Step 5: Push Docker images to Knitfab
+Now we will push the Docker images to the Knitfab registry for use within the Knitfab platform.
 
 **1. Tag Images with Registry URI:**
 

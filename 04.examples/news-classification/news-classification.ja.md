@@ -368,7 +368,7 @@ def run_test(self):
 
 ## ステップ 3: Docker イメージのビルド
 
-本章では、ニュース分類ファインチューニングの学習と評価の Docker イメージを作成し、Knitfab レジストリにプッシュします。
+本章では、ニュース分類ファインチューニングの学習と評価の Docker イメージを作成します。
 
 **1. `news-classification-train` イメージのビルド:**
 ```bash
@@ -439,6 +439,7 @@ docker run --rm -it --gpus all --network ollama-net\
 `deepeval-result.json` ファイルを確認して、定義されたカスタム指標に基づいてモデルの性能を分析します。カスタム指標が期待要件を適切に反映しているかどうかを検討し、必要に応じて調整・再定義してください。
 
 ## ステップ 5: Docker イメージを Knitfab にプッシュする
+本章は作成した Docker イメージを Knitfab レジストリにプッシュします。
 
 **1. レジストリ URI を用いてイメージのタグ付け:**
 
