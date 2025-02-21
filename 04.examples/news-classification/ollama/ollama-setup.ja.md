@@ -65,7 +65,7 @@ docker exec -it ollama ollama pull llama3.2
 このコマンドは、実行中の `ollama` コンテナ内で `ollama pull llama3.2` コマンドを実行して、Llama 3.2 モデルをダウンロードします。
 
 ## タスク 2: Ollama を Kubenetes にデプロイする
-本章ではでは、Kubernetes クラスタに Ollama をデプロイます。これにより、Knitfab で実行されている LLM-as-a-judge 評価タスクが Ollama に接続し、ローカル LLM を評価器として使用できるようになります。
+本章ではでは、Kubernetes クラスタに Ollama をデプロイします。これにより、Knitfab で実行されている LLM-as-a-judge 評価タスクが Ollama に接続し、ローカル LLM を評価器として使用できるようになります。
 
 ### 1. デプロイメントとサービスリソースの定義:
 > [!Note]
