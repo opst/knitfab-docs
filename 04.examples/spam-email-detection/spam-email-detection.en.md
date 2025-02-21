@@ -57,20 +57,20 @@ Once cloned, navigate to the `04.examples/spam-email-detection` directory. You w
 - **plans:** Contains the Knitfab Plan YAML templates.
 
 ### Task
-- [Step 1: Build and push docker image to Knitfab.](#step-1-build-and-push-docker-image-to-knitfab)
-- [Step 2: Initial training.](#step-2-initial-training)
-- [Step 3: Model validation.](#step-3-model-validation)
-- [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
-- [Step 5: Clean up.](#step-5-clean-up)
+- [Step 1: Build Docker images.](#step-1-build-docker-images)
+- [Step 2: (Optional) Verify Docker images.](#step-2-optional-verify-docker-images)
+- [Step 3: Push Docker images to Knitfab.](#step-3-push-docker-images-to-knitfab)
+- [Step 4: Initial training.](#step-4-initial-training)
+- [Step 5: Model validation.](#step-5-model-validation)
+- [Step 6: Incremental training and validation.](#step-6-incremental-training-and-validation)
+- [Step 7: Clean up.](#step-7-clean-up)
 
-## Step 1: Build and push docker image to Knitfab
-This step involves creating Docker images for each component of the spam email detection model (initial training, validation, and incremental training). These images will be pushed to the Knitfab registry for use within the Knitfab platform.
+## Step 1: Build Docker images
+This step involves creating Docker images for each component of the spam email detection model (initial training, validation, and incremental training).
 
 > [!Note]
 >
 > This example is intended to help you familiarize with building and managing ML models in Knitfab, so we will not discuss the content of Python scripts and Dockerfile.
-
-#### 1-1. To Build Docker Images:
 
 **1. Build `spam-detection-initial-train` Image:**
 ```bash
@@ -96,10 +96,10 @@ docker build -t spam-detection-incremental-train:v1.0 \
 ```
 The `spam-detection-incremental-train` image will retrain the existing model with new data to improve its performance and adapt to evolving patterns.
 
-#### 1-2. (Optional) To Verify Docker Images:
+## Step 2: (Optional) Verify Docker images
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#1-3-to-push-docker-images-to-knitfab))
+> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([To Push Docker Images to Knitfab](#step-3-push-docker-images-to-knitfab))
 
 **1. Initial Training:**
 ```bash
@@ -145,7 +145,8 @@ docker run --rm -it \
 
 Repeat steps [2 and 3](#step-0-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
-#### 1-3. To Push Docker Images to Knitfab:
+## Step 3: Push Docker images to Knitfab
+Now we will push the Docker images to the Knitfab registry for use within the Knitfab platform.
 
 **1. Tag Images with Registry URI:**
 
@@ -166,7 +167,7 @@ docker push ${registry_uri}/${docker_image}
 ```
 Replace `${docker_image}` with the name of each image (including the registry URI) as tagged in the previous step.
 
-## Step 2: Initial training
+## Step 4: Initial training
 This step involves the initial training of the ML model using the preprocessed data.
 
 **1. Push Traning Data to Knitfab:**
@@ -307,7 +308,7 @@ knit data pull -x $initial_train_model_knit_id ./out/model
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
 
-## Step 3: Model validation
+## Step 5: Model validation
 After training, we will validate the model to evaluate its performance and check for any issues.
 
 **1. Push Validation Data to Knitfab:**
@@ -433,10 +434,10 @@ knit data pull -x $validate_metrics_knit_id ./out/metric
 ```
 This command downloads the validation metrics artifact from the Knitfab platform and stores it in the `./out/metric` directory.
 
-## Step 4: Incremental training and validation
+## Step 6: Incremental training and validation
 Once the initial training and validation are complete, we will perform incremental training using new data, followed by further validation of the updated model.
 
-#### 4-1. Train and Update Initial Model with New Data:
+### Train and Update Initial Model with New Data:
 
 **1. Push New Traning Data to Knitfab:**
 ```bash
@@ -584,33 +585,34 @@ knit data pull -x $incremental_train_model_knit_id ./out/model
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
 
-#### 4-2. Validate the Updated Model:
+### Validate the Updated Model:
 
-**0. Auto-Run of Validation Plan:**
+**11. Auto-Run of Validation Plan:**
 
 Knitfab will automatically trigger a new Run under the validation Plan, recognizing the output model from the incremental training process.
 
-**1. Review the Validation Run and Metrics:**
+**12. Review the Validation Run and Metrics:**
 
-Repeat steps **6-9** from the ["Model validation"](#step-3-model-validation) section to:
+Repeat steps **6-9** from the ["Model validation"](#step-5-model-validation) section to:
 
 - View the Run log of the validation Run.
 - Download the metrics artifact for analysis.
 
 
-#### 4-3. Remove `mode:incremental-train` Tag from Initial Model:
+## Remove `mode:incremental-train` Tag from Initial Model:
 
 Knitfab is an automated platform that manages training processes and their associated artifacts.
 
 When a new dataset is registered, the initial model with the tag `mode:incremental-train` will be automatically recognized by the incremental training Plan, triggering a new training Run.
 
-To prevent this unintended behavior, execute the following command to remove the `mode:incremental-train` tag from the initial model:
+To prevent this unintended behavior, execute the following command to remove the `mode:incremental-train` tag from the initial model.
 
+**13. Remove `mode:incremental-train` tag:**
 ```bash
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
-## Step 5: Clean up
-#### 5-1. To Remove a Run:
+## Step 7: Clean up
+### To Remove a Run:
 
 > [!Caution]
 >
@@ -626,7 +628,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
-#### 5-2. To Deactivate a Plan:
+### To Deactivate a Plan:
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -635,7 +637,7 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-#### 5-3. To Remove the Uploaded Dataset:
+### To Remove the Uploaded Dataset:
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
@@ -696,7 +698,7 @@ This example demonstrates the following:
 - **Automated Training and Artifact Management:** Leveraging Knitfab to streamline and automate the entire training process, including efficient management of model versions and associated artifacts across all stages.
 
 ### Troubleshooting
-#### Problem 1:
+### Problem 1:
 Knitfab Run is stuck in "starting" status and doesn't progress.
 ```json
 {
@@ -744,11 +746,11 @@ knit run stop --fail ${run_id}
 - **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
 - **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
 - **Apply a new Plan:** Refer to the relevant section based on the type of training you're doing:
-  - [Step 2: Initial training.](#step-2-initial-training)
-  - [Step 3: Model validation.](#step-3-model-validation)
-  - [Step 4: Incremental training and validation.](#step-4-incremental-training-and-validation)
+  - [Step 4: Initial training.](#step-4-initial-training)
+  - [Step 5: Model validation.](#step-5-model-validation)
+  - [Step 6: Incremental training and validation.](#step-6-incremental-training-and-validation)
 
-#### Problem 2:
+### Problem 2:
 Error `Plan's tag dependency makes cycle` when applying an incremental train Plan.
 
 **Error Messages:**
