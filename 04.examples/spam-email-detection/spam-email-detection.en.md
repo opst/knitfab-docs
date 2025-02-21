@@ -437,7 +437,7 @@ This command downloads the validation metrics artifact from the Knitfab platform
 ## Step 6: Incremental training and validation
 Once the initial training and validation are complete, we will perform incremental training using new data, followed by further validation of the updated model.
 
-### Train and Update Initial Model with New Data:
+### Train and Update Initial Model with New Data
 
 **1. Push New Traning Data to Knitfab:**
 ```bash
@@ -585,7 +585,7 @@ knit data pull -x $incremental_train_model_knit_id ./out/model
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out/model` directory.
 
-### Validate the Updated Model:
+### Validate the Updated Model
 
 **11. Auto-Run of Validation Plan:**
 
@@ -599,7 +599,7 @@ Repeat steps **6-9** from the ["Model validation"](#step-5-model-validation) sec
 - Download the metrics artifact for analysis.
 
 
-## Remove `mode:incremental-train` Tag from Initial Model:
+### Remove `mode:incremental-train` Tag from Initial Model
 
 Knitfab is an automated platform that manages training processes and their associated artifacts.
 
@@ -612,7 +612,7 @@ To prevent this unintended behavior, execute the following command to remove the
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
 ## Step 7: Clean up
-### To Remove a Run:
+### To Remove a Run
 
 > [!Caution]
 >
@@ -628,7 +628,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
-### To Deactivate a Plan:
+### To Deactivate a Plan
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -637,7 +637,7 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-### To Remove the Uploaded Dataset:
+### To Remove the Uploaded Dataset
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 

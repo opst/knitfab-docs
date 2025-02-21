@@ -626,7 +626,7 @@ Knitfab は、増分学習からの出力したモデルを認識し、検証Pla
 - 検証 Run のログ
 - 指標レポート
 
-## 初期版のモデルから `mode:incremental-train` タグを削除する
+### 初期版のモデルから `mode:incremental-train` タグを削除する
 
 Knitfab は、学習プロセスとそれに関連付けられたリネージを自動的に管理する MLOps ツールです。
 
