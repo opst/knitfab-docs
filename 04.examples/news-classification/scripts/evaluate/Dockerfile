@@ -23,4 +23,4 @@ RUN deepeval set-local-model --model-name=llama3.2 \
     --api-key="ollama"
 
 ENTRYPOINT [ "python", "-u", "evaluate.py" ]
-CMD [ "--config-file", "/configs/evaluate-config.json", "--model-path", "in/model"]
+CMD [ "--config-file", "/configs/evaluate-config.json", "--model-path", "/in/model"]

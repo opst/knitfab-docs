@@ -4,7 +4,7 @@ This guide demonstrates how to set up a local Large Language Model (LLM) using O
 
 ### Overview
 #### What is LLM-as-a-Judge?
-LLM-as-a-Judge utilizes the power of Large Language Models (LLMs) to assess the performance of other AI models. This innovative approach provides near human-level evaluation while offering substantial cost and time savings compared to traditional methods. 1 
+LLM-as-a-Judge utilizes the power of Large Language Models (LLMs) to assess the performance of other AI models. This innovative approach provides near human-level evaluation while offering substantial cost and time savings compared to traditional methods.
 
 For example, in our news classification case study, LLM-as-a-Judge was used to evaluate a fine-tuned GPT-2 model. Instead of relying solely on traditional metrics, the LLM was prompted to assess the model's performance by evaluating the relevance of the predicted news category to the actual category, expressed in natural language. This allowed for a more nuanced and qualitative assessment of the model's accuracy.
 
@@ -73,7 +73,7 @@ This section deploys and configures Ollama within your Kubernetes cluster. This 
 > [!Note]
 >
 > For simplicity, this example deploys the Ollama Deployment and Service into the same namespace as Knitfab.
-> For enhanced security, consider deploying Ollama to a separate namespace. If you choose this approach, ensure you properly configure network access and permissions to allow evaluation runs to access the Ollama service in the other namespace.
+> For enhanced security, consider deploying Ollama to a separate namespace. If you choose this approach, ensure your DNS query pointing to correct namespace and confirm evaluation runs can access the Ollama service.
 
 Create a YAML file defines an Ollama application deployment and service for a Kubernetes cluster.  Save this content as `ollama.yaml`. Each section reponsible for:
 - **Deploys Ollama:** Creates a single Ollama pod using the `ollama/ollama` Docker image in the `knitfab` namespace.  It allocates 4 CPU cores, 5GB of memory, and 1 GPU to the pod.  Crucially, it downloads the `llama3.2` model on startup.
