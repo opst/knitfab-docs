@@ -15,8 +15,9 @@
   - [3.1. インストールされるもの](#31-インストールされるもの)
   - [3.2. 必要なもの](#32-必要なもの)
   - [3.3. インストール手順](#33-インストール手順)
-- [4. Knitfab をアンインストールする](#4-knitfab-をアンインストールする)
-- [5. Knitfab の helm 的構成について](#5-knitfab-の-helm-的構成について)
+- [4. インストーラのその他の機能](#4-インストーラのその他の機能)
+- [5. Knitfab をアンインストールする](#5-knitfab-をアンインストールする)
+- [6. Knitfab の helm 的構成について](#6-knitfab-の-helm-的構成について)
 
 
 # 1. はじめに
@@ -61,7 +62,7 @@
 
 Knitfab をインストールするには、以下の環境が必要です。
 
-- Kubernetes クラスタ: 
+- Kubernetes クラスタ:
   - **Kubernetes**（クバネティス/クバネテス/クーべネティス、K8sと略記されます）は、コンテナ化したアプリケーションのデプロイ、スケーリング、および管理を行うための、オープンソースのコンテナオーケストレーションシステムです。
   - Knitfab は Kubernetes クラスタ上で稼働します。
   - マルチノードクラスタまたはシングルノードクラスタでも構いません。
@@ -203,17 +204,19 @@ chmod +x ./installer.sh
 > もし特定の TLS 証明書類を利用したいなら、代わりに次のコマンドを実行してください。
 >
 > ```
-> TLSCACERT=path/to/ca.crt TLSCAKEY=path/to/ca.key TLSCERT=path/to/server.crt TLSKEY=path/to/server.key ./installler.sh --prepare --kubeconfig ${KUBECONFIG}
+> ./installler.sh --prepare --kubeconfig ${KUBECONFIG} --tls-ca-cert path/to/ca.crt --tls-ca-key path/to/ca.key --tls-cert path/to/server.crt --tls-key path/to/server.key ...
 > ```
 >
-> サーバ証明書について指定がないなら、環境変数 `TLSCERT`, `TLSKEY` を省略して、次のようにします。
+> サーバ証明書を CA 証明書から自動生成してよいなら、`--tls-cert`, `--tls-key` を省略して、次のようにします。
 >
 > ```
-> TLSCACERT=path/to/ca.crt TLSCAKEY=path/to/ca.key ./installler.sh --prepare
+> ./installler.sh --prepare --kubeconfig ${KUBECONFIG} --tls-ca-cert path/to/ca.crt --tls-ca-key path/to/ca.key ...
 > ```
 >
-> CA 証明書が指定されなかった場合には、インストーラは 自己署名証明書を自動的に生成します。
 > サーバ証明書が指定されなかった場合には、インストーラは CA 証明書から自動的に生成します。
+> この際、生成時の Kubernetes クラスタの各ノードの IP アドレスを SAN として証明書を構成します。
+>
+> CA 証明書も指定されなかった場合には、インストーラは 自己署名証明書を自動的に生成します。
 
 > [!Note]
 >
@@ -308,6 +311,7 @@ nfs:
 ここまで述べた以外のファイルについても、必要に応じてパラメータを変更できます。
 
 特に利用上影響があるのは次のものです。
+
 ##### (1) ポート番号
 
 - `knitfab-install-settings/values/knit-app.yaml` の `knitd.port`
@@ -316,13 +320,14 @@ nfs:
 前者は Knitfab API の LISTEN ポート、後者はクラスタ内イメージレジストリの LISTEN ポートです。
 
 ##### (2) クラスタのTLD
-また、 Kubernetes クラスタ構築時に、クラスタの TLD(Top Level Domain)をデフォルト
-値 ( `cluster.local` ) から変更していた場合には、次の項目にその TLD を設定する必
-要があります。
+
+また、 Kubernetes クラスタ構築時に、クラスタの TLD(Top Level Domain)をデフォルト値 ( `cluster.local` ) から変更していた場合には、
+次の項目にその TLD を設定する必要があります。
 
 - `knitfab-install-settings/values/knit-app.yaml` の `clusterTLD` (コメント解除して書き換えます)
 
 ##### (3) Knitfab 拡張機能関連
+
 Knitfab の動作を拡張するための設定ファイルも含まれています。
 
 - `knitfab-install-settings/values/hooks.yaml` を編集することで WebHook を設定できます。
@@ -330,12 +335,20 @@ Knitfab の動作を拡張するための設定ファイルも含まれていま
 
 詳細は、「Knitfab を拡張する」の章を参照ください。
 
+##### (4) 既存の PostgreSQL を利用する
+
+Knitfab はデフォルトではインストール時に Kubernetes クラスタ内に PostgreSQL データベースを構築します。
+この代わりに、既存の PostgreSQL サーバを利用するように設定することができます。
+
+- `knitfab-install-settings/values/knit-db-postgres.yaml` を編集することで、外部データベースを利用するようにできます。
+
+Knitfab は、 PostgreSQL 内のデータベース名として "knit" を利用します。
+
 ### 3.3.3. インストールする
 
-以下のコマンドを実行することで、インストールスクリプトが順次 Knitfab のコンポー
-ネントを Kubernetes クラスタにインストールします。 `${NAMESPACE}`には、Knitfabア
-プリケーションのインストール先とする Kubernetes 名前空間名を指定してくださ
-い。（ここで新規に指定します。）これには、**しばらく時間がかかります。**
+以下のコマンドを実行することで、インストールスクリプトが順次 Knitfab のコンポーネントを Kubernetes クラスタにインストールします。
+`${NAMESPACE}`には、Knitfabアプリケーションのインストール先とする Kubernetes 名前空間名を指定してください。（ここで新規に指定します。）
+これには、**しばらく時間がかかります。**
 
 ```
 ./installer.sh --install --kubeconfig path/to/kubeconfig -n ${NAMESPACE} -s ./knitfab-install-settings
@@ -368,18 +381,16 @@ kube-system        coredns                     2/2     2            2           
 tigera-operator    tigera-operator             1/1     1            1           21d
 
 ```
-上記の例では、`kf-mycluster` というネームスペースで Knitfab をインストールしてい
-ます。このネームスペースに属する deployment(NAME列)のREADY値がすべて '1/1' と
-なっているのが確認できます。
 
-この状態になるまでしばらく時間がかかる場合がありますので、READY値が'N/N'になって
-いない場合は少し時間置いて再度試してみてください。
+上記の例では、`kf-mycluster` というネームスペースで Knitfab をインストールしています。
+このネームスペースに属する deployment(NAME列)のREADY値がすべて '1/1' となっているのが確認できます。
 
-それでも駄目な場合は、[トラブルシュート](admin-guide-deep-dive.ja.md#5-トラブルシュート)
-などを参考にして対処してください。
+この状態になるまでしばらく時間がかかる場合がありますので、READY値が'N/N'になっていない場合は少し時間置いて再度試してみてください。
 
-Knitfabと関係のないネームスペースの情報を表示させたくない場合は、以下のように
-`-n` オプションを使用してください。
+それでも駄目な場合は、[トラブルシュート](admin-guide-deep-dive.ja.md#5-トラブルシュート) などを参考にして対処してください。
+
+Knitfabと関係のないネームスペースの情報を表示させたくない場合は、以下のように`-n` オプションを使用してください。
+
 ```
 $ kubectl get deploy -n kf-mycluster
 ```
@@ -397,9 +408,8 @@ $ kubectl get deploy -n kf-mycluster
 
 #### (任意実施)3.3.4.1. ハンドアウトを修正する
 
-Knitfab に対して特定のドメイン名でアクセスしたい場合には (例: 指定したサーバ証明
-書がそうなっている場合) 、ユーザにハンドアウトを配布する前に、接続設定を書き換え
-る必要があります。
+Knitfab に対して特定のドメイン名でアクセスしたい場合には (例: 指定したサーバ証明書がそうなっている場合) 、
+ユーザにハンドアウトを配布する前に、接続設定を書き換える必要があります。
 
 **knitprofile ファイル** と呼ばれる、Knitfab API への接続設定が
 `knitfab-install-settings/handouts/knitprofile` にあります。このファイルは次のよ
@@ -431,7 +441,77 @@ cert:
 このディレクトリ名は Kubernetes ノードの IPアドレスとポート名を `:` でつないだものです。
 この IPアドレスの部分を、使用したいドメイン名に変更してください。
 
-# 4. Knitfab をアンインストールする
+
+# 4. インストーラのその他の機能
+
+Knitfab のインストーラは、Knitfab システムの構成を維持するための機能を備えています。
+
+- Knitfab を最新版にアップグレードする機能
+- Knitfab が利用している TLS 証明書を更新し、入れ替える機能
+
+## 4.1. Knitfab を最新版にアップグレードする
+
+Knitfab を最新版にバージョンアップするには、インストーラのインストール手順（ `./installer.sh --install` ）を再実行してください。
+
+最後のインストール設定に従いつつ、最新版の Knitfab でシステムを更新します。
+
+## 4.2. TLS 証明書を更新する
+
+インストーラは、Knitfab システムが https 通信に利用している TLS 証明書を更新する機能を備えています。
+
+TLS 証明書の更新手順は、次のステップからなります。
+
+1. 新しい証明書を生成する、あるいは、証明書を指定して入れ替える
+2. Knitfab をアップグレードすることで、証明書を適用する
+
+ステップ1. だけでは、Knitfab は新しい証明書を利用しませんので、ご注意ください。ステップ 2. を実行することで Knitfab は新しい証明書を利用し始めます。
+
+### 4.2.1. 新しい証明書を生成する、あるいは、証明書を指定して入れ替える
+
+#### 4.2.1.1. 新しい証明書を生成する
+
+新しい証明書を生成するには、次のコマンドを実行します。
+
+```shell
+./installer.sh --renew-certs
+```
+
+このコマンドによって、指定済みの CA 証明書・キーペア（ `./knitfab-install-settings/certs/ca{.crt,.key}` ）から新しいサーバ証明書を生成します。
+
+この際、Knitfab がインストールされている Kubernetes クラスタの各ノードの IP を SAN とした証明書が発行されます。
+
+CA 証明書も新しく生成し直したい場合は、次のようにします。
+
+```shell
+./installer.sh --renew-certs --renew-ca
+```
+
+自己署名証明書として CA 証明書を発行しなおします。また、サーバ証明書がその CA 証明書に従って新しく発行されます。
+
+#### 4.2.2.2. 証明書を指定する
+
+既存の証明書を Knitfab に対して指定する場合には、次のコマンドを実行します。
+
+```shell
+./installer.sh --renew-certs --tls-ca-cert path/to/ca.crt --tls-ca-key path/to/ca.key --tls-cert path/to/server.crt --tls-key path/to/server.key
+```
+
+これにより、新しい CA 証明書・キーペア（`path/to/ca{.crt,.key}`）と、新しいサーバ証明書・キーペア（`path/to/server{.crt,.key}`）で Knitfab の構成設定を更新します。
+
+サーバ証明書・キーペアの指定（ `--tls-cert`, `--tls-key` ）は省略可能です。その場合、指定した CA 証明書に基づいて、新しくサーバ証明書を発行します。
+この際、Knitfab がインストールされている Kubernetes クラスタの各ノードの IP を SAN とした証明書が発行されます。
+
+#### 4.2.2. Knitfab をアップグレードすることで、証明書を適用する
+
+次のコマンドを実行して、Knitfab をアップグレードします。この際、新しい証明書も同時に適用されます。
+
+```shell
+./installer.sh --install
+```
+
+この際、 Knitfab の WebAPI サーバ（`knitd`）が停止して、再起動します。
+
+# 5. Knitfab をアンインストールする
 
 インストールを実行すると `knitfab-install-settings/uninstall.sh` としてアンインストーラが生成されます。
 
@@ -447,15 +527,13 @@ knitfab-install-settings/uninstall.sh
 knitfab-install-settings/uninstall.sh --hard
 ```
 
-
-# 5. Knitfab の helm 的構成について
+# 6. Knitfab の helm 的構成について
 
 Knitfab はいくつかの helm chart で構成されています。
 このセクションでは、Knitfab の helm 的な構築方法について解説します。
 
-管理者は Knitfab の一部をアンインストール・再インストールしたり、アップデートし
-たりしなくてはならない場合があるかもしれません。helm構成を理解しておけば、そうし
-た場合に何をすればよいか見通しが立つようになるでしょう。
+管理者は Knitfab の一部をアンインストール・再インストールしたり、アップデートしたりしなくてはならない場合があるかもしれません。
+helm構成を理解しておけば、そうした場合に何をすればよいか見通しが立つようになるでしょう。
 
 > [!Note]
 >
