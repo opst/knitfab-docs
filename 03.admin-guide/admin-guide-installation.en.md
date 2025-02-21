@@ -139,7 +139,7 @@ Following items are installed in your Kubernetes cluster.
 | Knitfab Application | knit-app, knit-schema-upgrader |
 | Database | knit-db-postgres |
 | In-cluster Image Registry | knit-image-registry |
-| TLS Certifications | knit-certs |
+| TLS Certificates | knit-certs |
 | StorageClass | knit-storage-nfs |
 
 [CSI "csi-driver-nfs"](https://github.com/kubernetes-csi/csi-driver-nfs/) is also installed in the same Namespace as Knitfab, since "knit-storage-nfs" depends on it.
@@ -426,7 +426,7 @@ Rename the part with this IP to the desired domain name for access.
 The Knitfab installer has functions to maintain Knitfab system.
 
 - Upgrade Knitfab itself to the latest version
-- Update and replace TLS Certifications in Knitfab
+- Update and replace TLS certificates in Knitfab
 
 ## 4.1. Upgrade Knitfab itself to the latest version
 
@@ -434,52 +434,52 @@ To upgrada Knitfab to the latest version, rerun install command (`./installer.sh
 
 It upgrade Knitfab system with the last install configuration.
 
-## 4.2. Update and replace TLS Certifications in Knitfab
+## 4.2. Update and replace TLS certificates in Knitfab
 
-Knitfab installer can update TLS Certifications which is used by Knitfab system.
+Knitfab installer can update TLS certificates which is used by Knitfab system.
 
-Updating TLS Certifications consists of the following steps:
+Updating TLS certificates consists of the following steps:
 
-1. Generate new Certificarions, or replace Certifications
-2. Upgrade Knitfab to apply the new Certifications
+1. Generate new Certificarions, or replace certificates
+2. Upgrade Knitfab to apply the new certificates
 
-Please note that Step 1. DOES NOT apply the new Certifications. By Step 2., Knitfab uses the new Certitications.
+Please note that Step 1. DOES NOT apply the new certificates. By Step 2., Knitfab uses the new Certitications.
 
-### 4.2.1. Generate new Certifications, or replace Certifications
+### 4.2.1. Generate new certificates, or replace certificates
 
-#### 4.2.1.1. Generate new Certifications
+#### 4.2.1.1. Generate new certificates
 
-To generate new Certifications, run follow command:
+To generate new certificates, run follow command:
 
 ```shell
 ./installer.sh --renew-certs
 ```
 
-This command generates new Server Certifications signed by previously configured CA Certifications ( `./knitfab-install-settings/certs/ca{.crt,.key}` ).
-The generated new Server Certifications have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
+This command generates new Server certificates signed by previously configured CA certificates ( `./knitfab-install-settings/certs/ca{.crt,.key}` ).
+The generated new Server certificates have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
 
-If you need to regenerate also CA Certifications, do as following:
+If you need to regenerate also CA certificates, do as following:
 
 ```shell
 ./installer.sh --renew-certs --renew-ca
 ```
 
-This command generates self-signed CA Certifications. New Server Certifications are genereted and signed with the new CA Certifications.
+This command generates self-signed CA certificates. New Server certificates are genereted and signed with the new CA certificates.
 
-#### 4.2.1.2. Replace Certifications
+#### 4.2.1.2. Replace certificates
 
-To replace Certifications with ones you specify, run following command:
+To replace certificates with ones you specify, run following command:
 
 ```shell
 ./installer.sh --renew-certs --tls-ca-cert path/to/ca.crt --tls-ca-key path/to/ca.key --tls-cert path/to/server.crt --tls-key path/to/server.key
 ```
 
-This command replaces Certifications with specified CA Certificartions (`path/to/ca{.crt,.key}`) and Server Certifications (`path/to/server{.crt,.key}`).
+This command replaces certificates with specified CA Certificartions (`path/to/ca{.crt,.key}`) and Server certificates (`path/to/server{.crt,.key}`).
 
-Server Certifications (`--tls-cert`, `--tls-key`) is optional. When omitted, new Server Certifications are generated and signed with the specified CA Certifications.
-The generated new Server Certifications have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
+Server certificates (`--tls-cert`, `--tls-key`) is optional. When omitted, new Server certificates are generated and signed with the specified CA certificates.
+The generated new Server certificatates have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
 
-#### 4.2.2. Upgrade Knitfab to apply Certifications
+#### 4.2.2. Upgrade Knitfab to apply certificates
 
 Upgrade Knitfab with following command:
 
@@ -487,7 +487,7 @@ Upgrade Knitfab with following command:
 ./installer.sh --install
 ```
 
-With this, Knitfab API Server (`knitd`) will stop and restart to apply new Certifications.
+With this, Knitfab API Server (`knitd`) will stop and restart to apply new certificates.
 
 # 5. Uninstall Knitfab
 
