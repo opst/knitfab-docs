@@ -743,8 +743,8 @@ After fixing the image pull issue, you'll likely need to:
 knit run stop --fail ${run_id}
 ```
 (Replace `${run_id}` with your actual Run Id, e.g., `64b5a7ae-5c85-48f1-b785-955c1709174a`)
-- **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 5: Clean Up](#step-5-clean-up).
-- **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 5: Clean Up](#step-5-clean-up).
+- **(Optional) Remove the Run:** Follow the instructions in "To Remove a Run" under [Step 7: Clean Up](#step-7-clean-up).
+- **Deactivate the old Plan:** Follow the instructions in "To Deactivate a Plan" under [Step 7: Clean Up](#step-7-clean-up).
 - **Apply a new Plan:** Refer to the relevant section based on the type of training you're doing:
   - [Step 4: Initial training.](#step-4-initial-training)
   - [Step 5: Model validation.](#step-5-model-validation)
