@@ -639,7 +639,7 @@ Knitfab は、学習プロセスとそれに関連付けられたリネージを
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
 
-## ステップ 5: 片付け
+## ステップ 7: 片付け
 ### Run の 削除
 > [!Caution]
 > 
