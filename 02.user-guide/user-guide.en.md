@@ -137,7 +137,10 @@ CLI Tool: knit
 
 Knitfab users perform operations on Knitfab using the CLI command `knit`.
 
-Instructions on how to obtain the CLI tool can be found in the getting-started section.
+You can get `knit` CLI from Knitfab Releases page ( https://github.com/opst/knitfab/releases ).
+Download a binary for your OS, and put it in a directory which in `PATH` environment variable.
+
+> For Linux/Max users: put executable permisson on the binary (`chmod +x ...`).
 
 ### Subcommands
 

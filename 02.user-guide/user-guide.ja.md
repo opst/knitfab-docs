@@ -142,7 +142,10 @@ CLI ツール: knit
 
 Knitfab ユーザは、Knitfab に対する操作を CLI コマンド `knit` を介して行います。
 
-CLI を入手する方法については getting-started に記載があります。
+CLI は Knitfab のリリースページ( https://github.com/opst/knitfab/releases ) から取得できます。
+お使いの OS に合ったバイナリをダウンロードして、 `PATH` 環境変数から見つかるディレクトリに配置します。
+
+> Linux/Mac ユーザは、バイナリに実行権限を付与( `chmod +x ...` )してください。
 
 ### サブコマンド
 
