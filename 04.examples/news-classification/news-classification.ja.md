@@ -1,7 +1,7 @@
 ### 例
 # Knitfab での LLM のファインチューニングによるニュース分類
 
-本書では、Knitfab を使用した一般大規模言語モデル (LLM) をファインチューニングすることにより、モデルがニュースといった特定の文書分類性能を向上することを示します。この事例を通して、Knitfab がファインチューニング実験の入力と出力、および履歴の管理を自動化しながら、LLM-as-a-judge を用いて効率的に人間のような評価ができるようになります。
+本書では、Knitfab を使用した一般大規模言語モデル (LLM) をファインチューニングすることにより、モデルがニュースといった特定の文書分類性能を改善できることを示します。この事例を通して、Knitfab がファインチューニング実験の入力と出力、および履歴の管理を自動化しながら、LLM-as-a-judge を用いて効率的に人間のような評価ができるようになります。
 
 ### 概要
 LLM のファインチューニングは、特定のタスクに対して処理性能と判断性能を高めるために複数なハイパーパラメータを調整する工程です。しかしながら、複雑なハイパーパラメータにより LLM のファインチューニングの管理はすぐに難しいものになります。そこで、 Knitfab により学習工程にくわえて学習の入出力、成果物まで自動管理することで、さまざまな構成設定での実験が容易になります。さらに、革新的な評価方法である LLM-as-a-judge を用いることにより人間のような評価品質を維持しながらコストの削減も可能になります。本事例では、このニュース分類タスクのファインチューニングから LLM-as-a-judge 評価までの一連のタスクを Knitfab 上で実装することを体験し、リネージ自動管理プラットフォームとして Knitfab の強みと容易さをお伝えします。
@@ -77,9 +77,9 @@ git clone https://github.com/opst/knitfab-docs.git
 
 本章では、`scripts/train/train.py` にニュース分類ファインチューニングのロジックを説明します。スクリプトは引数指定、モデル準備、データ処理、学習と、評価を構造化したパイプラインに従い、各コンポーネントの構成変更と最適化を容易にする設計を取っています。
 
-**1. 引数指定**
+**1.1. 引数指定**
 
-`parse_arguments` 関数は、学習タスクに必要な引数を受け取ります。さまざまなパラメータを任意に指定できるため、モデルのファインチューニングに柔軟に変更できます。
+`parse_arguments` 関数は、学習タスクに必要な引数を受け取ります。さまざまなパラメータを任意に指定できるため、モデルのファインチューニングに柔軟に対応できます。
 
 - `--config-file`: 設定ファイルのパス。指定された場合、既定引数を上書きします。
 - `--save-to`: ファインチューニング済みモデルとログが保存されるディレクトリです。既定値は `./out` です。
@@ -102,7 +102,7 @@ if args.config_file:
 - 指定された場合、JSON ファイルから構成を読み取ります。
 - 引数値を動的に更新します。
 
-**2. モデルとトークナイザーの初期化**
+**1.2. モデルとトークナイザーの初期化**
 
 `setup_environment` 関数は、基底モデルとトークナイザーの読み込みと、パフォーマンスを最適化するために量子化設定を行います。
 
@@ -134,7 +134,7 @@ self.model = AutoModelForSequenceClassification.from_pretrained(
 - シーケンス分類として基底モデルを読み込みます。
 - 分類タスクの出力ラベル数、量子化構成、およびハードウェア (`cpu/cuda`) を指定します。
 
-**3. データセットの読み込みと前処理**
+**1.3. データセットの読み込みと前処理**
 
 `prepare_datasets` 関数は、学習データセットを読み込み、トークン化します。
 
@@ -172,7 +172,7 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
 - 生データを `DataFrame` 形式に構造化します。
 - データを `Transformer` で読み込んだ基底モデルの入力形式にトークン化します。
 
-**4. 学習ハイパーパラメータの設定**
+**1.4. 学習ハイパーパラメータの設定**
 `setup_trainer` 関数は、適切なハイパーパラメータとモデル構成を使用して `SFTTrainer` を初期化します。
 
 - `TrainingArguments` を使用して学習ハイパーパラメータを定義します。
@@ -234,9 +234,9 @@ self.trainer = SFTTrainer(
 - 構成済みのモデル、学習引数、データセット、およびトークナイザーを使用して `SFTTrainer` を初期化します。
 - すべての要素を組み合わせて、分類ファインチューニングを効率的に実行します。
 
-**5. モデルの学習と評価**
+**1.5. モデルの学習と評価**
 
-`run` 関数は、環境設定から結果の保存まで、学習プロセス全体を調整します。
+`run` 関数は、環境設定から結果の保存まで、学習プロセス全体を順次実行します。
 
 - データセットを読み込み、学習器を初期化します。
 - 学習と評価を実装します。
@@ -256,9 +256,9 @@ self.save_results()
 
 本章では、ニュース分類ファインチューニング済みのモデルを評価するための、LLM を使用した評価パイプラインについて説明します。`scripts/evaluate/evaluate.py` の `TestGPT2Model` クラスは、定義したテストケースとニュースカテゴリ分類精度指標に従ってモデルを評価し、分類性能レポートを生成します。これにより、モデル間に一貫したベンチマークに従って比較できるため、モデルの精度向上に寄与します。
 
-**1. 引数指定**
+**2.1. 引数指定**
 
-`parse_arguments` 関数は、評価プロセスの必要な引数を処理します。さまざまなパラメータを任意に指定できるため、モデルのファインチューニングに柔軟的に変更で来ます。
+`parse_arguments` 関数は、評価プロセスの必要な引数を処理します。さまざまなパラメータを任意に指定できるため、モデルのファインチューニングに柔軟に対応で来ます。
 
 - `--config-file`: 設定ファイルのパス。指定された場合、既定引数を上書きします。
 - `--model-path`: ファインチューニング済みモデルへのパス。既定値は `./in/model` です。
@@ -269,7 +269,7 @@ self.save_results()
 
 設定ファイルとコマンドラインの両方で引数を指定した場合、設定ファイルの設定内容が優先されます。
 
-**2. 分類器の作成**
+**2.2. 分類器の作成**
 
 `create_classifier` 関数は、評価対象の分類モデルを初期化します。
 
@@ -293,7 +293,7 @@ return pipeline(
 - ファインチューニング済みモデルとトークナイザーを使用して、分類パイプラインを初期化します。
 - 最大固定長が `1024` トークンを超えないようにします。
 
-**3. テストケースの生成**
+**2.3. テストケースの生成**
 
 `get_test_cases` 関数は、`20 Newsgroups` データセットから `test` サブセットを取得し、評価の準備をします。
 
@@ -332,7 +332,7 @@ for text, category_idx, result in zip(data, target, batch_results):
 - 予測されたニュースカテゴリ (`actual_output`) を正解 (`expected_category`) と比較します。
 - 評価用のテストケースとして保存します。
 
-**4. モデルパフォーマンスの評価**
+**2.4. モデルパフォーマンスの評価**
 
 `TestGPT2Model` クラスは、`deepeval` という LLM-as-a-judge フレームワークを使用してモデルを評価します。
 
@@ -370,7 +370,7 @@ def run_test(self):
 
 本章では、ニュース分類ファインチューニングの学習と評価の Docker イメージを作成します。
 
-**1. `news-classification-train` イメージのビルド:**
+**3.1. `news-classification-train` イメージのビルド:**
 ```bash
 docker build -t news-classification-train:v1.0 \
              -f scripts/train/Dockerfile \
@@ -378,7 +378,7 @@ docker build -t news-classification-train:v1.0 \
 ```
 `news-classification-train` イメージは、基底モデルのファインチューニングを担います。
 
-**2. `news-classification-evaluate` イメージのビルド:**
+**3.2. `news-classification-evaluate` イメージのビルド:**
 
 **Dockerfile の変更:**
 `Dockerfile` 内のコマンドラインを変更して LLM-as-a-Judge の LLM 評価器を設定する必要があります。LLM 評価器の詳細設定については、[前提条件](#前提条件)に記載されているドキュメントを参照してください。
@@ -403,7 +403,7 @@ docker build -t news-classification-evaluate:v1.0 \
 >
 > ビルドしたイメージに自信がある場合は、Knitfab へのプッシュに進んでください。（[Docker イメージを Knitfab にプッシュする](#ステップ-5-Docker-イメージを-Knitfab-にプッシュする)）
 
-**1. ファインチューニングイメージの実行:**
+**4.1. ファインチューニングイメージの実行:**
 ```bash
 docker run --rm -it --gpus all \
     -v "$(pwd)/configs:/configs" \
@@ -415,7 +415,7 @@ docker run --rm -it --gpus all \
 - これにより、イメージの動作確認ができ、ファインチューニング済みモデルが生成されます。
 - 次の手順に進む方は、ファインチューニングを最後まで行ってください。そうでない方はコンテナに問題がないことを確認できたら、中断しても構いません。
 
-**2. LLM-as-a-judge を使用したモデル評価:**
+**4.2. LLM-as-a-judge を使用したモデル評価:**
 > [!Caution]
 > 
 >  以降は、LLM-as-a-Judge の評価器として事前に LLM を設定しておく必要があります。設定手順などについては、[前提条件](#前提条件)をご確認してください。
@@ -434,14 +434,14 @@ docker run --rm -it --gpus all --network ollama-net\
 - 評価指標は、`out` ディレクトリに `deepeval-result.json` の JSON ファイルとして保存されます。
 - 次の手順に進む方は、評価を最後まで行ってください。そうでない方はコンテナに問題がないことを確認できたら、中断しても構いません。
 
-**3. パフォーマンス分析:**
+**4.3. パフォーマンス分析:**
 
 `deepeval-result.json` ファイルを確認して、定義されたカスタム指標に基づいてモデルの性能を分析します。カスタム指標が期待要件を適切に反映しているかどうかを検討し、必要に応じて調整・再定義してください。
 
 ## ステップ 5: Docker イメージを Knitfab にプッシュする
 本章は作成した Docker イメージを Knitfab レジストリにプッシュします。
 
-**1. レジストリ URI を用いてイメージのタグ付け:**
+**5.1. レジストリ URI を用いてイメージのタグ付け:**
 
 イメージを Knitfab レジストリにプッシュする前に、正しいレジストリ URI でタグ付けする必要があります。これにより、Docker はプッシュ操作の目的のレジストリを識別できます。
 ```bash
@@ -452,7 +452,7 @@ docker tag ${docker_image} ${registry_uri}/${docker_image}
 - `${docker_image}` をビルドされた各イメージの名前（例：`news-classification-train:v1.0`, `news-classification-evaluate:v1.0`）に置き換えてください。
 - `${registry_uri}` を、Knitfab レジストリの実際の URI（例：`192.0.2.1:30503`）に置き換えてください。
 
-**2. イメージをKnitfabレジストリへプッシュ:**
+**5.2. イメージをKnitfabレジストリへプッシュ:**
 
 次に、タグ付きのイメージを Knitfab レジストリにプッシュします。
 ```bash
@@ -464,7 +464,7 @@ docker push ${registry_uri}/${docker_image}
 
 本章では、Knitfab 上 LLM のニュース分類ファインチューニングを行います。
 
-**1. YAML ひな型の生成:**
+**6.1. YAML ひな型の生成:**
 
 YAML ひな型を生成するには、2 つの選択肢があります。
 
@@ -485,7 +485,7 @@ docker save ${registry_uri}/news-classification-train:v1.0 | \
 
 \* コマンドが Docker イメージを解析して、ひな型の一部を記入したものが生成されます。
 
-**2. YAML ひな型の追記:**
+**6.2. YAML ひな型の追記:**
 - 重要な追記点:
   - `image`:
     Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
@@ -535,7 +535,7 @@ docker save ${registry_uri}/news-classification-train:v1.0 | \
 - その他の重要な考慮事項：
   変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにある YAML ファイルを参照してください。
 
-**3. YAML ひな型の登録:**
+**6.3. YAML ひな型の登録:**
 ```bash
 train_plan=$(knit plan apply ./plans/news-classification-train.v1.0.yaml)
 ```
@@ -543,13 +543,13 @@ train_plan=$(knit plan apply ./plans/news-classification-train.v1.0.yaml)
 
 `train_plan` 変数にはコマンドの出力として作成された Plan の詳細が格納されています。
 
-**4. Plan Id の抽出:**
+**6.4. Plan Id の抽出:**
 ```bash
 train_plan_id=$(echo "$train_plan" | jq -r '.planId')
 ```
 これで、Plan の詳細から Plan の一意の Id を抽出できます。
 
-**5. 設定ファイルを Knitfab へプッシュ:**
+**6.5. 設定ファイルを Knitfab へプッシュ:**
 ```bash
 knit data push -t type:config \
                -t project:news-classification \
@@ -559,7 +559,7 @@ knit data push -t type:config \
 
 `-t` フラグは、タグ（`type:config`, `project:news-classification`）を追加することで、Knitfab が設定ファイルを Plan に関連付けられるようになります。
 
-**6. 実行状況の確認:**
+**6.6. 実行状況の確認:**
 
 YAML ひな型を登録した後、Knitfab は学習 Plan を実行するための Run が開始します。次のコマンドを使用して、Runの実行状況を監視できます。
 ```bash
@@ -567,7 +567,7 @@ knit run find -p $train_plan_id
 ```
 このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマンドを定期的に実行し、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
-**7. モデル情報の取得:**
+**6.7. モデル情報の取得:**
 
 学習 Run が正常に終了したら、生成されたモデルに関する情報を取得できます。
 - Run 情報の取得:
@@ -583,7 +583,7 @@ train_outputs=$(echo "$train_run" | jq -r '.[-1].outputs')
 train_model_knit_id=$(echo "$train_outputs" | jq -r '.[0].knitId')
 ```
 
-**8.（任意）Run ログの確認:**
+**6.8.（任意）Run ログの確認:**
 
 学習中にログを確認したい場合は、次のコマンドを使用できます。
 - Run Id の取得:
@@ -595,7 +595,7 @@ train_run_id=$(echo "$train_run" | jq -r '.[-1].runId')
 knit run show --log $train_run_id
 ```
 
-**9.（任意）モデルの保存:**
+**6.9.（任意）モデルの保存:**
 
 学習済みのモデルをローカルに保存したい場合は、次のコマンドを使用して Knitfab からダウンロードできます。
 ```bash
@@ -610,7 +610,7 @@ knit data pull -x $train_model_knit_id ./out
 
 本章では、ニュース分類ファインチューニング済み LLM の分類性能を LLM-as-a-judge より評価します。
 
-**1. YAML ひな型の生成:**
+**7.1. YAML ひな型の生成:**
 YAML ひな型を生成するには、2 つの選択肢があります。
 
 - 選択肢①：空のひな型を作成する
@@ -624,7 +624,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 ```
 \* `${registry_uri}` を 実際の Knitfab のレジストリ URI に置き換えてください。
 
-**2. YAML ひな型の追記:**
+**7.2. YAML ひな型の追記:**
 - 重要な追記点:
   - `image`:
     Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
@@ -681,7 +681,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 - その他の重要な考慮事項：
   変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにある YAML ファイルを参照してください。
 
-**3. YAML ひな型の登録:**
+**7.3. YAML ひな型の登録:**
 ```bash
 evaluate_plan=$(knit plan apply ./plans/news-classification-evaluate.v1.0.yaml)
 ```
@@ -689,19 +689,19 @@ evaluate_plan=$(knit plan apply ./plans/news-classification-evaluate.v1.0.yaml)
 
 - 設定ファイルは前章にて Knitfab にプッシュされているため、`evaluate_plan` の基に Run が自動的に生成され実行されます。
 
-**4. Plan Id の抽出:**
+**7.4. Plan Id の抽出:**
 ```bash
 evaluate_plan_id=$(echo "$evaluate_plan" | jq -r '.planId')
 ```
 これで、Plan の詳細から Plan の一意の Id を抽出できます。
 
-**5. 実行状況の確認:**
+**7.5. 実行状況の確認:**
 ```bash
 knit run find -p $evaluate_plan_id
 ```
 `status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
-**6.（任意）評価指標の取得:**
+**7.6.（任意）評価指標の取得:**
 
 - Run 情報の取得:
 ```bash
@@ -716,7 +716,7 @@ evaluate_outputs=$(echo "$evaluate_run" | jq -r '.[-1].outputs')
 evaluate_metrics_knit_id=$(echo "$evaluate_outputs" | jq -r '.[0].knitId')
 ```
 
-**7.（任意）Run ログの確認:**
+**7.7.（任意）Run ログの確認:**
 - Run Id の取得:
 ```bash
 evaluate_run_id=$(echo "$evaluate_run" | jq -r '.[-1].runId')
@@ -726,7 +726,7 @@ evaluate_run_id=$(echo "$evaluate_run" | jq -r '.[-1].runId')
 knit run show --log $evaluate_run_id
 ```
 
-**8.（任意）指標レポートのダウンロード:**
+**7.8.（任意）指標レポートのダウンロード:**
 ```bash
 knit data pull -x $evaluate_metrics_knit_id ./out
 ```
@@ -809,7 +809,7 @@ knit run rm ${run_id}
 `${run_id}` を手順 1 で取得した `runId` に置き換えます。
 
 ### まとめ
-本書では、Knitfab を活用して大規模言語モデル (LLM) ファインチューニングの自動化、および LLM-as-a-judge の性能評価を示していました。
+本書では、Knitfab を活用して大規模言語モデル (LLM) ファインチューニングの自動化、および LLM-as-a-judge の性能評価を示しました。
 
 - **Knitfab による自動化された LLM ファインチューニング**: Knitfab は学習工程から学習成果物の管理まで自動化することで、さまざまな構成に対して実験を容易にし、進捗状況の明確な記録を維持できるようになります。これにより、手動工程が減り、LLM の学習とファインチューニングが容易になります。
 - **LLM-as-a-Judge による効率的な LLM 評価**: LLM を評価器として採用することにより、人間と同等程度の評価品質を維持できながら、費用対効果を高め、時間を節約できるようになります。
