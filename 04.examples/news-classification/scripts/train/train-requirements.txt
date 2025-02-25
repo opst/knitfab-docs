@@ -1,0 +1,10 @@
+configargparse
+torch
+accelerate
+pandas
+scikit-learn
+datasets
+bitsandbytes
+peft
+transformers
+trl

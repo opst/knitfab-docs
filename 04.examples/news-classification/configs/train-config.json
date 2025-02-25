@@ -1,0 +1,7 @@
+{
+    "save_to": "/out",
+    "base_model": "openai-community/gpt2",
+    "device": "auto",
+    "epochs": 3,
+    "learning_rate": 1.0e-5
+}

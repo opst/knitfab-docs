@@ -1,0 +1,6 @@
+configargparse
+torch
+scikit-learn
+peft
+transformers
+deepeval
