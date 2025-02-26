@@ -1639,3 +1639,165 @@ ANOTHER_PROFILE_NAME:
     - `ca`: CA 証明書。BASE64 エンコードされています。
 
 `apiRoot` のホストは自己署名証明書を使っている可能性があります。Web API にリクエストを送る際には `cert.ca` を信頼する必要があるでしょう。
+
+Web Console
+-----------
+
+Knitfab は、ブラウザベースのコンソール（Web Console）を提供しています。
+
+これによって、 Knitfab 上の "データ"、"プラン"、"ラン"を一覧できます。
+
+Web コンソールにアクセスするには、Knitfab がデプロイされているホストの、ルートにアクセスしてください。
+たとえば、
+
+- `example.com` にデプロイされているなら、 `https://example.com/`
+- `192.0.2.1:30803` にデプロイされているなら、 `https://192.0.2.1:30803/`
+
+具体的な URL は、 Knitfab の運用管理者にお問い合わせください。
+
+Web コンソールは、情報の種類ごとに一覧するタブがあります。
+
+- "データ"タブ
+- "プラン"タブ
+- "ラン"タブ
+
+各タブでは項目の検索ができます。
+
+### "データ"タブ
+
+![](./images/web-console/data-tab.png)
+
+Knitfab に登録されている"データ"の概要が一覧できます。
+
+### "データ"タブの操作
+
+![](./images/web-console/data-tab-control.png)
+
+- (1) Show Filters: 検索フィルタを表示します
+- (2) Refresh: 一覧を更新します。
+    - 右半分の "AUTO" にチェックを入れると、30秒おきに自動更新します。
+- (3) Show Detail: "データ" の詳細を表示します。
+- (4) Lineage: その "データ" にまつわるリネージグラフをポップアップします。
+
+#### Show Filters
+
+検索フィルタを開くと、次図に示す通りの入力欄が表示されます。
+
+![](./images/web-console/data-filter.png)
+
+- Tags: "データ"に指定されているタグで絞り込みます。
+    - `:` を含む文字列を入力して、Add ボタンを押すことで、検索条件に追加されます。
+    - `knit data find --tag ...` に対応しています。
+- Timestamp: "データ"の登録日時で絞り込みます。
+    - 日時は、お使いの環境のタイムゾーンでご入力ください。
+    - from 側を入力すると、「その日時以降」に登録されたものに絞り込みます。さらに、 to 側が入力できるようになります。
+        - `knit data find --since ...` に対応しています
+    - to 側を入力すると、「from 以降 to まで」の期間に登録されたものに絞り込みます。
+        - `knit data find --since ... --duration ...` に対応しています。
+
+#### Show Detail
+
+"データ"の詳細を表示します。次のとおりに、データの依存関係に関する情報が閲覧できます。
+
+![](./images/web-console/data-detail.png)
+
+#### Lineage
+
+次図のように、Data と Run のリネージグラフをポップアップします。
+
+![](./images/web-console/lineage-graph.png)
+
+グラフ上のノード（"データ"や"ラン"）をクリックすると、一覧と同様に、そのノードの情報を参照できます。
+
+### "プラン"タブ
+
+![](./images/web-console/plan-tab.png)
+
+Knitfab に登録されている"プラン"の概要が一覧できます。
+
+### "プラン"タブの操作
+
+![](./images/web-console/plan-tab-control.png)
+
+- (1) Show Filters: 検索フィルタを表示します
+- (2) Refresh: 一覧を更新します
+    - 右半分の "AUTO" にチェックを入れると、30秒おきに自動更新します。
+- (3) Show Details: "プラン" の詳細を表示します
+- (4) Plan Graph: "プラン"の依存関係を図示する "Plan Graph" をポップアップします
+
+#### Show Filters
+
+検索フィルタは、次図に示す通りの入力欄を持っています。
+
+![](./images/web-console/plan-filter.png)
+
+- Active Status: "プラン"の活性状態によって絞り込みます。
+    - Any = 活性状態による絞り込みをしません。
+    - Active = 活性であるもののみを一覧に表示します。
+    - Inactive = 非活性であるもののみを一覧に表示します。
+    - `knit plan find --active ...` に対応します。
+- Image: "プラン"に指定されているコンテナイメージ名で絞り込みます。
+    - `knit plan find --image ...` に対応します。
+- Tags for Inputs, Tags for Outputs: それぞれ、入力に指定されているタグと、出力に指定されているタグで絞り込みます
+    - いずれも、`:` を含むタグを入力して Add ボタンを押すことで、検索条件にタグを追加します。
+
+#### Show Detail
+
+詳細情報として、"プラン" に定義されている入出力の情報や、リソース定義などを確認できます。
+
+![](./images/web-console/plan-detail.png)
+
+#### Plan Graph
+
+"プラン" の依存関係を示す Plan Graph をポップアップします。
+
+![](./images/web-console/plan-graph.png)
+
+"プラン" 本体と、それに属する入出力が太い点線で結ばれています。入出力同士の依存関係が細い点線で結ばれています。
+"プラン" やその入出力をクリックすると、一覧と同様に、選択された "プラン" の情報を確認できます。
+
+### "ラン" タブ
+
+![](./images/web-console/run-tab.png)
+
+Knitfab に登録されている"ラン"の概要が一覧できます。
+
+### "ラン" タブの操作
+
+![](./images/web-console/run-tab-control.png)
+
+- (1) Show Filters: 検索フィルタを表示します。
+- (2) Refresh: 一覧を更新します。
+    - 右半分の Auto にチェックを入れると、5秒おきに自動更新します。
+- (3) Show Details: "ラン" の詳細情報を表示します。
+- (4) Lineage: その "ラン" にまつわるリネージグラフをポップアップします。
+
+#### Show Filters
+
+検索フィルタは、次図に示す通りの入力欄を持っています。
+
+![](./images/web-console/run-filter.png)
+
+- PlanIDs: "ラン" が基づいている "プラン" の ID で絞り込みます。
+    - ID を入力して、Add ボタンを押すことで検索条件に追加されます。
+    - `knit run find --plan-id ...` に対応しています
+- Input Knit IDs, Output Knit IDs: "ラン" に入出力された "データ" に基づいて絞り込みます。
+    - それぞれ `knit run find --in-knitid ...` および `knit run find --out-knitid ...` に対応しています。
+- Run Status: "ラン" の進行状況に基づいて絞り込みます。
+    - `knit run find --status ...` に対応しています
+- Timestamp: "ラン" の最終更新日時に基づいて絞り込みます。
+    - 日時は、お使いの環境のタイムゾーンでご入力ください。
+    - Since 側を入力すると「その日時以降に変化があった"ラン"」のみに絞り込みます。また、to 側が入力できるようになります
+        - `knit run find --since ...` に対応しています
+    - to 側を入力すると「Sicne 以降 to まで」の期間に変化のあった "ラン" のみに絞り込みます。
+        - `knit run find --since ... --duration ...` に対応しています。
+
+#### Show Details
+
+![](./images/web-console/run-detail.png)
+
+詳細を表示することで、"ラン" の入出力の情報を確認できます。
+
+#### Lineage
+
+"データ" タブの Lineage と同様に、その "ラン" に関係するリネージグラフをポップアップします。

@@ -1593,3 +1593,167 @@ Each elements in Profile means:
     - `ca`: CA Certificate, BASE64 encoded
 
 The host of `apiRoot` may use a self-signed certification. To request to Knitfab Web API, you may need to trust `cert.ca`.
+
+Web Console
+-----------
+
+Knitfab comes with a browser-based Web Console.
+
+With the Web Console, you can view Data, Plans, and Runs in Knitfab.
+
+The Web Console is accessible at the root (`/`) of the host where Knitfab is deployed.
+The URL of the Web Console could be, for example,
+
+- `https://example.com/`, if Knitfab is deployed on the host `example.com`
+- `https://192.0.2.1:30803/`, if Knitfab is deployed on the host `192.0.2.1` and port `30803`
+
+For the actual URL, ask your Knitfab admin.
+
+The Web Console has tabs, each of which lists specific information:
+
+- the Data tab
+- the Plan tab
+- the Run tab
+
+You can filter items in the list.
+
+### The Data tab
+
+![](./images/web-console/data-tab.png)
+
+The Data tab lists Data items in Knitfab.
+
+### Controls of the Data tab
+
+![](./images/web-console/data-tab-control.png)
+
+- (1) Show Filters: Opens filters.
+- (2) Refresh: Refreshes the list.
+    - To auto refresh every 30 seconds, check "AUTO".
+- (3) Show Detail: Opens details about the Data.
+- (4) Lineage: Opens a lineage graph related to the Data.
+
+#### Show Filters
+
+When you open the filters, input fields are displayed as shown below:
+
+![](./images/web-console/data-filter.png)
+
+- Tags: Filters with tags on the Data.
+    - Input a tag (a text containing `:`) and click Add button to update the filter.
+    - Corresponding to `knit data find --tag ...`.
+- Timestamp: Filters with timestamps when the Data is registered.
+    - Uses your local timezone.
+    - It filters the list to include only Data created since the "from" field, enabling "to" fields.
+        - Corresponding to `knit data find --since ...`.
+    - Inputting "to" fields, the list is narrowed to Data created since "from" until "to".
+        - Corresponding to `knit data find --since ... --duration ...`
+
+#### Show Detail
+
+Open details of the Data. It shows dependencies of the Data as shown below:
+
+![](./images/web-console/data-detail.png)
+
+#### Lineage
+
+As shown below, it opens Lineage Graph about Data and Runs.
+
+![](./images/web-console/data-detail.png)
+
+Click a node (Data or Run) on the graph to view its details.
+
+### The Plans tab
+
+![](./images/web-console/plan-tab.png)
+
+The Plans tab lists Plans items in Knitfab.
+
+### Controls of the Plans tab
+
+![](./images/web-console/plan-tab-control.png)
+
+- (1) Show Filters: Opens filters.
+- (2) Refresh: Refreshes the list.
+    - To auto refresh every 30 seconds, check "AUTO".
+- (3) Show Detail: Opens details about the Plan.
+- (4) Plan Graph: Opens a Plan Graph visualizing dependencies of the Plan.
+
+#### Show Filters
+
+When you open the filters, input fields are displayed as shown below:
+
+![](./images/web-console/plan-filter.png)
+
+- Active Status: Filters with activeness of Plans。
+    - Any = Does not filter with activeness.
+    - Active = Lists only active Plans.
+    - Inactive = Lists only inactive Plans.
+    - Corresponding to `knit plan find --active ...`.
+- Image: Filters with container names of Plans.
+    - Corresponds to `knit plan find --image ...`.
+- Tags for Inputs, Tags for Outputs: Filters with tags on Input and Output of Plans.
+    - Input a tag (a text containing `:`) and click Add button to update the filter.
+
+#### Show Detail
+
+Open details of the Plan. It shows Inputs/Outputs, resources and other options of the Plan.
+
+![](./images/web-console/plan-detail.png)
+
+#### Plan Graph
+
+It opens a Plan Graph showing the dependencies of the Plan.
+
+![](./images/web-console/plan-graph.png)
+
+Thick edges represent the connections between the main parts of Plans and their Inputs or Outputs.
+Thin edges are between Outputs to Inputs.
+
+Click a node (Plan, Input, or Output) to see information about the Plan.
+
+### The Run tab
+
+![](./images/web-console/run-tab.png)
+
+The Run tab lists Runs in Knitfab.
+
+### Controls of the Run tab
+
+![](./images/web-console/run-tab-control.png)
+
+- (1) Show Filters: Opens filters.
+- (2) Refresh: Refreshes the list.
+    - To auto refresh every 5 seconds, check "AUTO".
+- (3) Show Detail: Opens details about the Run.
+- (4) Lineage: Opens a lineage graph related to the Run.
+
+#### Show Filters
+
+When you open the filters, input fields are displayed as shown below:
+
+![](./images/web-console/run-filter.png)
+
+- PlanIDs: Filters with Plan ID of Runs.
+    - Input Plan ID and click Add button to update the filter.
+    - Corresponding to `knit run find --plan-id ...`.
+- Input Knit IDs, Output Knit IDs: Filter with Data which are input to or output from Runs.
+    - Corresponding to `knit run find --in-knitid ...` or `knit run find --out-knitid ...`, respectively.
+- Run Status: Filters with Run status.
+    - Corresponding to `knit run find --status ...`.
+- Timestamp: Filter with the timestamp when Runs are updated.
+    - Uses your local timezone.
+    - It filters the list to include only Runs updated since the "from" field, enabling "to" fields.
+        - Corresponding to `knit run find --since ...`.
+    - Inputting "to" fields, the list is narrowed to Run updated since "from" until "to".
+        - Corresponding to `knit run find --since ... --duration ...`.
+
+#### Show Details
+
+![](./images/web-console/run-detail.png)
+
+It opens the details of the Run. You can view the Runs' inputs and outputs.
+
+#### Lineage
+
+Like in the Data tab, it opens Lineage Graph related to the Run.
