@@ -11,8 +11,9 @@ Table of Contents
   - [3.1. What is installed](#31-what-is-installed)
   - [3.2. Prerequisites](#32-prerequisites)
   - [3.3. Installation steps](#33-installation-steps)
-- [4. Uninstall Knitfab](#4-uninstall-knitfab)
-- [5. Helm configuration for Knitfab](#5-helm-configuration-for-knitfab)
+- [4. Other Functions of the Installer]
+- [5. Uninstall Knitfab](#5-uninstall-knitfab)
+- [6. Helm configuration for Knitfab](#6-helm-configuration-for-knitfab)
 
 
 # 1. Introduction
@@ -138,7 +139,7 @@ Following items are installed in your Kubernetes cluster.
 | Knitfab Application | knit-app, knit-schema-upgrader |
 | Database | knit-db-postgres |
 | In-cluster Image Registry | knit-image-registry |
-| TLS Certifications | knit-certs |
+| TLS Certificates | knit-certs |
 | StorageClass | knit-storage-nfs |
 
 [CSI "csi-driver-nfs"](https://github.com/kubernetes-csi/csi-driver-nfs/) is also installed in the same Namespace as Knitfab, since "knit-storage-nfs" depends on it.
@@ -420,7 +421,75 @@ You will find a directory named `knitfab-install-settings/handout/docker/certs.d
 This directory is also named after the IP address of a appropriate Kubernetes node concatenated with the port number using `:` as a separator.
 Rename the part with this IP to the desired domain name for access.
 
-# 4. Uninstall Knitfab
+# 4. Other Functions of the Installer
+
+The Knitfab installer has functions to maintain Knitfab system.
+
+- Upgrade Knitfab itself to the latest version
+- Update and replace TLS certificates in Knitfab
+
+## 4.1. Upgrade Knitfab itself to the latest version
+
+To upgrada Knitfab to the latest version, rerun install command (`./installer.sh --install`).
+
+It upgrade Knitfab system with the last install configuration.
+
+## 4.2. Update and replace TLS certificates in Knitfab
+
+Knitfab installer can update TLS certificates which is used by Knitfab system.
+
+Updating TLS certificates consists of the following steps:
+
+1. Generate new Certificarions, or replace certificates
+2. Upgrade Knitfab to apply the new certificates
+
+Please note that Step 1. DOES NOT apply the new certificates. By Step 2., Knitfab uses the new Certitications.
+
+### 4.2.1. Generate new certificates, or replace certificates
+
+#### 4.2.1.1. Generate new certificates
+
+To generate new certificates, run follow command:
+
+```shell
+./installer.sh --renew-certs
+```
+
+This command generates new Server certificates signed by previously configured CA certificates ( `./knitfab-install-settings/certs/ca{.crt,.key}` ).
+The generated new Server certificates have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
+
+If you need to regenerate also CA certificates, do as following:
+
+```shell
+./installer.sh --renew-certs --renew-ca
+```
+
+This command generates self-signed CA certificates. New Server certificates are genereted and signed with the new CA certificates.
+
+#### 4.2.1.2. Replace certificates
+
+To replace certificates with ones you specify, run following command:
+
+```shell
+./installer.sh --renew-certs --tls-ca-cert path/to/ca.crt --tls-ca-key path/to/ca.key --tls-cert path/to/server.crt --tls-key path/to/server.key
+```
+
+This command replaces certificates with specified CA Certificartions (`path/to/ca{.crt,.key}`) and Server certificates (`path/to/server{.crt,.key}`).
+
+Server certificates (`--tls-cert`, `--tls-key`) is optional. When omitted, new Server certificates are generated and signed with the specified CA certificates.
+The generated new Server certificatates have SAN with IPs of Nodes of Kubernetes Cluster where Knitfab is installed.
+
+#### 4.2.2. Upgrade Knitfab to apply certificates
+
+Upgrade Knitfab with following command:
+
+```shell
+./installer.sh --install
+```
+
+With this, Knitfab API Server (`knitd`) will stop and restart to apply new certificates.
+
+# 5. Uninstall Knitfab
 
 When you execute the installation, an uninstaller will be generated as `knitfab-install-settings/uninstall.sh`.
 
@@ -439,7 +508,7 @@ Knitfab-install-settings/uninstall.sh --hard
 Executing this command will destroy all Knitfab-related resources, including the database and the in-cluster image registry.
 
 
-# 5. Helm configuration for Knitfab
+# 6. Helm configuration for Knitfab
 
 Knitfab is composed of several helm charts. This section explains the helm-based construction of Knitfab.
 
