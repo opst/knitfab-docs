@@ -220,7 +220,7 @@ graph TB
 
 
         subgraph "event loops"
-            subgraph circ["workflow circuit"]
+            subgraph circ["pipeline circuit"]
                 lproj["projection\n(Deployment)"]
                 lrini["initializing\n(Deployment)"]
                 lrst["run management\n(Deployment)"]
@@ -281,7 +281,7 @@ Web API を提供するコンテナ knitd が CLI からリクエストを受け
 ています。
 
 イベントループ (event loops) の各コンポーネントは、定期的に RDB を監視して、各々
-果たすべきタスクを探しています。特に、workflow circuit とラベル付けられているイ
+果たすべきタスクを探しています。特に、pipeline circuit とラベル付けられているイ
 ベントループの集まりは、
 
 - "プラン" や "データ" から "ラン" を生成し (projection)、
