@@ -3,7 +3,7 @@ EXAMPLE: Image Processing Pipeline with Knitfab
 
 This document introduces a case study of building an image processing pipeline using Knitfab.
 
-Specifically, we will create a workflow to "extract contour lines from videos and images, and generate an HTML file comparing the original images with their contour line counterparts."
+Specifically, we will create a pipeline to "extract contour lines from videos and images, and generate an HTML file comparing the original images with their contour line counterparts."
 
 ## Step 1. Overview
 
