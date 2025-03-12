@@ -392,7 +392,7 @@ docker build -t news-classification-evaluate:v1.0 \
 ## ステップ 4:（任意）Docker イメージの動作確認
 > [!Note]
 >
-> イメージの動作確認は時間がかかますので、必要に応じて実施してください。途中で中断しても構いません。
+> イメージの動作確認としてタスクをすべて実施すると時間がかかりますので、適宜中断してください。
 
 ### 4.1. ファインチューニングイメージの実行
 ```bash
@@ -462,7 +462,7 @@ YAML ひな型を生成するには、2つの選択肢があります。
 ```bash
 knit plan template --scratch > ./plans/news-classification-train.v1.0.yaml
 ```
-これにより、`./plans` ディレクトリに`news-classification-train.v1.0.yaml` という名前で新しい YAML ひな型が作成されます。このひな型の設定項目の値は全て「空（空欄）」になっていますので、ユーザが必要な項目を追記します。
+これにより、`./plans` ディレクトリに`news-classification-train.v1.0.yaml` という名前で新しい YAML ひな型が作成されます。このひな型の設定項目の値は全て空欄や仮の値になっていますので、ユーザが必要な項目を追記します。
 
 - 選択肢②: Docker イメージからひな型を生成する
 ```bash
@@ -738,12 +738,17 @@ Plan グラフは、パイプラインの全体像を把握し、初期学習、
 knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```
 
-生成された `plan-graph.png` を確認し、以下の点を検証してください。
+以下のようにパイプライン構造を表す Plan グラフが生成されます。
+![学習パイプライン構造](./graphs/plan_graphs/news-classification-plan-graph.svg)
+**Fig. 1:** 学習パイプライン構造
 
-- **下流依存関係:**
-  `train_plan` が、 `evaluate_plan` を下流タスクとして示していることを確認します。これは学習タスクの後に検証が実行されることを意味します。
-- **上流依存関係:**
-  `evaluate_plan` が `train_plan`を上流タスクとして示していることを確認します。これは、検証タスクが学習タスクから生成された `/out/model` を正しく受け取っていることを意味します。
+グラフはタスク間の依存関係を以下のように示します。
+
+- **訓練タスクと評価タスクの関係:**
+  - `train_plan` が、 `evaluate_plan` を下流タスクとして示していることを確認します。
+  - これは次のことを意味します。
+    - 学習タスクの後に検証が実行されること。
+    - 検証タスクが学習タスクから生成された `/out/model` を受け取ること。
 
 ### 7.2. リネージグラフの生成（データフロー）
 
@@ -754,7 +759,11 @@ knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```bash
 knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 ```
-生成された `lineage-graph.png` を確認し、以下の点を検証してください。
+以下のようにリネージグラフが生成されます。
+![学習パイプラインのリネージグラフ](./graphs/lineage_graphs/news-classification-lineage-graph.svg)
+**Fig. 2:** 学習データと成果物のリネージグラフ
+
+グラフはデータと成果物の依存関係を以下のように示します。
 
 - **学習の出力:**
   `$train_run` が `/out/model`（学習済みモデル）と `(log)`（実行ログ）を出力として生成していることを確認します。

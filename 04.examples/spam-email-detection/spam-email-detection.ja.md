@@ -46,7 +46,7 @@ flowchart LR
 - **Knit CLIが使える:** [01.getting-started: CLI ツール: knit](../../01.getting-started/getting-started.ja.md#cli-ツール-knit)のインストール手順に従って、Knit CLI を設定します。
 - **Knitコマンドを初期化ずみ:** `knit init` を使用して Knit コマンドを初期化する方法については、[01.getting-started: knit コマンドの初期化](../../01.getting-started/getting-started.ja.md#knit-コマンドの初期化)を参照してください。
 - **`Docker` インストールずみ:** コンテナイメージをビルドして Knitfab にプッシュするために必要です。
-¥
+
 ### 任意
 
 - **kubectl（推奨）が使える:** Knitfab Kubernetes クラスタのデバッグなどに用います。
@@ -75,8 +75,7 @@ Knitfabでは、各タスクをコンテナとして実行します。そのた�
 
 > [!Note]
 >
-> この事例は、Knitfab を用いた MLパイプラインの構築と管理を説明することが目的であるため、Python スクリプトや Dockerfile の内容は説明しないことにしました。
-
+> この事例は、Knitfab を用いた ML パイプラインの構築と管理に集中するため、Python スクリプトや Dockerfile の内容についての説明はいたしません。
 
 以下、'spam-email-detection' ディレクトリをカレントディレクトリとしてから、**1.1.**~**1.3.** のコマンドを実行してください。
 
@@ -107,7 +106,7 @@ docker build -t spam-detection-incremental-train:v1.0 \
 ## ステップ 2:（任意）Docker イメージの動作確認
 > [!Note]
 >
-> イメージの動作確認は時間がかかますので、必要に応じて実施してください。途中で中断しても構いません。
+> イメージの動作確認としてタスクをすべて実施すると時間がかかりますので、適宜中断してください。
 ### 2.1. 初期学習の確認
 ```bash
 docker run --rm -it \
@@ -201,7 +200,7 @@ YAML ひな型を生成するには、2つの選択肢があります。
 ```bash
 knit plan template --scratch > ./plans/spam-detection-initial-train.v1.0.yaml
 ```
-これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい YAML ひな型が作成されます。このひな型の設定項目の値は全て「空（空欄）」になっていますので、ユーザが必要な項目を追記します。
+これにより、`./plans` ディレクトリに`spam-detection-initial-train.v1.0.yaml` という名前で新しい YAML ひな型が作成されます。このひな型の設定項目の値は全て空欄や仮の値になっていますので、ユーザが必要な項目を追記します。
 
 - 選択肢②: Docker イメージからひな型を生成する
 ```bash
@@ -264,7 +263,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
       - これにより、Knitfab 内での出力とログの整理と検索が容易になります。
 
 - その他の重要な考慮事項:
-  - 計算資源割り当て: 学習プロセスに必要な資源（例: CPU、メモリ、GPU）を追加で定義します。
+  - 計算資源割り当て: 学習プロセスに必要な計算資源はデフォルト設定で十分ですが、必要に応じて CPU、メモリ、GPU などの資源を追加で定義してください。
   ```YAML
   resources:
     cpu: 1
@@ -420,7 +419,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     ```
 
 - その他の重要な考慮事項:
-  - 計算資源割り当て: 学習プロセスに必要な資源（例: CPU、メモリ、GPU）を追加的に定義します。
+  - 計算資源割り当て: 検証プロセスに必要な計算資源はデフォルト設定で十分ですが、必要に応じて CPU、メモリ、GPU などの資源を追加で定義してください。
   ```YAML
   resources:
     cpu: 1
@@ -567,7 +566,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     ```
 
 - その他の重要な考慮事項:
-  - 計算資源割り当て: 学習プロセスに必要な資源（例: CPU、メモリ、GPU）を追加に定義します。
+  - 計算資源割り当て: 学習プロセスに必要な計算資源はデフォルト設定設定で十分ですが、必要に応じて CPU、メモリ、GPU などの資源を追加で定義してください。
   ```YAML
   resources:
     cpu: 1
@@ -664,25 +663,34 @@ Plan グラフは、パイプラインの全体像を把握し、初期学習、
 knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```
 
-生成された `plan-graph.png` を確認し、以下の点を検証してください。
+以下のようにパイプライン構造を表す検証 Plan グラフを代表として表示します。
+![学習パイプライン構造](./graphs/plan_graphs/spam-detection-validate-plan-graph.svg)
+**Fig. 1:** 学習パイプライン構造 
 
-- **下流依存関係:**
-  `initial_train_plan` と `incremental_train_plan` の両方が、 `validate_plan` を下流タスクとして示していることを確認します。これは、各学習タスクの後に検証が実行されることを意味します。
-- **上流依存関係:**
-  `validate_plan` が `initial_train_plan` と `incremental_train_plan` の両方を上流タスクとして示していることを確認します。これは、検証タスクが両方の学習タスクから生成された `/out/model` を正しく受け取っていることを意味します。
+グラフはタスク間の依存関係を以下のように示します。
+- **訓練タスクと評価タスクの関係:**
+  - `initial_train_plan` と `incremental_train_plan` の両方が、 `validate_plan` を下流タスクとして示していることを確認します。
+  - これは、次のことを意味します。
+    - 各学習タスクの後に検証が実行されること。
+    - 検証タスクがそれぞれの学習タスクから生成された `/out/model` を受け取ること。
 - **独立した学習 Plan:**
-  `initial_train_plan` が `incremental_train_plan` を下流タスクとして示していないこと、またその逆も同様であることを確認します。これは意図的な設計であり、`incremental_train_plan` は、`initial_train_plan` の直接的な後続ステップではなく、すべて学習済みモデルを基に増分学習を行うことを意味します。`initial_train_plan` の出力モデルに `mode:incremental` タグを付与することで、`incremental_train_plan` の学習対象として認識され、リネージグラフにその関係が示されます。
+  - `initial_train_plan` と `incremental_train_plan` の間に依存関係が存在しないことを確認します。
+  - これは意図的な設計であり、`incremental_train_plan` は、`initial_train_plan` の直接的な後続ステップではなく、すべて学習済みモデルを基に増分学習を行うことを意味します。
+  - `initial_train_plan` の出力モデルに `mode:incremental` タグを付与することで、`incremental_train_plan` の学習対象として認識され、リネージグラフにその関係が示されます。
 ### 7.2. リネージグラフの生成（データフロー）
 
-リネージグラフは、パイプライン内のデータと成果物の流れを遡ります。
+リネージグラフは、パイプライン内のデータと成果物の依存関係を示します。
 
 以下のコマンドを実行して、リネージグラフの PNG 画像（`lineage-graph.png`）を生成してください。`${knit_id}` は、該当する Knit Id (`$initial_train_model_knit_id`、`$incremental_train_model_knit_id`、`$validate_metrics_knit_id`) に置き換えてください。
 
 ```bash
 knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 ```
-生成された `lineage-graph.png` を確認し、以下の点を検証してください。
+以下のように初期学習リネージグラフを代表として表示します。
+![学習パイプラインのリネージグラフ](./graphs/lineage_graphs/spam-detection-initial-train-lineage-graph.svg)
+**Fig. 2:** 学習データと成果物のリネージグラフ
 
+グラフはデータと成果物の依存関係を以下のようにしまします。
 - **初期学習の出力:**
   `$initial_train_run` が `/out/model`（初期学習済みモデル）と `(log)`（実行ログ）を出力として生成していることを確認します。
 - **増分学習の入力:**

@@ -727,13 +727,18 @@ Use the following command, replacing `${plan_id}` with the appropriate Plan Id (
 ```bash
 knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```
-Review the Plan Graph (`plan-graph.png`):
-Carefully examine the generated `plan-graph.png` image. Verify the following:
 
-- **Downstream Dependencies:**
-  Confirm that the `train_plan` shows the `evaluate_plan` as a downstream process. This indicates that the evaluation step is executed after each training phase.
-- **Upstream Dependencies:**
-  Verify that the `evaluate_plan` shows the `train_plan` as a upstream process. This confirms that the evaluation step receives `/out/model` from the training phase.
+The generated Plan Graph visualizes the pipeline's structure:
+![Pipeline Structure](./graphs/plan_graphs/news-classification-plan-graph.svg)
+**Fig. 1:** Pipeline structure.
+
+Verify the following from the pipeline's structure:
+
+- **Relation between training and evaluation plan:**
+  - Confirm that the `train_plan` shows the `evaluate_plan` as a downstream process.
+  - This indicates:
+    - The evaluation step is executed after training phase.
+    - The evaluation step receives `/out/model` from the training phase.
 
 ### 7.2. Generate Lineage Graph (Data Flow)
 
@@ -745,8 +750,11 @@ Use the following command, replacing `${knit_id}` with the respective Knit Ids (
 knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 ```
 
-Review the Lineage Graph:
-Carefully examine the generated `lineage-graph.png` image. Confirm the following:
+The generated Lineage Graph visualizes the flow of data and artifacts through your pipeline:
+![Flow of data and artifacts](./graphs/lineage_graphs/news-classification-lineage-graph.svg)
+**Fig. 2:** Flow of data and artifacts
+
+Review the Lineage Graph and confirm the following:
 
 - **Training Outputs:**
   Verify that the `$train_run` produces `/out/model` (the initial trained model) and `(log)` (execution logs) as outputs.

@@ -238,7 +238,7 @@ This command generates a YAML template based on the Docker image `spam-detection
     - This facilitates better organization and filtering of outputs and logs within the Knitfab system.
 
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
   ```YAML
   resources:
     cpu: 1
@@ -380,7 +380,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
         - "project:spam-detection"
     ```
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the validation process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
   ```YAML
   resources:
     cpu: 1
@@ -522,7 +522,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     ```
 
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
   ```YAML
   resources:
     cpu: 1
@@ -626,15 +626,20 @@ Use the following command, replacing `${plan_id}` with the appropriate Plan Id (
 ```bash
 knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```
-Review the Plan Graph (`plan-graph.png`):
-Carefully examine the generated `plan-graph.png` image. Verify the following:
 
-- **Downstream Dependencies:**
-  Confirm that the `initial_train_plan` and `incremental_train_plan` both show the `validate_plan` as a downstream process. This indicates that the validation step is executed after each training phase.
-- **Upstream Dependencies:**
-  Verify that the `validate_plan` shows both the `initial_train_plan` and `incremental_train_plan` as upstream processes. This confirms that the validation step receives `/out/model` from both training phases.
+The generated Validation Plan Graph visualizes the pipeline's structure:
+![Pipeline Structure](./graphs/plan_graphs/spam-detection-validate-plan-graph.svg)
+**Fig. 1:** Pipeline structure.
+
+Verify the following from the pipeline's structure:
+
+- **Relation between training and validation plan:**
+  - Confirm that the `initial_train_plan` and `incremental_train_plan` both show the `validate_plan` as a downstream process. 
+  - This indicates:
+    - The validation step is executed after each training phase.
+    - The validation step receives `/out/model` from both training phases.
 - **Isolated Training Plans:**
-  It's crucial to observe that the `initial_train_plan` does not directly show the `incremental_train_plan` as a downstream process, and vice versa. This separation is intended, as the `incremental_train_plan` *any* previously trained model that requires an update, rather than being a direct sequential step of the `initial_train_plan`. This seperation is caused by the lack of the `mode:incremental` tag in the output model of the `initial_train_plain`, that is then used as an input of the `incremental_train_plan`.
+  - It's crucial to observe that the `initial_train_plan` does not directly show the `incremental_train_plan` as a downstream process, and vice versa. This separation is intended, as the `incremental_train_plan` *any* previously trained model that requires an update, rather than being a direct sequential step of the `initial_train_plan`. This seperation is caused by the lack of the `mode:incremental` tag in the output model of the `initial_train_plain`, that is then used as an input of the `incremental_train_plan`.
 
 ### 7.2. Generate Lineage Graph (Data Flow)
 
@@ -646,8 +651,11 @@ Use the following command, replacing `${knit_id}` with the respective Knit Ids (
 knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 ```
 
-Review the Lineage Graph:
-Carefully examine the generated `lineage-graph.png` image. Confirm the following:
+The generated Initial Training Lineage Graph visualizes the flow of data and artifacts through your pipeline:
+![Flow of data and artifacts](./graphs/lineage_graphs/spam-detection-initial-train-lineage-graph.svg)
+**Fig. 2:** Flow of data and artifacts
+
+Review the Lineage Graph and confirm the following:
 
 - **Initial Training Outputs:**
   Verify that the `$initial_train_run` produces `/out/model` (the initial trained model) and `(log)` (execution logs) as outputs.
