@@ -744,6 +744,7 @@ knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
     <img src="./graphs/plan_graphs/news-classification-plan-graph.svg" alt="学習パイプライン構造">
     <br>
     <strong>Fig. 1:</strong> 学習パイプライン構造
+    <br>
 </div>
 
 グラフはタスク間の依存関係を以下のように示します。
@@ -769,6 +770,7 @@ knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
     <img src="./graphs/lineage_graphs/news-classification-lineage-graph.svg" alt="学習パイプラインのリネージグラフ">
     <br>
     <strong>Fig. 2:</strong> 学習データと成果物のリネージグラフ
+    <br>
 </div>
 
 グラフはデータと成果物の依存関係を以下のように示します。
