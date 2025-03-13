@@ -729,7 +729,9 @@ knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 ```
 
 The generated Plan Graph visualizes the pipeline's structure:
+
 ![Pipeline Structure](./graphs/plan_graphs/news-classification-plan-graph.svg)
+
 **Fig. 1:** Pipeline structure.
 
 Verify the following from the pipeline's structure:
@@ -751,7 +753,9 @@ knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 ```
 
 The generated Lineage Graph visualizes the flow of data and artifacts through your pipeline:
+
 ![Flow of data and artifacts](./graphs/lineage_graphs/news-classification-lineage-graph.svg)
+
 **Fig. 2:** Flow of data and artifacts
 
 Review the Lineage Graph and confirm the following:
