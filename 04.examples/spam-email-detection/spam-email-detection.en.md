@@ -633,8 +633,8 @@ The generated Validation Plan Graph visualizes the pipeline's structure:
     <img src="./graphs/plan_graphs/spam-detection-validate-plan-graph.svg" alt="Pipeline Structure">
     <br>
     <strong>Fig. 1:</strong> Pipeline structure
-    <br>
 </div>
+
 
 Verify the following from the pipeline's structure:
 
@@ -662,8 +662,8 @@ The generated Initial Training Lineage Graph visualizes the flow of data and art
     <img src="./graphs/lineage_graphs/spam-detection-initial-train-lineage-graph.svg" alt="Flow of data and artifacts">
     <br>
     <strong>Fig. 2:</strong> Flow of data and artifacts
-    <br>
 </div>
+
 
 Review the Lineage Graph and confirm the following:
 

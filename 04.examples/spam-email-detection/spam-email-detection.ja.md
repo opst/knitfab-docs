@@ -668,9 +668,8 @@ knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 <div align="center">
     <img src="./graphs/plan_graphs/spam-detection-validate-plan-graph.svg" alt="学習パイプライン構造">
     <br>
-    <strong>Fig. 1:</strong> 学習パイプライン構造
-    <br>
 </div>
+
 
 グラフはタスク間の依存関係を以下のように示します。
 - **訓練タスクと評価タスクの関係:**
@@ -697,8 +696,8 @@ knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
     <img src="./graphs/lineage_graphs/spam-detection-initial-train-lineage-graph.svg" alt="学習パイプラインのリネージグラフ">
     <br>
     <strong>Fig. 2:</strong> 学習データと成果物のリネージグラフ
-    <br>
 </div>
+
 
 グラフはデータと成果物の依存関係を以下のようにしまします。
 - **初期学習の出力:**

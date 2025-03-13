@@ -734,8 +734,8 @@ The generated Plan Graph visualizes the pipeline's structure:
     <img src="./graphs/plan_graphs/news-classification-plan-graph.svg" alt="Pipeline Structure">
     <br>
     <strong>Fig. 1:</strong> Pipeline structure
-    <br>
 </div>
+
 
 Verify the following from the pipeline's structure:
 
@@ -763,6 +763,7 @@ The generated Lineage Graph visualizes the flow of data and artifacts through yo
     <strong>Fig. 2:</strong> Flow of data and artifacts
     <br>
 </div>
+
 
 Review the Lineage Graph and confirm the following:
 
