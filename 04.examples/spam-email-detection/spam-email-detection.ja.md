@@ -40,11 +40,11 @@ flowchart LR
 この事例を正常に動作させるために、次の前提条件を満たしているかを確認してください。
 
 ### 必須
-- **Knitfabがセットアップずみ:
+- **Knitfab がセットアップずみ:**
   - **プロダクション向けの場合:** [03.admin-guide](../../03.admin-guide/admin-guide-installation.ja.md)に記載されている手順に従って、インストールを実行します。
   - **実験向けの場合:** 簡易版については、[01.getting-started: Knitfab（簡易版） をローカル環境にインストールする](../../01.getting-started/getting-started.ja.md#Knitfab簡易版-をローカル環境にインストールする)に記載されている手順に従ってください。
-- **Knit CLIが使える:** [01.getting-started: CLI ツール: knit](../../01.getting-started/getting-started.ja.md#cli-ツール-knit)のインストール手順に従って、Knit CLI を設定します。
-- **Knitコマンドを初期化ずみ:** `knit init` を使用して Knit コマンドを初期化する方法については、[01.getting-started: knit コマンドの初期化](../../01.getting-started/getting-started.ja.md#knit-コマンドの初期化)を参照してください。
+- **Knit CLI が使える:** [01.getting-started: CLI ツール: knit](../../01.getting-started/getting-started.ja.md#cli-ツール-knit)のインストール手順に従って、Knit CLI を設定します。
+- **Knit コマンドを初期化ずみ:** `knit init` を使用して Knit コマンドを初期化する方法については、[01.getting-started: knit コマンドの初期化](../../01.getting-started/getting-started.ja.md#knit-コマンドの初期化)を参照してください。
 - **`Docker` インストールずみ:** コンテナイメージをビルドして Knitfab にプッシュするために必要です。
 
 ### 任意
@@ -68,7 +68,7 @@ git clone https://github.com/opst/knitfab-docs.git
 
 ## ステップ 1: Docker イメージのビルド
 
-Knitfabでは、各タスクをコンテナとして実行します。そのため、ユーザは必要なタスクをコンテナイメージとして用意する必要があります。
+Knitfab では、各タスクをコンテナとして実行します。そのため、ユーザは必要なタスクをコンテナイメージとして用意する必要があります。
 
 
 このステップでは、スパムメール検知のパイプラインの各タスク（初期学習、検証、および増分学習）の Docker イメージを作成します。
@@ -77,7 +77,7 @@ Knitfabでは、各タスクをコンテナとして実行します。そのた�
 >
 > この事例は、Knitfab を用いた ML パイプラインの構築と管理に集中するため、Python スクリプトや Dockerfile の内容についての説明はいたしません。
 
-以下、'spam-email-detection' ディレクトリをカレントディレクトリとしてから、**1.1.**~**1.3.** のコマンドを実行してください。
+以下、`spam-email-detection` ディレクトリをカレントディレクトリとしてから、**1.1** ~ **1.3** のコマンドを実行してください。
 
 ### 1.1. `spam-detection-initial-train` イメージのビルド
 ```bash
@@ -150,10 +150,10 @@ docker run --rm -it \
 
 ### 2.5. 再検証
 
-手順 [2.2.~2.4.](#22-モデル検証処理の確認)を繰り返して、その都度出力される新しい `metrics.json` ファイルを確認し、更新されたモデルの性能指標の変化を検証します。モデルが正しく増分学習できていれば、性能指標もその都度変化しているはずです。
+手順 [2.2 ~ 2.4](#22-モデル検証処理の確認)を繰り返して、その都度出力される新しい `metrics.json` ファイルを確認し、更新されたモデルの性能指標の変化を検証します。モデルが正しく増分学習できていれば、性能指標もその都度変化しているはずです。
 
 ## ステップ 3: Docker イメージを Knitfab にプッシュする
-このステップではステップ２で作成した全ての Docker イメージを Knitfab レジストリにプッシュします。
+このステップではステップ 2 で作成した全ての Docker イメージを Knitfab レジストリにプッシュします。
 これにより、Knitfabはそのイメージ＝タスクを Run として実行できる状態になります。
 
 ### 3.1. レジストリ URI を用いてイメージのタグ付け
@@ -175,7 +175,7 @@ docker tag ${docker_image} ${registry_uri}/${docker_image}
 ```bash
 docker push ${registry_uri}/${docker_image}
 ```
-`${docker_image}` を、ステップ3.1. でタグ付けした各イメージの名前（レジストリ URI を含む）に置き換えてください。
+`${docker_image}` を、ステップ 3.1 でタグ付けした各イメージの名前（レジストリ URI を含む）に置き換えてください。
 
 ## ステップ 4: 初期学習
 この手順では、準備したデータセットを使用して ML モデルの初期学習を行います。
@@ -217,7 +217,7 @@ docker save ${registry_uri}/spam-detection-initial-train:v1.0 | \
 ### 4.3. YAML ひな型への追記
 - 重要な追記項目:
   - `image`:
-    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
+    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の `registry_uri` を `localhost` に置き換えてください。
     
     例:
     ```YAML
@@ -295,7 +295,7 @@ knit run find -p $initial_train_plan_id
 ```
 このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマン
 ドを定期的に実行し( Linux の watch コマンドが便利です)、`status` が `done` に変わる
-まで待ちます。Run が正常終了すれば、'status'が`done` に変わります。
+まで待ちます。Run が正常終了すれば、`status` が `done` に変わります。
 
 ### 4.7. モデル情報の取得
 
@@ -366,7 +366,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
 
 - 重要な追記項目:
   - `image`:
-    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
+    - Knitfab Kubernetesクラスタがローカルレジストリを使用している場合は、`image` 項目の `registry_uri` を `localhost` に置き換えてください。
     
     例:
     ```YAML
@@ -425,7 +425,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
     cpu: 1
     memory: 1Gi
   ```
-  - YAML構造: 変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにあるYAMLファイルを参照してください。
+  - YAML構造: 変更した YAML ひな型が正しい構造と構文に準拠していることを再確認してください。必要に応じてクローンした Git リポジトリの `/plans` ディレクトリにある YAML ファイルを参照してください。
 
 ### 5.4. YAML ひな型の登録
 
@@ -507,7 +507,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 
 - 重要な追記項目:
   - `image`:
-    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
+    - Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の `registry_uri` を `localhost` に置き換えてください。
     
     例:
     ```YAML
@@ -636,7 +636,7 @@ knit data pull -x $incremental_train_model_knit_id./out/model
 ### 6.11. 増分モデルの検証
 
 Knitfab は、増分学習からの出力したモデルをタグで認識し、検証Plan を基に新しい Run を自動的に実行します。
-生成した検証 Run の実装状況、ログ、指標レポートの確認は[ステップ5:モデル検証](#ステップ-5-モデル検証)の手順 6〜9 を実施してください。
+生成した検証 Run の実装状況、ログ、指標レポートの確認は[ステップ5: モデル検証](#ステップ-5-モデル検証)の手順 6〜9 を実施してください。
 
 ### 6.12. 以前のモデルから `mode:incremental-train` タグを削除する
 
@@ -668,8 +668,9 @@ knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
 <div align="center">
     <img src="./graphs/plan_graphs/spam-detection-validate-plan-graph.svg" alt="学習パイプライン構造">
     <br>
+    <strong>Fig. 1:</strong> 学習パイプライン構造
 </div>
-
+<br>
 
 グラフはタスク間の依存関係を以下のように示します。
 - **訓練タスクと評価タスクの関係:**
@@ -697,9 +698,9 @@ knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
     <br>
     <strong>Fig. 2:</strong> 学習データと成果物のリネージグラフ
 </div>
+<br>
 
-
-グラフはデータと成果物の依存関係を以下のようにしまします。
+グラフはデータと成果物の依存関係を以下のように示します。
 - **初期学習の出力:**
   `$initial_train_run` が `/out/model`（初期学習済みモデル）と `(log)`（実行ログ）を出力として生成していることを確認します。
 - **増分学習の入力:**
