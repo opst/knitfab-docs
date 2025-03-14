@@ -1,0 +1,222 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800pt" height="721pt" viewBox="0.00 0.00 800.00 721.00">
+<g id="graph0" class="graph" transform="translate(4,717) scale(1)" data-name="G">
+
+<polygon fill="white" stroke="none" points="-4,4 -4,-717 796,-717 796,4 -4,4"/>
+<!-- d9b468ea7&#45;1da0&#45;4623&#45;8d5a&#45;9d21204bf93c -->
+<g id="node1" class="node" pointer-events="visible" data-name="d9b468ea7-1da0-4623-8d5a-9d21204bf93c">
+
+<polygon fill="#1c9930" stroke="none" points="9,-45.5 9,-63.5 35,-63.5 35,-45.5 9,-45.5"/>
+<polygon fill="none" stroke="#1c9930" points="9,-45.5 9,-63.5 35,-63.5 35,-45.5 9,-45.5"/>
+<text text-anchor="start" x="11.72" y="-52.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Data</text>
+<polygon fill="#d4ecc6" stroke="none" points="35,-45.5 35,-63.5 243,-63.5 243,-45.5 35,-45.5"/>
+<polygon fill="none" stroke="#1c9930" points="35,-45.5 35,-63.5 243,-63.5 243,-45.5 35,-45.5"/>
+<text text-anchor="start" x="37.77" y="-51.5" font-family="Times,serif" font-size="10.00">knit#id: 9b468ea7-1da0-4623-8d5a-9d21204bf93c</text>
+<polygon fill="none" stroke="#1c9930" points="9,-30.5 9,-45.5 243,-45.5 243,-30.5 9,-30.5"/>
+<text text-anchor="start" x="72.3" y="-35.3" font-family="Times,serif" font-size="8.00">2025-02-14T13:07:24.677+09:00</text>
+<polygon fill="none" stroke="#1c9930" points="9,-4.5 9,-30.5 243,-30.5 243,-4.5 9,-4.5"/>
+<text text-anchor="start" x="71.02" y="-19.5" font-family="Times,serif" font-weight="bold" font-size="10.00">project</text>
+<text text-anchor="start" x="101.56" y="-19.5" font-family="Times,serif" font-size="10.00">:news-classification</text>
+<text text-anchor="start" x="100.73" y="-9.5" font-family="Times,serif" font-weight="bold" font-size="10.00">type</text>
+<text text-anchor="start" x="119.06" y="-9.5" font-family="Times,serif" font-size="10.00">:metrics</text>
+<polygon fill="none" stroke="#1c9930" points="8,-4 8,-65 244,-65 244,-4 8,-4"/>
+</g>
+<!-- d57961b16&#45;1cf4&#45;4b0e&#45;b173&#45;b19ac3e8dfbf -->
+<g id="node2" class="node" pointer-events="visible" data-name="d57961b16-1cf4-4b0e-b173-b19ac3e8dfbf">
+
+<polygon fill="#1c9930" stroke="none" points="280,-45.5 280,-63.5 306,-63.5 306,-45.5 280,-45.5"/>
+<polygon fill="none" stroke="#1c9930" points="280,-45.5 280,-63.5 306,-63.5 306,-45.5 280,-45.5"/>
+<text text-anchor="start" x="282.72" y="-52.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Data</text>
+<polygon fill="#ffffff" stroke="none" points="306,-45.5 306,-63.5 511,-63.5 511,-45.5 306,-45.5"/>
+<polygon fill="none" stroke="#1c9930" points="306,-45.5 306,-63.5 511,-63.5 511,-45.5 306,-45.5"/>
+<text text-anchor="start" x="308.94" y="-51.5" font-family="Times,serif" font-size="10.00">knit#id: 57961b16-1cf4-4b0e-b173-b19ac3e8dfbf</text>
+<polygon fill="none" stroke="#1c9930" points="280,-30.5 280,-45.5 511,-45.5 511,-30.5 280,-30.5"/>
+<text text-anchor="start" x="341.8" y="-35.3" font-family="Times,serif" font-size="8.00">2025-02-14T13:07:24.677+09:00</text>
+<polygon fill="none" stroke="#1c9930" points="280,-4.5 280,-30.5 511,-30.5 511,-4.5 280,-4.5"/>
+<text text-anchor="start" x="340.52" y="-19.5" font-family="Times,serif" font-weight="bold" font-size="10.00">project</text>
+<text text-anchor="start" x="371.06" y="-19.5" font-family="Times,serif" font-size="10.00">:news-classification</text>
+<text text-anchor="start" x="378.56" y="-9.5" font-family="Times,serif" font-weight="bold" font-size="10.00">type</text>
+<text text-anchor="start" x="396.89" y="-9.5" font-family="Times,serif" font-size="10.00">:log</text>
+<polygon fill="none" stroke="#1c9930" points="278.5,-4 278.5,-65 511.5,-65 511.5,-4 278.5,-4"/>
+</g>
+<!-- dfcd9a267&#45;f683&#45;4861&#45;98b7&#45;7bb2114521d5 -->
+<g id="node3" class="node" pointer-events="visible" data-name="dfcd9a267-f683-4861-98b7-7bb2114521d5">
+
+<polygon fill="#1c9930" stroke="none" points="281,-271.5 281,-289.5 307,-289.5 307,-271.5 281,-271.5"/>
+<polygon fill="none" stroke="#1c9930" points="281,-271.5 281,-289.5 307,-289.5 307,-271.5 281,-271.5"/>
+<text text-anchor="start" x="283.72" y="-278.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Data</text>
+<polygon fill="#ffffff" stroke="none" points="307,-271.5 307,-289.5 515,-289.5 515,-271.5 307,-271.5"/>
+<polygon fill="none" stroke="#1c9930" points="307,-271.5 307,-289.5 515,-289.5 515,-271.5 307,-271.5"/>
+<text text-anchor="start" x="309.76" y="-277.5" font-family="Times,serif" font-size="10.00">knit#id: fcd9a267-f683-4861-98b7-7bb2114521d5</text>
+<polygon fill="none" stroke="#1c9930" points="281,-256.5 281,-271.5 515,-271.5 515,-256.5 281,-256.5"/>
+<text text-anchor="start" x="344.3" y="-261.3" font-family="Times,serif" font-size="8.00">2025-02-13T15:55:46.775+09:00</text>
+<polygon fill="none" stroke="#1c9930" points="281,-230.5 281,-256.5 515,-256.5 515,-230.5 281,-230.5"/>
+<text text-anchor="start" x="343.02" y="-245.5" font-family="Times,serif" font-weight="bold" font-size="10.00">project</text>
+<text text-anchor="start" x="373.56" y="-245.5" font-family="Times,serif" font-size="10.00">:news-classification</text>
+<text text-anchor="start" x="374.95" y="-235.5" font-family="Times,serif" font-weight="bold" font-size="10.00">type</text>
+<text text-anchor="start" x="393.28" y="-235.5" font-family="Times,serif" font-size="10.00">:model</text>
+<polygon fill="none" stroke="#1c9930" points="280,-230 280,-291 516,-291 516,-230 280,-230"/>
+</g>
+<!-- rb7c9f6db&#45;e4b4&#45;4a09&#45;937b&#45;68c8f45800d7 -->
+<g id="node6" class="node" pointer-events="visible" data-name="rb7c9f6db-e4b4-4a09-937b-68c8f45800d7">
+
+<polygon fill="#ffa500" stroke="none" points="140,-154.5 140,-172.5 166,-172.5 166,-154.5 140,-154.5"/>
+<polygon fill="none" stroke="#ffa500" points="140,-154.5 140,-172.5 166,-172.5 166,-154.5 140,-154.5"/>
+<text text-anchor="start" x="143.83" y="-161.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Run</text>
+<polygon fill="none" stroke="#ffa500" points="166,-154.5 166,-172.5 193,-172.5 193,-154.5 166,-154.5"/>
+<text text-anchor="start" x="169.22" y="-161.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#007700">done</text>
+<polygon fill="#ffffff" stroke="none" points="193,-154.5 193,-172.5 381,-172.5 381,-154.5 193,-154.5"/>
+<polygon fill="none" stroke="#ffa500" points="193,-154.5 193,-172.5 381,-172.5 381,-154.5 193,-154.5"/>
+<text text-anchor="start" x="196.6" y="-160.5" font-family="Times,serif" font-size="10.00">id: b7c9f6db-e4b4-4a09-937b-68c8f45800d7</text>
+<polygon fill="none" stroke="#ffa500" points="140,-139.5 140,-154.5 381,-154.5 381,-139.5 140,-139.5"/>
+<text text-anchor="start" x="185.47" y="-144.3" font-family="Times,serif" font-size="8.00">last updated: 2025-02-14T13:07:24.677+09:00</text>
+<polygon fill="none" stroke="#ffa500" points="140,-121.5 140,-139.5 381,-139.5 381,-121.5 140,-121.5"/>
+<text text-anchor="start" x="142.85" y="-127.5" font-family="Times,serif" font-size="10.00">image = localhost:30503/news-classification-evaluate:v1.0</text>
+<polygon fill="none" stroke="#ffa500" points="138.5,-121 138.5,-174 381.5,-174 381.5,-121 138.5,-121"/>
+</g>
+<!-- dfcd9a267&#45;f683&#45;4861&#45;98b7&#45;7bb2114521d5&#45;&gt;rb7c9f6db&#45;e4b4&#45;4a09&#45;937b&#45;68c8f45800d7 -->
+<g id="edge4" class="edge" data-name="dfcd9a267-f683-4861-98b7-7bb2114521d5-&gt;rb7c9f6db-e4b4-4a09-937b-68c8f45800d7">
+
+<path fill="none" stroke="black" d="M356.6,-226.2C340.38,-213.16 321.74,-198.16 305.18,-184.84"/>
+<polygon fill="black" stroke="black" points="307.39,-182.13 297.41,-178.59 303,-187.58 307.39,-182.13"/>
+<text text-anchor="middle" x="338.28" y="-199" font-family="Times,serif" font-size="10.00">/in</text>
+</g>
+<!-- deeb235d7&#45;cc3e&#45;43a7&#45;b3aa&#45;19edf0663b71 -->
+<g id="node4" class="node" pointer-events="visible" data-name="deeb235d7-cc3e-43a7-b3aa-19edf0663b71">
+
+<polygon fill="#1c9930" stroke="none" points="551,-271.5 551,-289.5 577,-289.5 577,-271.5 551,-271.5"/>
+<polygon fill="none" stroke="#1c9930" points="551,-271.5 551,-289.5 577,-289.5 577,-271.5 551,-271.5"/>
+<text text-anchor="start" x="553.72" y="-278.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Data</text>
+<polygon fill="#ffffff" stroke="none" points="577,-271.5 577,-289.5 783,-289.5 783,-271.5 577,-271.5"/>
+<polygon fill="none" stroke="#1c9930" points="577,-271.5 577,-289.5 783,-289.5 783,-271.5 577,-271.5"/>
+<text text-anchor="start" x="579.9" y="-277.5" font-family="Times,serif" font-size="10.00">knit#id: eeb235d7-cc3e-43a7-b3aa-19edf0663b71</text>
+<polygon fill="none" stroke="#1c9930" points="551,-256.5 551,-271.5 783,-271.5 783,-256.5 551,-256.5"/>
+<text text-anchor="start" x="613.3" y="-261.3" font-family="Times,serif" font-size="8.00">2025-02-13T15:55:46.775+09:00</text>
+<polygon fill="none" stroke="#1c9930" points="551,-230.5 551,-256.5 783,-256.5 783,-230.5 551,-230.5"/>
+<text text-anchor="start" x="612.02" y="-245.5" font-family="Times,serif" font-weight="bold" font-size="10.00">project</text>
+<text text-anchor="start" x="642.56" y="-245.5" font-family="Times,serif" font-size="10.00">:news-classification</text>
+<text text-anchor="start" x="650.06" y="-235.5" font-family="Times,serif" font-weight="bold" font-size="10.00">type</text>
+<text text-anchor="start" x="668.39" y="-235.5" font-family="Times,serif" font-size="10.00">:log</text>
+<polygon fill="none" stroke="#1c9930" points="550,-230 550,-291 784,-291 784,-230 550,-230"/>
+</g>
+<!-- d9077c7f7&#45;1cc3&#45;4be3&#45;bc46&#45;7f856b53a52f -->
+<g id="node5" class="node" pointer-events="visible" data-name="d9077c7f7-1cc3-4be3-bc46-7f856b53a52f">
+
+<polygon fill="#1c9930" stroke="none" points="145,-507.5 145,-525.5 171,-525.5 171,-507.5 145,-507.5"/>
+<polygon fill="none" stroke="#1c9930" points="145,-507.5 145,-525.5 171,-525.5 171,-507.5 145,-507.5"/>
+<text text-anchor="start" x="147.72" y="-514.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Data</text>
+<polygon fill="#ffffff" stroke="none" points="171,-507.5 171,-525.5 375,-525.5 375,-507.5 171,-507.5"/>
+<polygon fill="none" stroke="#1c9930" points="171,-507.5 171,-525.5 375,-525.5 375,-507.5 171,-507.5"/>
+<text text-anchor="start" x="173.72" y="-513.5" font-family="Times,serif" font-size="10.00">knit#id: 9077c7f7-1cc3-4be3-bc46-7f856b53a52f</text>
+<polygon fill="none" stroke="#1c9930" points="145,-492.5 145,-507.5 375,-507.5 375,-492.5 145,-492.5"/>
+<text text-anchor="start" x="206.3" y="-497.3" font-family="Times,serif" font-size="8.00">2025-02-13T15:19:29.408+09:00</text>
+<polygon fill="none" stroke="#1c9930" points="145,-456.5 145,-492.5 375,-492.5 375,-456.5 145,-456.5"/>
+<text text-anchor="start" x="232.23" y="-481.5" font-family="Times,serif" font-weight="bold" font-size="10.00">name</text>
+<text text-anchor="start" x="255.56" y="-481.5" font-family="Times,serif" font-size="10.00">:configs</text>
+<text text-anchor="start" x="205.02" y="-471.5" font-family="Times,serif" font-weight="bold" font-size="10.00">project</text>
+<text text-anchor="start" x="235.56" y="-471.5" font-family="Times,serif" font-size="10.00">:news-classification</text>
+<text text-anchor="start" x="236.67" y="-461.5" font-family="Times,serif" font-weight="bold" font-size="10.00">type</text>
+<text text-anchor="start" x="255" y="-461.5" font-family="Times,serif" font-size="10.00">:config</text>
+<polygon fill="none" stroke="#1c9930" points="144,-456 144,-527 376,-527 376,-456 144,-456"/>
+</g>
+<!-- d9077c7f7&#45;1cc3&#45;4be3&#45;bc46&#45;7f856b53a52f&#45;&gt;rb7c9f6db&#45;e4b4&#45;4a09&#45;937b&#45;68c8f45800d7 -->
+<g id="edge3" class="edge" data-name="d9077c7f7-1cc3-4be3-bc46-7f856b53a52f-&gt;rb7c9f6db-e4b4-4a09-937b-68c8f45800d7">
+
+<path fill="none" stroke="black" d="M260,-452.26C260,-387.15 260,-255.34 260,-188.83"/>
+<polygon fill="black" stroke="black" points="263.5,-189.1 260,-179.1 256.5,-189.1 263.5,-189.1"/>
+<text text-anchor="middle" x="276.11" y="-316" font-family="Times,serif" font-size="10.00">/configs</text>
+</g>
+<!-- rf0d0efa7&#45;9103&#45;413b&#45;b61f&#45;fee0f897eb44 -->
+<g id="node7" class="node" pointer-events="visible" data-name="rf0d0efa7-9103-413b-b61f-fee0f897eb44">
+
+<polygon fill="#ffa500" stroke="none" points="283,-380.5 283,-398.5 307,-398.5 307,-380.5 283,-380.5"/>
+<polygon fill="none" stroke="#ffa500" points="283,-380.5 283,-398.5 307,-398.5 307,-380.5 283,-380.5"/>
+<text text-anchor="start" x="285.83" y="-387.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Run</text>
+<polygon fill="none" stroke="#ffa500" points="307,-380.5 307,-398.5 333,-398.5 333,-380.5 307,-380.5"/>
+<text text-anchor="start" x="309.72" y="-387.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#007700">done</text>
+<polygon fill="#ffffff" stroke="none" points="333,-380.5 333,-398.5 514,-398.5 514,-380.5 333,-380.5"/>
+<polygon fill="none" stroke="#ffa500" points="333,-380.5 333,-398.5 514,-398.5 514,-380.5 333,-380.5"/>
+<text text-anchor="start" x="335.89" y="-386.5" font-family="Times,serif" font-size="10.00">id: f0d0efa7-9103-413b-b61f-fee0f897eb44</text>
+<polygon fill="none" stroke="#ffa500" points="283,-365.5 283,-380.5 514,-380.5 514,-365.5 283,-365.5"/>
+<text text-anchor="start" x="323.47" y="-370.3" font-family="Times,serif" font-size="8.00">last updated: 2025-02-13T15:55:46.775+09:00</text>
+<polygon fill="none" stroke="#ffa500" points="283,-347.5 283,-365.5 514,-365.5 514,-347.5 283,-347.5"/>
+<text text-anchor="start" x="288.35" y="-353.5" font-family="Times,serif" font-size="10.00">image = localhost:30503/news-classification-train:v1.0</text>
+<polygon fill="none" stroke="#ffa500" points="281.5,-347 281.5,-400 514.5,-400 514.5,-347 281.5,-347"/>
+</g>
+<!-- d9077c7f7&#45;1cc3&#45;4be3&#45;bc46&#45;7f856b53a52f&#45;&gt;rf0d0efa7&#45;9103&#45;413b&#45;b61f&#45;fee0f897eb44 -->
+<g id="edge8" class="edge" data-name="d9077c7f7-1cc3-4be3-bc46-7f856b53a52f-&gt;rf0d0efa7-9103-413b-b61f-fee0f897eb44">
+
+<path fill="none" stroke="black" d="M305.57,-452.2C321.33,-438.94 338.95,-424.13 354.54,-411.03"/>
+<polygon fill="black" stroke="black" points="356.41,-414.03 361.81,-404.92 351.91,-408.67 356.41,-414.03"/>
+<text text-anchor="middle" x="357.11" y="-425" font-family="Times,serif" font-size="10.00">/configs</text>
+</g>
+<!-- rb7c9f6db&#45;e4b4&#45;4a09&#45;937b&#45;68c8f45800d7&#45;&gt;d9b468ea7&#45;1da0&#45;4623&#45;8d5a&#45;9d21204bf93c -->
+<g id="edge1" class="edge" data-name="rb7c9f6db-e4b4-4a09-937b-68c8f45800d7-&gt;d9b468ea7-1da0-4623-8d5a-9d21204bf93c">
+
+<path fill="none" stroke="black" d="M224.44,-117.05C209.12,-104.36 190.97,-89.32 174.45,-75.63"/>
+<polygon fill="black" stroke="black" points="177.08,-73.27 167.15,-69.59 172.62,-78.66 177.08,-73.27"/>
+<text text-anchor="middle" x="209.78" y="-90" font-family="Times,serif" font-size="10.00">/out</text>
+</g>
+<!-- rb7c9f6db&#45;e4b4&#45;4a09&#45;937b&#45;68c8f45800d7&#45;&gt;d57961b16&#45;1cf4&#45;4b0e&#45;b173&#45;b19ac3e8dfbf -->
+<g id="edge2" class="edge" data-name="rb7c9f6db-e4b4-4a09-937b-68c8f45800d7-&gt;d57961b16-1cf4-4b0e-b173-b19ac3e8dfbf">
+
+<path fill="none" stroke="black" d="M295.82,-117.05C311.26,-104.36 329.54,-89.32 346.19,-75.63"/>
+<polygon fill="black" stroke="black" points="348.05,-78.64 353.55,-69.58 343.6,-73.23 348.05,-78.64"/>
+<text text-anchor="middle" x="340.72" y="-90" font-family="Times,serif" font-size="10.00">(log)</text>
+</g>
+<!-- rf0d0efa7&#45;9103&#45;413b&#45;b61f&#45;fee0f897eb44&#45;&gt;dfcd9a267&#45;f683&#45;4861&#45;98b7&#45;7bb2114521d5 -->
+<g id="edge6" class="edge" data-name="rf0d0efa7-9103-413b-b61f-fee0f897eb44-&gt;dfcd9a267-f683-4861-98b7-7bb2114521d5">
+
+<path fill="none" stroke="black" d="M398,-343.05C398,-331.64 398,-318.33 398,-305.81"/>
+<polygon fill="black" stroke="black" points="401.5,-306.13 398,-296.13 394.5,-306.13 401.5,-306.13"/>
+<text text-anchor="middle" x="405.78" y="-316" font-family="Times,serif" font-size="10.00">/out</text>
+</g>
+<!-- rf0d0efa7&#45;9103&#45;413b&#45;b61f&#45;fee0f897eb44&#45;&gt;deeb235d7&#45;cc3e&#45;43a7&#45;b3aa&#45;19edf0663b71 -->
+<g id="edge7" class="edge" data-name="rf0d0efa7-9103-413b-b61f-fee0f897eb44-&gt;deeb235d7-cc3e-43a7-b3aa-19edf0663b71">
+
+<path fill="none" stroke="black" d="M469.38,-343.05C501.97,-329.6 540.94,-313.52 575.63,-299.2"/>
+<polygon fill="black" stroke="black" points="576.94,-302.45 584.85,-295.4 574.27,-295.98 576.94,-302.45"/>
+<text text-anchor="middle" x="549.72" y="-316" font-family="Times,serif" font-size="10.00">(log)</text>
+</g>
+<!-- r7d2e5eed&#45;daa1&#45;42cb&#45;8144&#45;f9dfb7f4e30d -->
+<g id="node8" class="node" pointer-events="visible" data-name="r7d2e5eed-daa1-42cb-8144-f9dfb7f4e30d">
+
+<polygon fill="#ffa500" stroke="none" points="144,-616.5 144,-634.5 168,-634.5 168,-616.5 144,-616.5"/>
+<polygon fill="none" stroke="#ffa500" points="144,-616.5 144,-634.5 168,-634.5 168,-616.5 144,-616.5"/>
+<text text-anchor="start" x="146.83" y="-623.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#ffffff">Run</text>
+<polygon fill="none" stroke="#ffa500" points="168,-616.5 168,-634.5 194,-634.5 194,-616.5 168,-616.5"/>
+<text text-anchor="start" x="170.72" y="-623.5" font-family="Times,serif" font-weight="bold" font-size="10.00" fill="#007700">done</text>
+<polygon fill="#ffffff" stroke="none" points="194,-616.5 194,-634.5 377,-634.5 377,-616.5 194,-616.5"/>
+<polygon fill="none" stroke="#ffa500" points="194,-616.5 194,-634.5 377,-634.5 377,-616.5 194,-616.5"/>
+<text text-anchor="start" x="196.78" y="-622.5" font-family="Times,serif" font-size="10.00">id: 7d2e5eed-daa1-42cb-8144-f9dfb7f4e30d</text>
+<polygon fill="none" stroke="#ffa500" points="144,-601.5 144,-616.5 377,-616.5 377,-601.5 144,-601.5"/>
+<text text-anchor="start" x="185.47" y="-606.3" font-family="Times,serif" font-size="8.00">last updated: 2025-02-13T15:19:29.408+09:00</text>
+<polygon fill="none" stroke="#ffa500" points="144,-583.5 144,-601.5 377,-601.5 377,-583.5 144,-583.5"/>
+<text text-anchor="start" x="231.89" y="-589.5" font-family="Times,serif" font-size="10.00">knit#uploaded</text>
+<polygon fill="none" stroke="#ffa500" points="142.5,-583 142.5,-636 377.5,-636 377.5,-583 142.5,-583"/>
+</g>
+<!-- r7d2e5eed&#45;daa1&#45;42cb&#45;8144&#45;f9dfb7f4e30d&#45;&gt;d9077c7f7&#45;1cc3&#45;4be3&#45;bc46&#45;7f856b53a52f -->
+<g id="edge9" class="edge" data-name="r7d2e5eed-daa1-42cb-8144-f9dfb7f4e30d-&gt;d9077c7f7-1cc3-4be3-bc46-7f856b53a52f">
+
+<path fill="none" stroke="black" d="M260,-579.23C260,-568.03 260,-554.91 260,-542.32"/>
+<polygon fill="black" stroke="black" points="263.5,-542.49 260,-532.49 256.5,-542.49 263.5,-542.49"/>
+<text text-anchor="middle" x="275" y="-552" font-family="Times,serif" font-size="10.00">/upload</text>
+</g>
+<!-- root#0 -->
+<g id="node9" class="node" pointer-events="visible" data-name="root#0">
+
+<polygon fill="none" stroke="black" points="260,-713 224.38,-695 260,-677 295.62,-695 260,-713"/>
+<polyline fill="none" stroke="black" points="235.09,-700.41 235.09,-689.59"/>
+<polyline fill="none" stroke="black" points="249.29,-682.41 270.71,-682.41"/>
+<polyline fill="none" stroke="black" points="284.91,-689.59 284.91,-700.41"/>
+<polyline fill="none" stroke="black" points="270.71,-707.59 249.29,-707.59"/>
+<text text-anchor="middle" x="260" y="-692" font-family="Times,serif" font-size="10.00">root#0</text>
+</g>
+<!-- root#0&#45;&gt;r7d2e5eed&#45;daa1&#45;42cb&#45;8144&#45;f9dfb7f4e30d -->
+<g id="edge5" class="edge" data-name="root#0-&gt;r7d2e5eed-daa1-42cb-8144-f9dfb7f4e30d">
+
+<path fill="none" stroke="black" d="M260,-676.7C260,-669.24 260,-660.18 260,-651.18"/>
+<polygon fill="black" stroke="black" points="263.5,-651.46 260,-641.46 256.5,-651.46 263.5,-651.46"/>
+</g>
+</g>
+</svg>
