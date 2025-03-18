@@ -114,7 +114,7 @@ docker run --rm -it \
 ```
 The command runs `spam-detection-validate:v1.0` image to evaluate the initial model using the validation dataset.
 
-The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
+The evaluation metrics will be saved as a json file named `metrics.json` in the `out/metrics` directory.
 
 ### 2.3. Performance Analysis
 
@@ -252,13 +252,13 @@ initial_train_plan=$(knit plan apply ./plans/spam-detection-initial-train.v1.0.y
 ```
 This command sends the YAML template to the Knitfab API, which creates a new Plan based on the provided configuration. 
 
-The output of the command, which is stored in the `initial_train_plan` variable, is a JSON object containing details about the created Plan.
+The output of the command, which is stored in the `initial_train_plan` variable, is a json object containing details about the created Plan.
 
 ### 4.5. Extract the Plan Id
 ```bash
 initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
 ```
-This command extracts the unique Id of the created Plan from the JSON output.
+This command extracts the unique Id of the created Plan from the json output.
 
 ### 4.6. Confirm the Run Status
 
@@ -392,7 +392,7 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
 ```bash
 validate_plan=$(knit plan apply ./plans/spam-detection-validate.v1.0.yaml)
 ```
-- The `validate_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+- The `validate_plan` variable will contain the json response from the Knitfab API, which includes details about the created Plan.
 
 ### 5.5. Extract the Plan Id
 ```bash
@@ -534,7 +534,7 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
 ```bash
 incremental_train_plan=$(knit plan apply ./plans/spam-detection-incremental-train.v1.0.yaml)
 ```
-- The `incremental_train_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+- The `incremental_train_plan` variable will contain the json response from the Knitfab API, which includes details about the created Plan.
 
 ### 6.5. Extract the Plan Id
 ```bash
@@ -634,7 +634,7 @@ The generated Validation Plan Graph visualizes the pipeline's structure:
     <br>
     <strong>Fig. 1:</strong> Pipeline structure
 </div>
-
+<br>
 
 Verify the following from the pipeline's structure:
 
@@ -663,7 +663,7 @@ The generated Initial Training Lineage Graph visualizes the flow of data and art
     <br>
     <strong>Fig. 2:</strong> Flow of data and artifacts
 </div>
-
+<br>
 
 Review the Lineage Graph and confirm the following:
 
