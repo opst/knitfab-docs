@@ -50,7 +50,7 @@ flowchart LR
 - **`kubectl`**: LLM-as-a-Judge 評価に Ollama を使用したローカル LLM を選んだ場合は必須です。
 
 ## リポジトリ
-本書で使用されるファイルとディレクトリは、GitHub の `knitfab-docs` リポジトリからをクローンできます。
+本書で使用されるファイルとディレクトリは、GitHub の `knitfab-docs` リポジトリから取得（クローン）できます。
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
 ```
@@ -90,7 +90,7 @@ if args.config_file:
     for key, value in config.items():
         setattr(args, key.replace("-", "_"), value)
 ```
-- 指定された場合、JSON ファイルから構成を読み取ります。
+- 指定された場合、json ファイルから構成を読み取ります。
 - 引数値を動的に更新します。
 
 ### 1.2. モデルとトークナイザーの初期化
@@ -355,7 +355,7 @@ def run_test(self):
     self.save_evaluate_result()
 ```
 - 学習済みモデルを評価します。
-- 評価結果を JSON ファイルに保存します。
+- 評価結果を json ファイルに保存します。
 
 ## ステップ 3: Docker イメージのビルド
 
@@ -372,6 +372,7 @@ docker build -t news-classification-train:v1.0 \
 ### 3.2. `news-classification-evaluate` イメージのビルド
 
 **Dockerfile の変更:**
+
 `Dockerfile` 内のコマンドラインを変更して LLM-as-a-Judge の LLM 評価器を設定する必要があります。LLM 評価器の詳細設定については、[前提条件](#前提条件)に記載されているドキュメントを参照してください。
 
 ```docker
@@ -421,7 +422,7 @@ docker run --rm -it --gpus all --network ollama-net\
 ```
 - このコマンドは、`news-classification-evaluate:v1.0` イメージを実行し、Ollama アプリが実行されている `ollama-net` ネットワークに接続します。Ollama を使用していない場合は、`--network` オプションを省略または適切に変更してください。
 - イメージは定義されたカスタム指標と `20 Newsgroups` データセットの `test` サブセットを使用して、ファインチューニング済みモデルを評価します。
-- 評価指標は、`out` ディレクトリに `deepeval-result.json` の JSON ファイルとして保存されます。
+- 評価指標は、`out` ディレクトリに `deepeval-result.json` の json ファイルとして保存されます。
 - 次の手順に進む方は、評価を最後まで行ってください。そうでない方はコンテナに問題がないことを確認できたら、中断しても構いません。
 
 ### 4.3. パフォーマンス分析
@@ -554,12 +555,12 @@ knit data push -t type:config \
 
 YAML ひな型を登録すると、Knitfab は学習 Plan を実行するための Run を開始します。この動作はバックグラウンドで行われ、Runを開始したことを示すメッセージ等をユーザに自動的に通知することはありません。
 
-Runの状況を知るには、次のコマンドを使用して、Runの現在の実行状況を Knitfab に問い合わせます。
+Run の状況を知るには、次のコマンドを使用して、Runの現在の実行状況を Knitfab に問い合わせます。
 
 ```bash
 knit run find -p $train_plan_id
 ```
-このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマンドを定期的に実行し( Linux の watch コマンドが便利です)、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
+このコマンドは、指定された Plan Id に関連付けられた学習 Run を表示します。コマンドを定期的に実行し (Linux の watch コマンドが便利です)、`status` が `done` に変わるまで待ちます。`done` に変わると Run が正常終了になります。
 
 ### 6.7. モデル情報の取得
 
@@ -621,7 +622,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 ### 7.2. YAML ひな型への追記
 - 重要な追記項目:
   - `image`:
-    Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の`registry_uri` を `localhost` に置き換えてください。
+    Knitfab Kubernetes クラスタがローカルレジストリを使用している場合は、`image` 項目の `registry_uri` を `localhost` に置き換えてください。
 
     例:
     ```YAML
@@ -805,7 +806,7 @@ knit plan active no ${plan_id}
 `${plan_id}` を、非活性化したい Plan の一意の Id（例: `$train_plan_id`, `$evaluate_plan_id`）に置き換えてください。
 
 ### 8.3. アップロードされたデータセットの削除
-Knitfabでアップロードされたデータセットを削除するには、関連付けられたアップロード Run を削除する必要があります。
+Knitfab でアップロードされたデータセットを削除するには、関連付けられたアップロード Run を削除する必要があります。
 
 #### 8.3.1. データセット Run Id の検索
 - データセット一覧の取得:
@@ -897,13 +898,13 @@ kubectl -n knitfab get po
   image: "localhost:30503/news-classification-train:v1.0"
   ```
 
-  - **リモートレジストリ:** リモートレジストリ（Docker Hubなど）を使用している場合は、Knitfab Kubernetes　クラスタにイメージをプルするために必要な認証情報（例: ユーザー名/パスワード、アクセストークン）が設定されることを確認してください。
+  - **リモートレジストリ:** リモートレジストリ（Docker Hub など）を使用している場合は、Knitfab Kubernetes クラスタにイメージをプルするために必要な認証情報（例: ユーザー名/パスワード、アクセストークン）が設定されることを確認してください。
 
 ##### 3. Plan の再登録
 
 イメージプルの問題を修正した後、Plan の再登録が必要となる場合があります。そのとき、以下の手順に従ってください。
 
-- 現在のRunの停止:
+- 現在の Run の停止:
 ```bash
 knit run stop --fail ${run_id}
 ```
