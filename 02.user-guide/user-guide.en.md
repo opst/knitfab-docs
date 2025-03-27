@@ -504,11 +504,55 @@ Both options can be specified multiple times and will take effect for all specif
 
 When `--remove`, `--remove-key` and `--add` are passed at a time, Knitfab perform removing first, and then adding. So, when you do `knit data tag --remove foo:bar --add foo:bar KNIT_ID`, the Data is tagged with `foo:bar` finally.
 
-### Data cannot be deleted
+### Deleteing Data
 
-In Knitfab, it is not possible to directly delete specific Data.
+Knitfab has 2 flavors about deletring Data.
 
-However, if a Run is deleted, the output Data of that Run will also be deleted. Therefore, this method can be used if the Data is no longer needed.
+1. **purge**: Delete only files in Data, but keep its lineage and metadata,
+2. **delete completely**: Delete Data including its lineage and metadata.
+
+#### purging Data
+
+With *purging* Data, you can delete only files in Data.
+
+Purging is useful when
+
+- Contents of the Data should be deleted, but its downstreams are needed, or
+- To reclaiming storage, it is needed that Data files are deleted, but lineage should be kept.
+
+With purgeing a Data, files under the Data are deleted from Knitfab system, and storage space are reclaimed.
+Purging Data does *not delete* lineages or tags related the Data.
+So, the information about "what Data had existed" or "What Runs are using the Data" are kept after purging.
+
+Once Data are purged, no new Runs uses the Data will not be created anymore, or users cannot download the Data.
+
+Purged Data are set system tag `knit#transient: purged` as a marker.
+
+To purge Data, use the command below:
+
+```shell
+knit data purge KNIT_ID
+```
+
+Specify Knit ID of Data to be purged as `KNIT_ID`.
+
+`knit data purge` will fail if the targetted Data is being read.
+To be specific, some Run taking the Data as a input have not stopped yet, or other users are downloading the Data.
+
+##### Command Line Options
+
+```shell
+knit data purge KNIT_ID
+```
+
+- `KNIT_ID`: Knit ID of the Data to be purged.
+
+When you do `knit data purge` for the Data which has purged already, the command will success (but do nothing).
+
+#### deleting Data completely
+
+To delete Data completely, the Run which output that Data is to be deleted.
+Once a Run is deleted, the output Data of the Run, including its metadata and lineage, are also deleted.
 
 For more details, please refer to the "Managing Runs" section.
 
@@ -1501,7 +1545,9 @@ In combination with the `dot` command,
 knit data lineage KNIT_ID | dot -T png -o lineage-graph.png
 ```
 
-can obtain the lineage of the specified Data with the preceding and following 3 Data  as an image file named `lineage-graph.png`.
+can obtain the lineage of the specified Data with the preceding and following 3 Data as an image file named `lineage-graph.png`, like an image below.
+
+![](./images/knit-data-lineage/lineage-graph.png)
 
 #### Command Line Flags
 
