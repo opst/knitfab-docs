@@ -1592,7 +1592,9 @@ knit run rm RUN_ID
 knit data lineage KNIT_ID | dot -T png -o lineage-graph.png
 ```
 
-こうすると、指定した "データ" の前後 3 データ分のリネージを画像ファイル `lineage-graph.png` として得ることができます。
+こうすると、指定した "データ" の前後 3 データ分のリネージを画像ファイル `lineage-graph.png` として、次のような画像を得ることができます。
+
+![](./images/knit-data-lineage/lineage-graph.png)
 
 #### コマンドラインフラグ
 

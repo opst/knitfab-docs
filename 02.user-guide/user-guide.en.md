@@ -1545,7 +1545,9 @@ In combination with the `dot` command,
 knit data lineage KNIT_ID | dot -T png -o lineage-graph.png
 ```
 
-can obtain the lineage of the specified Data with the preceding and following 3 Data  as an image file named `lineage-graph.png`.
+can obtain the lineage of the specified Data with the preceding and following 3 Data as an image file named `lineage-graph.png`, like an image below.
+
+![](./images/knit-data-lineage/lineage-graph.png)
 
 #### Command Line Flags
 
