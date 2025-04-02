@@ -1,14 +1,13 @@
-### Example
-# Fine-Tune LLM model for News Classification with Knitfab
+# Example: Fine-Tune LLM model for News Classification with Knitfab
 
 This guide walks you through fine-tuning a large language model (LLM) for classification using Knitfab. Discover how Knitfab automates the fine-tuning process and how you can leverage the LLM-as-a-judge approach for efficient, human-like evaluation.
 
-### Overview
-Fine-tuning Large Language Models (LLMs) requires careful optimization of numerous parameters, a complex process that can easily become unmanageable. Knitfab simplifies this complexity by providing robust management of all training artifacts, from initial input data to final model outputs. This streamlined approach facilitates experimentation with diverse configurations, enabling efficient fine-tuning. Furthermore, we'll explore the innovative concept of "LLM-as-a-judge," a promising evaluation technique that offers human-quality assessments while significantly reducing both cost and time. This example will walk through the complete process, from fine-tuning an LLM for news classification to evaluating its performance using an LLM-as-a-judge, all within the Knitfab platform. This demonstration will highlight the power and seamless functionality of Knitfab as a comprehensive machine learning management platform.
+## Overview
+Fine-tuning Large Language Models (LLMs) requires careful optimization of numerous parameters, a complex process that can easily become unmanageable. Knitfab simplifies this complexity by providing robust management of all training artifacts, from initial input data to final model outputs. This streamlined approach facilitates experimentation with diverse configurations, enabling efficient fine-tuning. Furthermore, we'll explore the innovative concept of "LLM-as-a-judge," a promising evaluation technique that offers human-quality assessments while significantly reducing both cost and time. This example will walk through the complete process, from fine-tuning an LLM for news classification to evaluating its performance using an LLM-as-a-judge, all within the Knitfab platform. This demonstration will highlight the power and seamless functionality of Knitfab as a comprehensive machine learning pipeline management platform.
  
 The following diagram outlines the key components and steps involved:
 
-**Components:**
+### Data
 - __Base Model:__ The pre-trained LLM used as a foundation for fine-tuning. In this example, we will use `GPT-2`.
 - __Training Dataset:__ The dataset used to fine-tune the model for news classification. We will leverage the `20 Newsgroups` dataset from `scikit-learn`.
 - __Fine-tuned Model:__ The resulting model after fine-tuning, now specialized for news classification.
@@ -16,7 +15,7 @@ The following diagram outlines the key components and steps involved:
 - __LLM as Evaluator:__ A LLM model for LLM-as-a-judge evaluation.
 - __Metrics:__ Custom metrics designed to evaluate LLM outputs.
 
-**Process:**
+### Tasks
 - __Train:__ Fine-tune the base LLM on the training dataset to classify news articles.
 - __LLM-as-a-judge Evaluate:__ Assess the performance of the fine-tuned model using the defined custom metrics and the evaluation dataset.
 
@@ -30,10 +29,10 @@ flowchart LR
     F((LLM as Evaluator)) --> G
     G --> H((Metrics)) 
 ```
-### Prerequisites
+## Prerequisites
 To successfully complete this example, ensure you have met the following prerequisites:
 
-**Essential:**
+### Essential
 - **GPU:** This example is designed for GPU execution. Running it on a CPU is inefficient and will result in significantly longer processing times.
 - **Knitfab Setup:** 
   - **Production:** Follow the instructions provided in [03.admin-guide](../../03.admin-guide/admin-guide-installation.en.md) for full installation.
@@ -47,10 +46,10 @@ To successfully complete this example, ensure you have met the following prerequ
   - **OpenAI**: Configure an OpenAI API key as described in the documentation: https://docs.confident-ai.com/docs/metrics-introduction#using-openai.
   - **Custom Model**: To use your own custom model, follow the setup instructions provided here: https://docs.confident-ai.com/docs/metrics-introduction#using-any-custom-llm.
 
-**Optional:**
+### Optional
 - **`kubectl`**: Required if you choose to use a local LLM with Ollama for LLM-as-a-Judge evaluation.
 
-### Repository
+## Repository
 To access the files and directories used in this example, clone the `knitfab-docs` repository from GitHub:
 ```bash
 git clone https://github.com/opst/knitfab-docs.git
@@ -63,21 +62,13 @@ Once cloned, navigate to the `04.examples/news-classification` directory. You wi
 - **configs:** Contains the configuration for training and evaluation task.
 - **plans:** Contains the Knitfab Plan YAML templates.
 
-### Task
-- [Step 1: Define fine-tuning task.](#step-1-define-fine-tuning-task)
-- [Step 2: Define LLM-as-a-judge evaluation task.](#step-2-define-llm-as-a-judge-evaluation-task)
-- [Step 3: Build Docker images.](#step-3-build-docker-images)
-- [Step 4: (Optional) Verify Docker images.](#step-4-optional-verify-docker-images)
-- [Step 5: Push Docker images to Knitfab.](#step-5-push-docker-images-to-knitfab)
-- [Step 6: Fine-tuning.](#step-6-fine-tuning)
-- [Step 7: LLM-as-a-judge evaluation.](#step-7-llm-as-a-judge-evaluation)
-- [Step 8: Clean up.](#step-8-clean-up)
+## Implementation Steps
 
 ## Step 1: Define fine-tuning task
 
 This section provides an in-depth explanation of the logic implemented in `scripts/train/train.py` for fine-tuning a news classification model. The script follows a structured pipeline that includes argument parsing, model preparation, dataset processing, training, and evaluation. Each component is designed to facilitate easy customization and optimization.
 
-**1.1. Parse Arguments**
+### 1.1. Parse Arguments
 
 The `parse_arguments` function is responsible for handling command-line arguments to configure the training process. Users can specify different parameters to override the default settings, allowing flexibility in model fine-tuning.
 
@@ -102,7 +93,7 @@ if args.config_file:
 - Reads configuration from a JSON file if provided.
 - Updates argument values dynamically.
 
-**1.2. Initialize Model and Tokenizer**
+### 1.2. Initialize Model and Tokenizer
 
 The `setup_environment` method loads the selected base model and tokenizer, ensuring compatibility with quantization settings to optimize performance.
 
@@ -134,7 +125,7 @@ self.model = AutoModelForSequenceClassification.from_pretrained(
 - Load a pre-trained model for sequence classification.
 - Specify the number of output labels for the classification task, the quantization config and the device (`cpu/cuda`)
 
-**1.3. Load and Preprocess Datasets**
+### 1.3. Load and Preprocess Datasets
 
 The `prepare_datasets` method converts raw datasets into tokenized datasets, suitable for training.
 
@@ -172,7 +163,7 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
 - Converts raw text into structured `DataFrame` format.
 - Applies tokenization to ensure compatibility with `Transformer` models.
 
-**1.4. Configure Training Parameters**
+### 1.4. Configure Training Parameters
 
 The `setup_trainer` method initializes the `SFTTrainer` with appropriate hyperparameters and model configurations.
 
@@ -235,7 +226,7 @@ self.trainer = SFTTrainer(
 - Initializes the `SFTTrainer` with the configured model, training arguments, dataset, and tokenizer.
 - Combines all elements to execute the fine-tuning process efficiently.
 
-**1.5. Train and Evaluate the Model**
+### 1.5. Train and Evaluate the Model
 
 The `run` method orchestrates the entire training process, from setting up the environment to saving the results.
 
@@ -257,7 +248,7 @@ self.save_results()
 
 This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class in `scripts/evaluate/evaluate.py` processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
 
-**2.1. Parse Arguments**
+### 2.1. Parse Arguments
 
 The `parse_arguments` function handles command-line arguments for configuring the evaluation process. Users can specify parameters to override default settings, ensuring flexibility in model evaluation.
 
@@ -270,7 +261,7 @@ The `parse_arguments` function handles command-line arguments for configuring th
 
 If a configuration file is provided via `--config-file`, its settings will override corresponding command-line arguments for consistency.
 
-**2.2. Create Classifier**
+### 2.2. Create Classifier
 
 The `create_classifier` function initializes a text classification model for evaluation.
 
@@ -294,7 +285,7 @@ return pipeline(
 - Initializes a classification pipeline with the given model and tokenizer.
 - Ensures maximum sequence length does not exceed `1024` tokens.
 
-**2.3. Generate Test Cases**
+### 2.3. Generate Test Cases
 
 The `get_test_cases` function retrieves test samples from the `20 Newsgroups` dataset and prepares them for evaluation.
 
@@ -333,7 +324,7 @@ for text, category_idx, result in zip(data, target, batch_results):
 - Compares predicted category (`actual_output`) with ground truth (`expected_category`).
 - Stores results as test cases for evaluation.
 
-**2.4. Evaluate Model Performance**
+### 2.4. Evaluate Model Performance
 
 The `TestGPT2Model` class manages the LLM-as-a-judge evaluation process using the `deepeval` framework.
 
@@ -370,7 +361,7 @@ def run_test(self):
 ## Step 3: Build Docker images
 This section involves creating Docker images for the fine-tuning and evaluation of the LLM. 
 
-**3.1. Build `news-classification-train` Image:**
+### 3.1. Build `news-classification-train` Image
 ```bash
 docker build -t news-classification-train:v1.0 \
              -f scripts/train/Dockerfile \
@@ -378,7 +369,7 @@ docker build -t news-classification-train:v1.0 \
 ```
 The `news-classification-train` image is responsible for fine-tuning of the model.
 
-**3.2. Build `news-classification-evaluate` Image:**
+### 3.2. Build `news-classification-evaluate` Image
 **Modify the Dockerfile:**
 To configure the LLM as Evaluator for the LLM-as-a-Judge process, modify the command line within your Dockerfile. Consult the documentation provided in the [Prerequisites](#prerequisites) section for specific instructions and requirements.
 ```docker
@@ -398,9 +389,9 @@ The `news-classification-evaluate` image is used to evaluate the performance of 
 ## Step 4: (Optional) Verify Docker images
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([Push Docker images to Knitfab](#step-5-push-docker-images-to-knitfab))
+> You may skip the Docker image verify step and proceed to ([Push Docker images to Knitfab](#step-5-push-docker-images-to-knitfab)) if you deem it unnecessary. 
 
-**4.1. Run the Fine-tune Image:**
+### 4.1. Run the Fine-tune Image
 ```bash
 docker run --rm -it --gpus all \
     -v "$(pwd)/configs:/configs" \
@@ -412,7 +403,7 @@ This command runs the `news-classification-train:v1.0` image in an interactive m
 - This allows you to test the image locally and generate the fine-tuned model.
 - If you plan to proceed to the next step, keep the container running until it completes. Otherwise, you can stop it at any time once it appears to be running.
 
-**4.2. Model Evaluation with LLM-as-a-judge:**
+### 4.2. Model Evaluation with LLM-as-a-judge
 > [!Warning]
 > 
 > These steps require a pre-existing LLM to function as the evaluator in the LLM-as-a-Judge process. Please review the [Prerequisites](#prerequisites) section for resource requirements and installation instructions.
@@ -433,14 +424,14 @@ docker run --rm -it --gpus all --network ollama-net\
 - If you plan to proceed to the next step, keep the container running until it completes. Otherwise, you can stop it at any time once it appears to be running.
 - The evaluation metrics will be saved as a JSON file named `deepeval-result.json` in the `out` directory.
 
-**4.3. Performance Analysis:**
+### 4.3. Performance Analysis
 
 Review the `deepeval-result.json` file to analyze the model's performance based on the defined custom metrics. This analysis will allow you to evaluate the effectiveness of your fine-tuning. Consider whether the current custom metrics adequately reflect your specific requirements, and redefine them if necessary.
 
 ## Step 5: Push Docker images to Knitfab
 Now we will push the Docker images to the Knitfab registry for use within the Knitfab platform.
 
-**5.1. Tag Images with Registry URI:**
+### 5.1. Tag Images with Registry URI
 
 Before pushing the images to the Knitfab registry, you need to tag them with the correct registry URI. This allows Docker to identify the target registry for the push operation.
 ```bash
@@ -451,7 +442,7 @@ Replace:
 - `${docker_image}` with the name of each built image (e.g., `news-classification-train:v1.0`, `news-classification-evaluate:v1.0`).
 - `${registry_uri}` with the actual URI of your Knitfab registry (e.g., `192.0.2.1:30503`).
 
-**5.2. Push Images to Knitfab Registry:**
+### 5.2. Push Images to Knitfab Registry
 
 Now, push the tagged images to the Knitfab registry:
 ```bash
@@ -462,7 +453,7 @@ Replace `${docker_image}` with the name of each image (including the registry UR
 ## Step 6: Fine-tuning.
 This step involves the fine-tuning of the LLM for news classification on Knitfab.
 
-**6.1. Generate YAML tempelate:**
+### 6.1. Generate YAML tempelate
 
 You have two options for generating the YAML template:
 - Option 1: Create a Blank Template:
@@ -481,7 +472,7 @@ This command generates a YAML template based on the Docker image `news-classific
 
 \* This approach can help automate some of the configuration process.
 
-**6.2. Modify YAML Template:**
+### 6.2. Modify YAML Template
 - Crucial Modifications:
   - `image`: 
     If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the `image` field with `localhost`. 
@@ -532,7 +523,7 @@ This command generates a YAML template based on the Docker image `news-classific
 - Other Important Considerations:
   Always double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
-**6.3. Apply the YAML Template:**
+### 6.3. Apply the YAML Template
 ```bash
 train_plan=$(knit plan apply ./plans/news-classification-train.v1.0.yaml)
 ```
@@ -540,13 +531,13 @@ This command sends the Plan YAML to the Knitfab API, which creates a new Plan ba
 
 The output of the command, which is stored in the `train_plan` variable, is a JSON object containing details about the created Plan.
 
-**6.4. Extract the Plan Id:**
+### 6.4. Extract the Plan Id
 ```bash
 train_plan_id=$(echo "$train_plan" | jq -r '.planId')
 ```
 This command extracts the unique Id of the created Plan from the JSON output.
 
-**6.5. Push Configuration File to Knitfab:**
+### 6.5. Push Configuration File to Knitfab
 ```bash
 knit data push -t type:config \
                -t project:news-classification \
@@ -556,15 +547,15 @@ This command pushes the configuration files located at `./configs` to the Knitfa
 
 The `-t` flags add tags (e.g., `type:config`, `project:news-classification`) that Knitfab uses to identify and associate configurations with generated Plans.
 
-**6.6. Confirm the Run Status:**
+### 6.6. Confirm the Run Status
 
 After pushing the configuration file, Knitfab will initiate a Run to execute the training plan. You can monitor the status of this Run using the following command:
 ```bash
 knit run find -p $train_plan_id
 ```
-This command displays the training Run associated with the specified Plan Id. Periodically execute the command and wait until the `status` changes to `done` to indicate that the fine-tuning has completed successfully.
+This command displays the training Run associated with the specified Plan Id. Periodically execute the command (or ultilize the Linux watch command) and wait until the `status` changes to `done` to indicate that the fine-tuning has completed successfully.
 
-**6.7. Retrieve Model Information:**
+### 6.7. Retrieve Model Information
 
 Once the training Run has completed successfully, you can retrieve information about the generated model artifact:
 - Get Run Information:
@@ -580,7 +571,7 @@ train_outputs=$(echo "$train_run" | jq -r '.[-1].outputs')
 train_model_knit_id=$(echo "$train_outputs" | jq -r '.[0].knitId')
 ```
 
-**6.8. (Optional) Review the Run Log:**
+### 6.8. (Optional) Review the Run Log
 
 If you want to examine the logs generated during the training process, you can use the following commands:
 - Get Run Id:
@@ -592,7 +583,7 @@ train_run_id=$(echo "$train_run" | jq -r '.[-1].runId')
 knit run show --log $train_run_id
 ```
 
-**6.9. (Optional) Download the Model:**
+### 6.9. (Optional) Download the Model
 
 If you need to access the trained model artifact directly, you can download it from the Knitfab platform using the following command:
 ```bash
@@ -600,14 +591,14 @@ knit data pull -x $train_model_knit_id ./out
 ```
 This command downloads the trained model artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 7: LLM-as-a-judge evaluation.
+## Step 7: LLM-as-a-judge evaluation
 > [!Warning]
 > 
 > As with Step 2, the evaluation task requires access to an LLM to serve as the evaluator in the LLM-as-a-Judge process. Please refer to the [Prerequisites](#prerequisites) section for resource requirements and installation instructions.
 
 After fine-tuning, we will evaluate the model performance with LLM-as-a-judge.
 
-**7.1. Generate YAML tempelate:**
+### 7.1. Generate YAML tempelate
 - Option 1: Create a Blank Template:
 ```bash
 knit plan template --scratch > ./plans/news-classification-evaluate.v1.0.yaml
@@ -619,7 +610,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 ```
 \* Replace `${registry_uri}` with the actual URI of your Knitfab registry.
 
-**7.2. Modify YAML Template:**
+### 7.2. Modify YAML Template
 - Crucial Modifications:
   - `image`: 
     If your Knitfab Kubernetes Cluster utilizes a local registry, replace `registry_uri` within the image field with `localhost`.
@@ -674,7 +665,7 @@ docker save ${registry_uri}/news-classification-evaluate:v1.0 | \
 - Other Important Considerations:
   Double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
-**7.3. Apply the YAML Template:**
+### 7.3. Apply the YAML Template
 ```bash
 evaluate_plan=$(knit plan apply ./plans/news-classification-evaluate.v1.0.yaml)
 ```
@@ -682,18 +673,18 @@ evaluate_plan=$(knit plan apply ./plans/news-classification-evaluate.v1.0.yaml)
 
 - Since the configuration file was pushed to Knitfab in the previous step, a Run under `evaluate_plan` will be automatically triggered and processed.
 
-**7.4. Extract the Plan Id:**
+### 7.4. Extract the Plan Id
 ```bash
 evaluate_plan_id=$(echo "$evaluate_plan" | jq -r '.planId')
 ```
 
-**7.5. Confirm the Run Status:**
+### 7.5. Confirm the Run Status
 ```bash
 knit run find -p $evaluate_plan_id
 ```
 Wait until the `status` changes to `done` to indicate that the evaluation has completed successfully.
 
-**7.6. (Optional) Retrieve Evaluation Metrics Information:**
+### 7.6. (Optional) Retrieve Evaluation Metrics Information
 - Get Run Information:
 ```bash
 evaluate_run=$(knit run find -p $evaluate_plan_id)
@@ -707,7 +698,7 @@ evaluate_outputs=$(echo "$evaluate_run" | jq -r '.[-1].outputs')
 evaluate_metrics_knit_id=$(echo "$evaluate_outputs" | jq -r '.[0].knitId')
 ```
 
-**7.7. (Optional) Review the Run Log:**
+### 7.7. (Optional) Review the Run Log
 - Get Run Id:
 ```bash
 evaluate_run_id=$(echo "$evaluate_run" | jq -r '.[-1].runId')
@@ -717,14 +708,72 @@ evaluate_run_id=$(echo "$evaluate_run" | jq -r '.[-1].runId')
 knit run show --log $evaluate_run_id
 ```
 
-**7.8. (Optional) Download the Metrics:**
+### 7.8. (Optional) Download the Metrics
 ```bash
 knit data pull -x $evaluate_metrics_knit_id ./out
 ```
 This command downloads the evaluation metrics artifact from the Knitfab platform and stores it in the `./out` directory.
 
-## Step 8: Clean up
-### To Remove a Run:
+## Step 8: Confirm Pipeline Structure and Lineage Graph
+
+This step focuses on visually verifying the relationships between your pipeline components and tracing the flow of data through the system. We'll use graph visualizations to confirm the intended structure and data dependencies.
+
+### 8.1. Generate Plan Graph (Pipeline Structure)
+
+The Plan Graph provides a high-level overview of your pipeline's structure, showing the dependencies between different Plans (e.g., train, evaluate).
+
+Use the following command, replacing `${plan_id}` with the appropriate Plan Id (`$train_plan_id`, `$evaluate_plan_id`) to generate a PNG image of the plan graph:
+
+```bash
+knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
+```
+
+The generated Plan Graph visualizes the pipeline's structure:
+
+<div align="center">
+    <img src="./graphs/plan_graphs/news-classification-plan-graph.svg" alt="Pipeline Structure">
+    <br>
+    <strong>Fig. 1:</strong> Pipeline structure
+</div>
+
+
+Verify the following from the pipeline's structure:
+
+- **Relation between training and evaluation plan:**
+  - Confirm that the `train_plan` shows the `evaluate_plan` as a downstream process.
+  - This indicates:
+    - The evaluation step is executed after training phase.
+    - The evaluation step receives `/out/model` from the training phase.
+
+### 7.2. Generate Lineage Graph (Data Flow)
+
+The Lineage Graph tracks the flow of data and artifacts through your pipeline, to generate a PNG image of the plan graph:
+
+Use the following command, replacing `${knit_id}` with the respective Knit Ids (`$train_model_knit_id`, `$evaluate_metrics_knit_id`) to display the lineage graph in your terminal:
+
+```bash
+knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
+```
+
+The generated Lineage Graph visualizes the flow of data and artifacts through your pipeline:
+
+<div align="center">
+    <img src="./graphs/lineage_graphs/news-classification-lineage-graph.svg" alt="Flow of data and artifacts">
+    <br>
+    <strong>Fig. 2:</strong> Flow of data and artifacts
+    <br>
+</div>
+
+
+Review the Lineage Graph and confirm the following:
+
+- **Training Outputs:**
+  Verify that the `$train_run` produces `/out/model` (the initial trained model) and `(log)` (execution logs) as outputs.
+- **Evaluation Outputs:**
+  Confirm that the `$evaluate_run` evaluates the performance of the output models from the training task and generates corresponding `/out/metrics` (performance metrics) and `(log)`.
+
+## Step 9: Clean up
+### 9.1. To Remove a Run
 
 > [!Caution]
 >
@@ -740,7 +789,7 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$evaluate_run_id` → `$train_run_id`.
 
-### To Deactivate a Plan:
+### 9.2. To Deactivate a Plan
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
@@ -749,11 +798,11 @@ knit plan active no ${plan_id}
 ```
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$train_plan_id`, `$evaluate_plan_id`).
 
-### To Remove the Uploaded Dataset:
+### 9.3. To Remove the Uploaded Dataset
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
-**1. Find the Dataset Run Id:**
+#### 9.3.1. Find the Dataset Run Id
 - List Datasets:
   - Execute the following command to list all datasets with the tag `project:news-classification`:
 ```bash
@@ -790,7 +839,7 @@ knit data find -t project:news-classification
   - In the output, identify the dataset entry where the `upstream.mountpoint.path` is equal to `/upload`.
   - Extract the corresponding `upstream.run.runId` value.
 
-**2. Remove the Run:**
+#### 9.3.2. Remove the Run
 > [!Warning]
 >
 > Deleting a Run is an **irreversible** action. It will permanently delete the Run and any associated artifacts, including the uploaded dataset.
@@ -800,14 +849,14 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the `runId` obtained in step 1.
 
-### Summary
+## Summary
 This example showcases how to leverage Knitfab to streamline the process of fine-tuning large language models (LLMs) and evaluating their performance using an LLM-as-a-judge approach. Specifically, it demonstrates:
 
 - **Automated LLM Fine-tuning with Knitfab:** Knitfab simplifies the management of training artifacts, enabling seamless experimentation with diverse configurations and maintaining a clear record of progress. This eliminates the overhead of manual tracking and facilitates efficient iteration.
 - **Efficient LLM Evaluation with LLM-as-a-Judge:** By employing an LLM as a judge, this example highlights a cost-effective and time-saving method for assessing LLM quality, achieving human-comparable evaluation while significantly reducing manual effort.
 
-### Troubleshooting
-### Problem 1:
+## Troubleshooting
+### Problem 1
 Knitfab Run is stuck in "starting" status and doesn't progress.
 ```json
 {
@@ -817,15 +866,15 @@ Knitfab Run is stuck in "starting" status and doesn't progress.
         ...
 }
 ```
-**Debugging Steps:**
+#### Solution Steps
 
-**1. Inspect the Kubernetes Pods:**
+##### 1. Inspect the Kubernetes Pods
 ```bash
 kubectl -n knitfab get po
 ```
 This command lists all pods in the `knitfab` namespace. Look for the pod associated with your Run Id (`64b5a7ae-5c85-48f1-b785-955c1709174a` in this example).
 
-**2. Analyze Pod Status:**
+##### 2. Analyze Pod Status
 
 Pay close attention to the `STATUS` column in the output.  You might see something like this:
 
@@ -844,7 +893,7 @@ Pay close attention to the `STATUS` column in the output.  You might see somethi
 
   - **Remote Registry:** If you're using a remote registry (like Docker Hub), verify that your Knitfab Kubernetes cluster has the necessary credentials (e.g., username/password, access token) to pull the image.
 
-**3. Reapply the Plan:**
+##### 3. Reapply the Plan
 
 After fixing the image pull issue, you'll likely need to:
 - **Stop the current Run:** 

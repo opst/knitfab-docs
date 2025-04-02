@@ -91,7 +91,7 @@ The `spam-detection-incremental-train` image will retrain the existing model wit
 ## Step 2: (Optional) Verify Docker images
 > [!Note]
 > 
-> If you're confident in your images, feel free to skip ahead to pushing them to Knitfab. ([Push Docker Images to Knitfab](#step-3-push-docker-images-to-knitfab))
+> You may skip the Docker image verify step and proceed to ([Push Docker Images to Knitfab](#step-3-push-docker-images-to-knitfab)) if you deem it unnecessary. 
 
 ### 2.1. Initial Training
 ```bash
@@ -104,7 +104,6 @@ This command runs the `spam-detection-initial-train:v1.0` image in an interactiv
 - The `-v` flags mount the host directories containing the initial dataset (`in/dataset/initial`) and the output directory (`out/model`) into the container.
 - This allows you to test the image locally and generate the first version of the model.
 
-#### <span id="step-2-2"></span>
 ### 2.2. Model Validation
 ```bash
 docker run --rm -it \
@@ -115,7 +114,7 @@ docker run --rm -it \
 ```
 The command runs `spam-detection-validate:v1.0` image to evaluate the initial model using the validation dataset.
 
-The evaluation metrics will be saved as a JSON file named `metrics.json` in the `out/metrics` directory.
+The evaluation metrics will be saved as a json file named `metrics.json` in the `out/metrics` directory.
 
 ### 2.3. Performance Analysis
 
@@ -135,7 +134,7 @@ docker run --rm -it \
 
 ### 2.5. Re-validation
 
-Repeat steps [2 and 3](#step-2-2) to validate the performance of the updated model and analyze the new `metrics.json` file.
+Repeat steps [2.2 and 2.3](#22-model-validation) to validate the performance of the updated model and analyze the new `metrics.json` file.
 
 ## Step 3: Push Docker images to Knitfab
 Now we will push the Docker images to the Knitfab registry for use within the Knitfab platform.
@@ -239,7 +238,12 @@ This command generates a YAML template based on the Docker image `spam-detection
     - This facilitates better organization and filtering of outputs and logs within the Knitfab system.
 
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
+  ```YAML
+  resources:
+    cpu: 1
+    memory: 1Gi
+  ```
   - YAML Structure: Always double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
 ### 4.4. Apply the YAML Template
@@ -248,13 +252,13 @@ initial_train_plan=$(knit plan apply ./plans/spam-detection-initial-train.v1.0.y
 ```
 This command sends the YAML template to the Knitfab API, which creates a new Plan based on the provided configuration. 
 
-The output of the command, which is stored in the `initial_train_plan` variable, is a JSON object containing details about the created Plan.
+The output of the command, which is stored in the `initial_train_plan` variable, is a json object containing details about the created Plan.
 
 ### 4.5. Extract the Plan Id
 ```bash
 initial_train_plan_id=$(echo "$initial_train_plan" | jq -r '.planId')
 ```
-This command extracts the unique Id of the created Plan from the JSON output.
+This command extracts the unique Id of the created Plan from the json output.
 
 ### 4.6. Confirm the Run Status
 
@@ -262,7 +266,7 @@ After applying the YAML template, Knitfab will initiate a Run to execute the tra
 ```bash
 knit run find -p $initial_train_plan_id
 ```
-This command displays the training Run associated with the specified Plan Id. Periodically execute the command and wait until the `status` changes to `done` to indicate that the initial training has completed successfully.
+This command displays the training Run associated with the specified Plan Id. Periodically execute the command (or ultilize the Linux watch command) and wait until the `status` changes to `done` to indicate that the initial training has completed successfully.
 
 ### 4.7. Retrieve Model Information
 
@@ -376,14 +380,19 @@ docker save ${registry_uri}/spam-detection-validate:v1.0 | \
         - "project:spam-detection"
     ```
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the validation process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
+  ```YAML
+  resources:
+    cpu: 1
+    memory: 1Gi
+  ```
   - YAML Structure: Double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
 ### 5.4. Apply the YAML Template
 ```bash
 validate_plan=$(knit plan apply ./plans/spam-detection-validate.v1.0.yaml)
 ```
-- The `validate_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+- The `validate_plan` variable will contain the json response from the Knitfab API, which includes details about the created Plan.
 
 ### 5.5. Extract the Plan Id
 ```bash
@@ -513,14 +522,19 @@ docker save ${registry_uri}/spam-detection-incremental-train:v1.0 | \
     ```
 
 - Other Important Considerations:
-  - Resource Allocation: Define the required resources for the training process (e.g., CPU, memory, GPU).
+  - Resource Allocation: Resource allocation defaults are sufficient. However, you can customize resources (CPU, memory, GPU) as needed.
+  ```YAML
+  resources:
+    cpu: 1
+    memory: 1Gi
+  ```
   - YAML Structure: Double-check that your modified YAML template adheres to the correct structure and syntax. You can use the YAML file provided in the `/plans` directory of the cloned Git repository as a reference.
 
 ### 6.4. Apply the YAML Template
 ```bash
 incremental_train_plan=$(knit plan apply ./plans/spam-detection-incremental-train.v1.0.yaml)
 ```
-- The `incremental_train_plan` variable will contain the JSON response from the Knitfab API, which includes details about the created Plan.
+- The `incremental_train_plan` variable will contain the json response from the Knitfab API, which includes details about the created Plan.
 
 ### 6.5. Extract the Plan Id
 ```bash
@@ -579,31 +593,91 @@ This command downloads the trained model artifact from the Knitfab platform and 
 
 ### 6.11. Validate the Updated Model
 
-#### 6.11.1. Auto-Run of Validation Plan
-
 Knitfab will automatically trigger a new Run under the validation Plan, recognizing the output model from the incremental training process.
 
-#### 6.11.2. Review the Validation Run and Metrics
-
 Repeat steps **6-9** from the ["Model validation"](#step-5-model-validation) section to:
-
+- Confirm the triggered Run status.
 - View the Run log of the validation Run.
 - Download the metrics artifact for analysis.
 
 
-### 6.12. Remove `mode:incremental-train` Tag from Initial Model
+### 6.12. Remove `mode:incremental-train` Tag
 
 Knitfab is an automated platform that manages training processes and their associated artifacts.
 
 When a new dataset is registered, the previous model with the tag `mode:incremental-train` will be automatically recognized by the incremental training Plan, triggering a new incremental training Run.
 
-To prevent this unintended behavior, execute the following command to remove the `mode:incremental-train` tag from the initial model.
+To prevent this unintended behavior, execute the following command to remove the `mode:incremental-train` tag.
 
 ```bash
 knit data tag --remove mode:incremental-train $initial_train_model_knit_id
 ```
-## Step 7: Clean up
-### 7.1. To Remove a Run
+
+## Step 7: Confirm Pipeline Structure and Lineage Graph
+
+This step focuses on visually verifying the relationships between your pipeline components and tracing the flow of data through the system. We'll use graph visualizations to confirm the intended structure and data dependencies.
+
+### 7.1. Generate Plan Graph (Pipeline Structure)
+
+The Plan Graph provides a high-level overview of your pipeline's structure, showing the dependencies between different Plans (e.g., initial train, incremental train, validate).
+
+Use the following command, replacing `${plan_id}` with the appropriate Plan Id (`$initial_train_plan_id`, `$incremental_train_plan_id`, or `$validate_plan_id`) to generate a PNG image of the plan graph:
+
+```bash
+knit plan graph -n all ${plan_id} | dot -Tpng > plan-graph.png
+```
+
+The generated Validation Plan Graph visualizes the pipeline's structure:
+
+<div align="center">
+    <img src="./graphs/plan_graphs/spam-detection-validate-plan-graph.svg" alt="Pipeline Structure">
+    <br>
+    <strong>Fig. 1:</strong> Pipeline structure
+</div>
+<br>
+
+Verify the following from the pipeline's structure:
+
+- **Relation between training and validation plan:**
+  - Confirm that the `initial_train_plan` and `incremental_train_plan` both show the `validate_plan` as a downstream process. 
+  - This indicates:
+    - The validation step is executed after each training phase.
+    - The validation step receives `/out/model` from both training phases.
+- **Isolated Training Plans:**
+  - It's crucial to observe that the `initial_train_plan` does not directly show the `incremental_train_plan` as a downstream process, and vice versa. This separation is intended, as the `incremental_train_plan` *any* previously trained model that requires an update, rather than being a direct sequential step of the `initial_train_plan`. This seperation is caused by the lack of the `mode:incremental` tag in the output model of the `initial_train_plain`, that is then used as an input of the `incremental_train_plan`.
+
+### 7.2. Generate Lineage Graph (Data Flow)
+
+The Lineage Graph tracks the flow of data and artifacts through your pipeline, to generate a PNG image of the plan graph:
+
+Use the following command, replacing `${knit_id}` with the respective Knit Ids (`$initial_train_model_knit_id`, `$incremental_train_model_knit_id`, `$validate_metrics_knit_id`) to display the lineage graph in your terminal:
+
+```bash
+knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
+```
+
+The generated Initial Training Lineage Graph visualizes the flow of data and artifacts through your pipeline:
+
+<div align="center">
+    <img src="./graphs/lineage_graphs/spam-detection-initial-train-lineage-graph.svg" alt="Flow of data and artifacts">
+    <br>
+    <strong>Fig. 2:</strong> Flow of data and artifacts
+</div>
+<br>
+
+Review the Lineage Graph and confirm the following:
+
+- **Initial Training Outputs:**
+  Verify that the `$initial_train_run` produces `/out/model` (the initial trained model) and `(log)` (execution logs) as outputs.
+- **Incremental Training Inputs:**
+  Confirm that the `$incremental_train_run` recognizes the `/out/model` generated by the `$initial_train_run` as its input. This is enabled by defining the `mode:incremental` tag.
+- **Incremental Training Outputs:**
+  Verify that the `$incremental_train_run` updates the initial model and generates a new `/out/model` and `(log)`.
+- **Validation Outputs:**
+  Confirm that the `$validate_run` validates the performance of the output models from both initial and incremental training tasks and generates corresponding `/out/metrics` (performance metrics) and `(log)`.
+
+## Step 8: Clean up
+### 8.1. To Remove a Run
 
 > [!Caution]
 >
@@ -619,20 +693,21 @@ knit run rm ${run_id}
 ```
 Replace `${run_id}` with the unique Id of the Run in the following sequence: `$validate_run_id` → `$incremental_train_run_id` → `$initial_train_run_id`.
 
-### 7.2 To Deactivate a Plan
+### 8.2 To Deactivate a Plan
 
 If you no longer require a registered Plan, use the following command to deactivate it:
 
 ```bash
 knit plan active no ${plan_id}
 ```
+
 Replace `${plan_id}` with the unique Id of the Plan you want to deactivate (e.g., `$initial_train_plan_id`, `$validate_plan_id`, `$incremental_train_plan_id`).
 
-### 7.3. To Remove the Uploaded Dataset
+### 8.3. To Remove the Uploaded Dataset
 
 To remove an uploaded dataset in Knitfab, you must delete the associated upload Run.
 
-#### 7.3.1. Find the Dataset Run Id
+#### 8.3.1. Find the Dataset Run Id
 - List Datasets:
   - Execute the following command to list all datasets with the tag `project:spam-detection`:
 ```bash
@@ -672,7 +747,7 @@ knit data find -t project:spam-detection
   - In the output, identify the dataset entry where the `upstream.mountpoint.path` is equal to `/upload`.
   - Extract the corresponding `upstream.run.runId` value.
 
-#### 7.3.2. Remove the Run
+#### 8.3.2. Remove the Run
 > [!Warning]
 >
 > Deleting a Run is an **irreversible** action. It will permanently delete the Run and any associated artifacts, including the uploaded dataset.
@@ -699,7 +774,7 @@ Knitfab Run is stuck in "starting" status and doesn't progress.
         ...
 }
 ```
-#### Solution steps
+#### Solution Steps
 
 ##### 1. Inspect the Kubernetes Pods
 ```bash
@@ -751,7 +826,7 @@ Error `Plan's tag dependency makes cycle` when applying an incremental train Pla
 }
 ```
 
-#### Solution
+#### Solution Steps
 Add tag `mode:incremental-train` to the `path:"/in/model"` entry in your Plan YAML template.
 ```YAML
 inputs:
