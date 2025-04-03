@@ -86,7 +86,7 @@ FROM python:3.12.7-bookworm
 
 WORKDIR "/work"
 RUN git clone https://github.com/huggingface/smollm.git .
-RUN pip install -r evaluation/requirements.txt
+RUN pip install -r text/evaluation/requirements.txt
 ENTRYPOINT ["lighteval", "accelerate", "--model_args", "pretrained=HuggingFaceTB/SmolLM2-135M,revision=main,dtype=float16,vllm,gpu_memory_utilisation=0.8,max_model_length=2048", "--save_details"]
 CMD ["--custom_tasks", "/in/tasks.py", "--tasks", "custom|trivia_qa|0|1", "--output_dir", "/out"]
 ```
@@ -199,7 +199,7 @@ TASKS_TABLE=[
 ```
 
 This script defines a task to evaluate TriviaQA performance using the SmolLM2 model.
-It is a simplified version of https://github.com/huggingface/smollm/blob/main/evaluation/tasks.py specifically designed for this experiment.
+It is a simplified version of https://github.com/huggingface/smollm/blob/main/text/evaluation/tasks.py specifically designed for this experiment.
 
 The prompt content is determined by the `prompt.triviaqa` function provided by lighteval. The function can be viewed here:
 
