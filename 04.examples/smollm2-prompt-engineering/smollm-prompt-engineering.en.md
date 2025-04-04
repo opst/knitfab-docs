@@ -364,10 +364,10 @@ TASKS_TABLE=[
 Register this as a Data:
 
 ```
-knit data push -t type:lighteval-task -n ./precise-answerer/tasks.py
+knit data push -t type:lighteval-task -n ./precise-answerer
 ```
 
-### 待つ
+### Wait
 
 After pushing the above Data using `knit data push ...`, simply wait for all the results to be generated. Knitfab will detect that each prompt can be applied to the "smollm2-evaluation" plan and will automatically execute the corresponding Runs with these prompts as inputs.
 

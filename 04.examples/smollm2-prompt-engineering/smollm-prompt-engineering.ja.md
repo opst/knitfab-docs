@@ -367,7 +367,7 @@ TASKS_TABLE=[
 これも Data として登録しましょう。
 
 ```
-knit data push -t type:lighteval-task -n ./precise-answerer/tasks.py
+knit data push -t type:lighteval-task -n ./precise-answerer
 ```
 
 ### 待つ
