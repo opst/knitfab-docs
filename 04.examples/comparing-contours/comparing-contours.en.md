@@ -56,7 +56,7 @@ wget -O ./raw_videos_and_images/sleeping-cat.mp4 https://raw.githubusercontent.c
 Then, upload the folder `./raw_videos_and_images` as Data to Knitfab.
 
 ```
-knit data push -t format:mixed -t type:raw-dataset -n ./raw_videos_and_images/
+knit data push -t format:mixed -t type:raw-dataset -t project:comparing-contours -n ./raw_videos_and_images/
 ```
 
 ## Step 4. Building the Pipeline
@@ -158,19 +158,27 @@ Create a Dockerfile at `plans/frame-extracter/Dockerfile` to create an image:
 ```Dockerfile:plans/frame-extracter/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+For the script to work well, make `plans/frame-extracter/requirements.txt` as below:
+
+```plans/frame-extracter/requirements.txt
+opencv-python-headless==4.11.0.86
+
 ```
 
 Build, tag, and push the Docker image:
 
 ```sh
 docker build -t frame-extracter:1.0 plans/frame-extracter
-docker tag ${REGISTRY}/frame-extracter:1.0 frame-extracter:1.0
+docker tag frame-extracter:1.0 ${REGISTRY}/frame-extracter:1.0
 docker push ${REGISTRY}/frame-extracter:1.0
 ```
 
@@ -294,19 +302,27 @@ Create the Dockerfile at `plans/contour-extracter/Dockerfile`:
 ```Dockerfile:plans/contour-extracter/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
+COPY . .
+RUN pip install -r requirements.txt
 
 WORKDIR "/work"
-COPY ./main.py .
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+For the script to work well, make `plans/contour-extracter/requirements.txt` as below:
+
+```plans/contour-extracter/requirements.txt
+opencv-python-headless==4.11.0.86
+
 ```
 
 Build, tag, and push the Docker image:
 
 ```sh
 docker build -t contour-extracter:1.0 plans/contour-extracter
-docker tag ${REGISTRY}/contour-extracter:1.0 contour-extracter:1.0
+docker tag contour-extracter:1.0 ${REGISTRY}/contour-extracter:1.0
 docker push ${REGISTRY}/contour-extracter:1.0
 ```
 
@@ -423,13 +439,20 @@ Create the Dockerfile at `plans/movie-composer/Dockerfile`:
 ```Dockerfile:plans/movie-composer/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
-RUN pip install imageio
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+For the script to work well, make `plans/contour-extracter/requirements.txt` as below:
+
+```plans/contour-extracter/requirements.txt
+opencv-python-headless==4.11.0.86
+imageio==2.37.0
 
 ```
 
@@ -437,7 +460,7 @@ Build, tag, and push the image:
 
 ```sh
 docker build -t movie-composer:1.0 plans/movie-composer
-docker tag ${REGISTRY}/movie-composer:1.0 movie-composer:1.0
+docker tag movie-composer:1.0 ${REGISTRY}/movie-composer:1.0
 docker push ${REGISTRY}/movie-composer:1.0
 ```
 
@@ -607,27 +630,35 @@ Create the Dockerfile at `./plans/collager/Dockerfile`:
 ```Dockerfile:plans/collager/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install beautifulsoup4
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
+For the script to work well, make `plans/collager/requirements.txt` as below:
+
+```plans/collager/requirements.txt
+beautifulsoup4==4.13.3
+
+```
+
+
 Build, tag, and push the image:
 
 ```sh
 docker build -t collager:1.0 plans/collager
-docker tag ${REGISTRY}/collager:1.0 collager:1.0
+docker tag collager:1.0 ${REGISTRY}/collager:1.0
 docker push ${REGISTRY}/collager:1.0
 ```
 
 Write the Plan Definition at `plans/collager/collager.plan.yaml`:
 
 ```yaml:plans/collager/collager.plan.yaml
-image: "localhost:30503/collager:1.0"
+image: "${REGISTRY}/collager:1.0"
 
 args:
   - --input

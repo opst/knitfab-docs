@@ -57,7 +57,7 @@ wget -O ./raw_videos_and_images/sleeping-cat.mp4 https://raw.githubusercontent.c
 その後、フォルダ `./raw_videos_and_images` を Knitfab の Data としてアップロードします。
 
 ```
-knit data push -t format:mixed -t type:raw-dataset -n ./raw_videos_and_images/
+knit data push -t format:mixed -t type:raw-dataset -t project:comparing-contours -n ./raw_videos_and_images/
 ```
 
 ## ステップ4. パイプラインを構築する
@@ -159,24 +159,32 @@ if __name__ == "__main__":
 この際、MP4 ファイルについては、ファイルを複製する代わりに、その各フレームを JPEG ファイルとして抽出しています。
 フレーム画像は、 `${元のファイル名}_frame_${フレーム番号}.jpg` というファイル名になるようにしました。フレーム番号は 10 桁の左ゼロ埋めフォーマットにしてあります。これは、ファイル名を辞書順に並べたときに、フレーム番号順に並ぶようにするためです。
 
-続いて、これをコンテナイメージします。 `plans/frame-extracter/Dockerfile` に、次の Dockerfile を作成します。
+続いて、これをコンテナイメージにします。 `plans/frame-extracter/Dockerfile` に、次の Dockerfile を作成します。
 
 ```Dockerfile:plans/frame-extracter/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+また、このスクリプトを動作させるために、`plans/frame-extracter/requirements.txt` に次の内容を書き込みます。
+
+```plans/frame-extracter/requirements.txt
+opencv-python-headless==4.11.0.86
+
 ```
 
 これをビルドし、タグ付けて、プッシュします。
 
 ```sh
 docker build -t frame-extracter:1.0 plans/frame-extracter
-docker tag ${REGISTRY}/frame-extracter:1.0 frame-extracter:1.0
+docker tag frame-extracter:1.0 ${REGISTRY}/frame-extracter:1.0
 docker push ${REGISTRY}/frame-extracter:1.0
 ```
 
@@ -300,19 +308,27 @@ if __name__ == "__main__":
 ```Dockerfile:plans/contour-extracter/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+また、このスクリプトを動作させるために、`plans/contour-extracter/requirements.txt` に次の内容を書き込みます。
+
+```plans/conrour-extracter/requirements.txt
+opencv-python-headless==4.11.0.86
+
 ```
 
 これをビルドし、タグ付けて、プッシュします。
 
 ```sh
 docker build -t contour-extracter:1.0 plans/contour-extracter
-docker tag ${REGISTRY}/contour-extracter:1.0 contour-extracter:1.0
+docker tag contour-extracter:1.0 ${REGISTRY}/contour-extracter:1.0
 docker push ${REGISTRY}/contour-extracter:1.0
 ```
 
@@ -431,13 +447,20 @@ if __name__ == "__main__":
 ```Dockerfile:plans/movie-composer/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install opencv-python-headless
-RUN pip install imageio
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+また、このスクリプトを動作させるために、`plans/movie-composer/requirements.txt` に次の内容を書き込みます。
+
+```plans/movie-composer/requirements.txt
+opencv-python-headless==4.11.0.86
+imageio==2.37.0
 
 ```
 
@@ -445,7 +468,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```sh
 docker build -t movie-composer:1.0 plans/movie-composer
-docker tag ${REGISTRY}/movie-composer:1.0 movie-composer:1.0
+docker tag movie-composer:1.0 ${REGISTRY}/movie-composer:1.0
 docker push ${REGISTRY}/movie-composer:1.0
 ```
 
@@ -615,12 +638,19 @@ if __name__ == "__main__":
 ```Dockerfile:plans/collager/Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install beautifulsoup4
-
 WORKDIR "/work"
-COPY ./main.py .
+COPY . .
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "./main.py" ]
 CMD ["--input", "/in", "--output", "/out"]
+
+```
+
+また、このスクリプトを動作させるために、`plans/collager/requirements.txt` に次の内容を書き込みます。
+
+```plans/collager/requirements.txt
+beautifulsoup4==4.13.3
 
 ```
 
@@ -628,14 +658,14 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```sh
 docker build -t collager:1.0 plans/collager
-docker tag ${REGISTRY}/collager:1.0 collager:1.0
+docker tag collager:1.0 ${REGISTRY}/collager:1.0
 docker push ${REGISTRY}/collager:1.0
 ```
 
 続いて、このイメージを利用する Plan 定義を `plans/collager/collager.plan.yaml` に作成します。
 
 ```yaml:plans/collager/collager.plan.yaml
-image: "localhost:30503/collager:1.0"
+image: "${REGISTRY}/collager:1.0"
 
 args:
   - --input
