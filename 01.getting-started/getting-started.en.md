@@ -390,16 +390,15 @@ FROM python:3.11
 
 WORKDIR /work
 
-RUN pip install numpy==1.26.4 && \
-    pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
-
 COPY . .
+
+RUN pip install -r requirements.txt
 
 ENTRYPOINT [ "python", "-u", "train.py" ]
 CMD [ "--dataset", "/in/dataset", "--save-to", "/out/model" ]
 ```
 
-This Dockerfile installs the dependent libraries and runs `./train.py`. It specifies the CPU version of PyTorch because it is not intended to be executed in a GPU environment.
+This Dockerfile installs the dependent libraries and runs `./train.py`.
 `train.py` takes two command-line flags:
 
 - `--dataset /in/dataset`: The location of the training dataset is `/in/dataset` inside the container.
@@ -1011,12 +1010,12 @@ FROM python:3.11
 
 WORKDIR /work
 
-RUN pip install numpy==1.26.4 && \
-    pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
-
 COPY . .
 
+RUN pip install -r requirements.txt
+
 ENTRYPOINT [ "python", "-u", "validation.py", "--dataset", "/in/dataset", "--model", "/in/model/model.pth" ]
+
 ```
 
 It is similar to the training side. The differences are:
