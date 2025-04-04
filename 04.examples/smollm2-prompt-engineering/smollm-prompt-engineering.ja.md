@@ -67,7 +67,7 @@ tag:
 
 言語モデル SmolLM2-135M の評価を行う Plan を定義します。
 
-[SmolLM2 のドキュメント](https://github.com/huggingface/smollm/blob/main/evaluation/README.md) によれば、評価は [lighteval](https://github.com/huggingface/lighteval/) を使って行う、とのことなので、本実験でもそれに従うことにします。
+[SmolLM2 のドキュメント](https://github.com/huggingface/smollm/blob/main/text/evaluation/README.md) によれば、評価は [lighteval](https://github.com/huggingface/lighteval/) を使って行う、とのことなので、本実験でもそれに従うことにします。
 
 この実験では、プロンプトの違いによる性能の差異に関心がありますから、作成する評価用 Plan は、*任意のプロンプトを、 Knitfab 的な Data として受け入れることができる*ものである必要があります。
 
@@ -200,7 +200,7 @@ TASKS_TABLE=[
 ]
 ```
 
-このファイルは、 https://github.com/huggingface/smollm/blob/main/evaluation/tasks.py の抜粋版であり、言語モデルに対して TriviaQA の評価を行うタスクを実行させるものです。
+このファイルは、 https://github.com/huggingface/smollm/blob/main/text/evaluation/tasks.py の抜粋版であり、言語モデルに対して TriviaQA の評価を行うタスクを実行させるものです。
 
 ここで使われているプロンプトの内容は、lighteval が提供する関数 `prompt.trivia_qa` で決まっています。次の内容となっています。
 
@@ -367,7 +367,7 @@ TASKS_TABLE=[
 これも Data として登録しましょう。
 
 ```
-knit data push -t type:lighteval-task -n ./precise-answerer/tasks.py
+knit data push -t type:lighteval-task -n ./precise-answerer
 ```
 
 ### 待つ
