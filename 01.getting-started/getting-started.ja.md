@@ -412,16 +412,15 @@ FROM python:3.11
 
 WORKDIR /work
 
-RUN pip install numpy==1.26.4 && \
-    pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
-
 COPY . .
+
+RUN pip install -r requirements.txt
 
 ENTRYPOINT [ "python", "-u", "train.py" ]
 CMD [ "--dataset", "/in/dataset", "--save-to", "/out/model" ]
 ```
 
-上記では依存ライブラリをインストールし、`./train.py` を実行しています。GPU 環境を想定していないので、pytorch は CPU 版を指定しました。
+上記では依存ライブラリをインストールし、`./train.py` を実行しています。
 `train.py` は 2 つのコマンドラインフラグをとっています。
 
 - `--dataset /in/dataset` : 訓練用データセットの所在は (コンテナ内の) `/in/dataset` である
@@ -966,12 +965,11 @@ FROM python:3.11
 
 WORKDIR /work
 
-RUN pip install numpy==1.26.4 && \
-    pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
-
 COPY . .
 
-ENTRYPOINT [ "python", "-u", "validation.py", "--dataset", "/in/dataset", "--model", "/in/model/model.pth" ]
+RUN pip install -r requirements.txt
+
+ENTRYPOINT [ "python", "-u", "validation.py", "--dataset", "/in/dataset", "--model", "/in/model/model.pth" ]s
 ```
 
 訓練側とよく似ています。違う点は
