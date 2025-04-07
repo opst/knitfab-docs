@@ -173,12 +173,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-また、このスクリプトを動作させるために、`plans/frame-extracter/requirements.txt` に次の内容を書き込みます。
-
-```plans/frame-extracter/requirements.txt
-opencv-python-headless==4.11.0.86
-
-```
+また、このイメージをビルドするために、このリポジトリの [`04.examples/comparing-contours/plans/frame-extracter/requirements.txt`](./plans/frame-extracter/requirements.txt) を、`plans/frame-extracter/requirements.txt` として配置してください。
 
 これをビルドし、タグ付けて、プッシュします。
 
@@ -317,12 +312,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-また、このスクリプトを動作させるために、`plans/contour-extracter/requirements.txt` に次の内容を書き込みます。
-
-```plans/conrour-extracter/requirements.txt
-opencv-python-headless==4.11.0.86
-
-```
+また、このイメージをビルドするために、このリポジトリの [`04.examples/comparing-contours/plans/contour-extracter/requirements.txt`](./plans/contour-extracter/requirements.txt) を、`plans/contour-extracter/requirements.txt` として配置してください。
 
 これをビルドし、タグ付けて、プッシュします。
 
@@ -456,7 +446,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-また、このスクリプトを動作させるために、`plans/movie-composer/requirements.txt` に次の内容を書き込みます。
+また、イメージをビルドするためにこのリポジトリの [`04.examples/comparing-contours/plans/movie-composer/requirements.txt`](./plans/movie-composer/requirements.txt) を、`plans/movie-composer/requirements.txt` として配置してください。
 
 ```plans/movie-composer/requirements.txt
 opencv-python-headless==4.11.0.86
@@ -647,12 +637,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-また、このスクリプトを動作させるために、`plans/collager/requirements.txt` に次の内容を書き込みます。
-
-```plans/collager/requirements.txt
-beautifulsoup4==4.13.3
-
-```
+また、このイメージをビルドするために、このリポジトリの [`04.examples/comparing-contours/plans/collager/requirements.txt`](./plans/collager/requirements.txt) を、 `plans/collager/requirements.txt` として配置してください。
 
 これを、ビルドして、タグ付けして、プッシュします。
 

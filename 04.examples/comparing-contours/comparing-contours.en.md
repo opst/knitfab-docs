@@ -167,12 +167,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-For the script to work well, make `plans/frame-extracter/requirements.txt` as below:
-
-```plans/frame-extracter/requirements.txt
-opencv-python-headless==4.11.0.86
-
-```
+To build the image, place the file [`04.examples/comparing-contours/plans/frame-extracter/requirements.txt`](./plans/frame-extracter/requirements.txt) in this repository at `plans/frame-extracter/requirements.txt`.
 
 Build, tag, and push the Docker image:
 
@@ -311,12 +306,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-For the script to work well, make `plans/contour-extracter/requirements.txt` as below:
-
-```plans/contour-extracter/requirements.txt
-opencv-python-headless==4.11.0.86
-
-```
+To build the image, place the file [`04.examples/comparing-contours/plans/contour-extracter/requirements.txt`](./plans/contour-extracter/requirements.txt) in this repository at `plans/contour-extracter/requirements.txt`.
 
 Build, tag, and push the Docker image:
 
@@ -448,13 +438,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-For the script to work well, make `plans/contour-extracter/requirements.txt` as below:
-
-```plans/contour-extracter/requirements.txt
-opencv-python-headless==4.11.0.86
-imageio==2.37.0
-
-```
+To build the image, place the file [`04.examples/comparing-contours/plans/movie-composer/requirements.txt`](./plans/movie-composer/requirements.txt) in this repository at `plans/movie-composer/requirements.txt`.
 
 Build, tag, and push the image:
 
@@ -639,13 +623,7 @@ CMD ["--input", "/in", "--output", "/out"]
 
 ```
 
-For the script to work well, make `plans/collager/requirements.txt` as below:
-
-```plans/collager/requirements.txt
-beautifulsoup4==4.13.3
-
-```
-
+To build the image, place the file [`04.examples/comparing-contours/plans/collager/requirements.txt`](./plans/collager/requirements.txt) in this repository at `plans/collager/requirements.txt`.
 
 Build, tag, and push the image:
 
