@@ -88,9 +88,9 @@ Dockerfile の内容を次のようにします。
 FROM python:3.12.7-bookworm
 
 WORKDIR "/work"
-RUN git clone https://github.com/huggingface/smollm.git .
-RUN pip install -r evaluation/requirements.txt
-ENTRYPOINT ["lighteval", "accelerate", "--model_args", "pretrained=HuggingFaceTB/SmolLM2-135M,revision=main,dtype=float16,vllm,gpu_memory_utilisation=0.8,max_model_length=2048", "--save_details"]
+COPY . .
+RUN pip install -r requirements.txt
+ENTRYPOINT ["lighteval", "accelerate", "--model_args", "pretrained=HuggingFaceTB/SmolLM2-135M,revision=main,dtype=bfloat16", "--save_details"]
 CMD ["--custom_tasks", "/in/tasks.py", "--tasks", "custom|trivia_qa|0|1", "--output_dir", "/out"]
 ```
 
@@ -100,6 +100,9 @@ CMD ["--custom_tasks", "/in/tasks.py", "--tasks", "custom|trivia_qa|0|1", "--out
 > これは、我々が実験に使った GPU (NVIDIA TITAN V) の機能制約によるものです。
 
 `lighteval` は、引数 `--model_args` に指定されたモデルに対し、 引数 `--custom_tasks` の指す python モジュールから評価対象のタスクを読み取る、という振る舞いをします。このコンテナイメージの設計は、適宜 `/in/tasks.py` の内容を Data として取り替えて、プロンプト同士の性能差を調べよう、というものです。
+
+また、このコンテナイメージをビルドするために、`evaluator/requirements.txt` を作成します。
+その内容は、このリポジトリの [`04.examples/smollm2-prompt-engineering/evaluator/requirements.txt`](./evaluator/requirements.txt) にあります。
 
 続いて、これをビルドして、適宜プッシュします。
 

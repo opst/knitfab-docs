@@ -85,10 +85,11 @@ Set the contents of the Dockerfile as follows:
 FROM python:3.12.7-bookworm
 
 WORKDIR "/work"
-RUN git clone https://github.com/huggingface/smollm.git .
-RUN pip install -r text/evaluation/requirements.txt
-ENTRYPOINT ["lighteval", "accelerate", "--model_args", "pretrained=HuggingFaceTB/SmolLM2-135M,revision=main,dtype=float16,vllm,gpu_memory_utilisation=0.8,max_model_length=2048", "--save_details"]
+COPY . .
+RUN pip install -r requirements.txt
+ENTRYPOINT ["lighteval", "accelerate", "--model_args", "pretrained=HuggingFaceTB/SmolLM2-135M,revision=main,dtype=bfloat16", "--save_details"]
 CMD ["--custom_tasks", "/in/tasks.py", "--tasks", "custom|trivia_qa|0|1", "--output_dir", "/out"]
+
 ```
 
 > [!NOTE]
@@ -98,6 +99,8 @@ CMD ["--custom_tasks", "/in/tasks.py", "--tasks", "custom|trivia_qa|0|1", "--out
 
 `lighteval` operates by reading the evaluation tasks from the Python module specified by the `--custom_tasks` argument for the model defined in the `--model_args` argument.
 This container image is designed to allow replacing the contents of `/in/tasks.py` with different Data as needed to investigate performance differences between prompts.
+
+To build the container image, create a `evaluator/requirements.txt` file with the content as [`04.examples/smollm2-prompt-engineering/evaluator/requirements.txt`](./evaluator/requirements.txt) in this repository.
 
 Next, build and push the container image.
 
