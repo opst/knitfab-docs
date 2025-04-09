@@ -2,9 +2,9 @@ FROM python:3.10 AS builder
 
 WORKDIR /work
 
-COPY evaluate-requirements.txt . 
+COPY requirements.txt .
 RUN python -m venv venv && \
-    venv/bin/pip install --no-cache-dir -r evaluate-requirements.txt
+    venv/bin/pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
@@ -19,7 +19,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
 RUN deepeval set-local-model --model-name=llama3.2 \
-    --base-url="http://ollama:11434/v1/" \
+    --base-url="http://ollama:11434/" \
     --api-key="ollama"
 
 ENTRYPOINT [ "python", "-u", "evaluate.py" ]

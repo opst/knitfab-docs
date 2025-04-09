@@ -4,7 +4,7 @@ image: "localhost:30503/news-classification-train:v1.0"
 
 entrypoint: ["python", "-u", "train.py"]
 
-args: ["--config-file", "/configs/train-config.json"]
+args: ["--config-file", "/configs/train-config.json", "--save-to", "/out"]
 
 inputs:
   - path: "/configs"

@@ -17,6 +17,7 @@ from datasets import Dataset
 from peft import LoraConfig
 from trl import SFTTrainer
 
+
 def parse_arguments() -> configargparse.Namespace:
     parser = configargparse.ArgumentParser(
         description="Fine-tune model for news classification"
@@ -39,10 +40,10 @@ def parse_arguments() -> configargparse.Namespace:
         help="Base model name.",
     )
     parser.add_argument(
-        "--device", 
-        type=str, 
+        "--device",
+        type=str,
         default=NewsClassifierFineTuner.DEFAULT_DEVICE,
-        help="Device to run inference on (cuda/cpu)"
+        help="Device to run inference on (cuda/cpu)",
     )
     parser.add_argument(
         "--epochs",
@@ -56,7 +57,7 @@ def parse_arguments() -> configargparse.Namespace:
         default=NewsClassifierFineTuner.DEFAULT_LEARNING_RATE,
         help="Learning rate.",
     )
-    
+
     args = parser.parse_args()
 
     if args.config_file:
@@ -66,6 +67,7 @@ def parse_arguments() -> configargparse.Namespace:
             setattr(args, key.replace("-", "_"), value)
 
     return args
+
 
 class NewsClassifierFineTuner:
     DEFAULT_BASE_MODEL: str = "openai-community/gpt2"
@@ -84,7 +86,7 @@ class NewsClassifierFineTuner:
         self.eval_results: dict[str, Any] = {}
         self.num_labels: int = 20
 
-    def setup_environment(self) -> None:        
+    def setup_environment(self) -> None:
         quant_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
@@ -103,6 +105,7 @@ class NewsClassifierFineTuner:
     def prepare_datasets(self, dataset: Any) -> Dataset:
         def tokenize(examples):
             return self.tokenizer(examples["text"], truncation=True)
+
         df: pd.DataFrame = pd.DataFrame(
             {
                 "text": dataset.data,
@@ -115,7 +118,7 @@ class NewsClassifierFineTuner:
 
         dataset = Dataset.from_pandas(df_cleaned)
         tokenized_dataset = dataset.map(tokenize, batched=True)
-        
+
         return tokenized_dataset
 
     def load_train_datasets(self) -> None:
@@ -152,7 +155,9 @@ class NewsClassifierFineTuner:
             task_type="SEQ_CLS",
         )
 
-        collator = DataCollatorWithPadding(tokenizer=self.tokenizer, padding="max_length")
+        collator = DataCollatorWithPadding(
+            tokenizer=self.tokenizer, padding="max_length"
+        )
 
         self.trainer = SFTTrainer(
             model=self.model,
@@ -160,7 +165,7 @@ class NewsClassifierFineTuner:
             peft_config=peft_config,
             train_dataset=self.train_dataset,
             eval_dataset=self.eval_dataset,
-            tokenizer=self.tokenizer,
+            processing_class=self.tokenizer,
             data_collator=collator,
         )
 
@@ -172,7 +177,7 @@ class NewsClassifierFineTuner:
 
         self.trainer.model.save_pretrained(model_dir)
         self.trainer.model.config.save_pretrained(model_dir)
-        self.trainer.tokenizer.save_pretrained(model_dir)
+        self.trainer.processing_class.save_pretrained(model_dir)
 
         metrics_path = os.path.join(metrics_dir, f"metrics.json")
         with open(metrics_path, "w") as f:
@@ -182,16 +187,14 @@ class NewsClassifierFineTuner:
         print(f"Evaluation metrics saved to {metrics_path}")
 
     def run(self) -> None:
-        try:
-            self.setup_environment()
-            self.load_train_datasets()
-            self.load_eval_datasets()
-            self.setup_trainer()
-            self.trainer.train()
-            self.eval_results = self.trainer.evaluate()
-            self.save_results()
-        except Exception as e:
-            print(f"Error: {e}")
+        self.setup_environment()
+        self.load_train_datasets()
+        self.load_eval_datasets()
+        self.setup_trainer()
+        self.trainer.train()
+        self.eval_results = self.trainer.evaluate()
+        self.save_results()
+
 
 if __name__ == "__main__":
     args = parse_arguments()
