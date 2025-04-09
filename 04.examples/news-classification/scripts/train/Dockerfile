@@ -2,9 +2,9 @@ FROM python:3.10 AS builder
 
 WORKDIR /work
 
-COPY train-requirements.txt .
+COPY requirements.txt .
 RUN python -m venv venv && \
-    venv/bin/pip install --no-cache-dir -v -r train-requirements.txt
+    venv/bin/pip install --no-cache-dir -v -r requirements.txt
 
 COPY . .
 
