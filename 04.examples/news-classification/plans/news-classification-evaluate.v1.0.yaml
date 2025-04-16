@@ -4,14 +4,14 @@ image: "localhost:30503/news-classification-evaluate:v1.0"
 
 entrypoint: ["python", "-u", "evaluate.py"]
 
-args: ["--config-file", "/configs/evaluate-config.json"]
+args: ["--config-file", "/configs/evaluate-config.json", "--model", "/in/model"]
 
 inputs:
   - path: "/configs"
     tags:
       - "type:config"
       - "project:news-classification"
-  
+
   - path: "/in"
     tags:
       - "type:model"
