@@ -1,9 +1,9 @@
 # Example: Fine-Tune LLM model for News Classification with Knitfab
 
-This guide walks you through fine-tuning a large language model (LLM) for classification using Knitfab. Discover how Knitfab automates the fine-tuning process and how you can leverage the LLM-as-a-judge approach for efficient, human-like evaluation.
+This guide walks you through fine-tuning a large language model (LLM) for classification using Knitfab. Discover how Knitfab automates the fine-tuning process and how you can leverage the "LLM-as-a-judge" approach for efficient, human-like evaluation.
 
 ## Overview
-Fine-tuning Large Language Models (LLMs) requires careful optimization of numerous parameters, a complex process that can easily become unmanageable. Knitfab simplifies this complexity by providing robust management of all training artifacts, from initial input data to final model outputs. This streamlined approach facilitates experimentation with diverse configurations, enabling efficient fine-tuning. Furthermore, we'll explore the innovative concept of "LLM-as-a-judge," a promising evaluation technique that offers human-quality assessments while significantly reducing both cost and time. This example will walk through the complete process, from fine-tuning an LLM for news classification to evaluating its performance using an LLM-as-a-judge, all within the Knitfab platform. This demonstration will highlight the power and seamless functionality of Knitfab as a comprehensive machine learning pipeline management platform.
+Fine-tuning Large Language Models (LLMs) requires careful optimization of numerous parameters, a complex process that can easily become unmanageable. Knitfab simplifies this complexity by providing robust management of all training artifacts, from initial input data to final model outputs. This streamlined approach facilitates experimentation with diverse configurations, enabling efficient fine-tuning. Furthermore, we'll explore the innovative concept of "LLM-as-a-judge," a promising evaluation technique that offers human-quality assessments while significantly reducing both cost and time. This example will demonstrate the entire process, from fine-tuning an LLM to evaluating its performance using an LLM-as-a-judge, all on the Knitfab. This demonstration will highlight Knitfab's capabilities as a comprehensive platform for managing machine learning pipelines.
  
 The following diagram outlines the key components and steps involved:
 
@@ -66,7 +66,7 @@ Once cloned, navigate to the `04.examples/news-classification` directory. You wi
 
 ## Step 1: Define fine-tuning task
 
-This section provides an in-depth explanation of the logic implemented in `scripts/train/train.py` for fine-tuning a news classification model. The script follows a structured pipeline that includes argument parsing, model preparation, dataset processing, training, and evaluation. Each component is designed to facilitate easy customization and optimization.
+This section explains the logic in `scripts/train/train.py` for fine-tuning a news classification model. The script follows the Knitfab pipeline described above and covers argument parsing, model preparation, dataset processing, training, and evaluation.
 
 ### 1.1. Parse Arguments
 
@@ -246,7 +246,7 @@ self.save_results()
 
 ## Step 2: Define LLM-as-a-judge evaluation task
 
-This section presents an evaluation pipeline using an LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class in `scripts/evaluate/evaluate.py` processes test cases, applies a category precision metric, and generates performance reports. This automated approach ensures consistent benchmarking and helps refine model accuracy.
+This section explains the evaluation pipeline using LLM to assess a fine-tuned news classification model. The `TestGPT2Model` class in `scripts/evaluate/evaluate.py` evaluates the model based on defined test cases and news category classification accuracy metrics, generating a classification performance report. This enables consistent benchmarking for model comparison, contributing to improved model accuracy.
 
 ### 2.1. Parse Arguments
 
@@ -850,10 +850,10 @@ knit run rm ${run_id}
 Replace `${run_id}` with the `runId` obtained in step 1.
 
 ## Summary
-This example showcases how to leverage Knitfab to streamline the process of fine-tuning large language models (LLMs) and evaluating their performance using an LLM-as-a-judge approach. Specifically, it demonstrates:
+This example showcases how to leverage Knitfab to streamline the process of fine-tuning large language models (LLMs) and evaluating their performance using an "LLM-as-a-judge" approach. Specifically, it demonstrates:
 
-- **Automated LLM Fine-tuning with Knitfab:** Knitfab simplifies the management of training artifacts, enabling seamless experimentation with diverse configurations and maintaining a clear record of progress. This eliminates the overhead of manual tracking and facilitates efficient iteration.
-- **Efficient LLM Evaluation with LLM-as-a-Judge:** By employing an LLM as a judge, this example highlights a cost-effective and time-saving method for assessing LLM quality, achieving human-comparable evaluation while significantly reducing manual effort.
+- **Automated LLM Fine-tuning with Knitfab:** Knitfab simplifies the management of training artifacts, enabling seamless experimentation with diverse configurations and maintaining a comprehensive record of progress. This eliminates the overhead of manual tracking and facilitates efficient iteration.
+- **Efficient Evaluation using LLM-as-a-Judge:** By employing an LLM as a judge, this example demonstrates how to work a human-like evaluation of the target model's performance. This approach is cost-effective and time-saving, and significantly reduces need for manual evaluation.
 
 ## Troubleshooting
 ### Problem 1

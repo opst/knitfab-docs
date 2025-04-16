@@ -1,15 +1,7 @@
 # Example: Knitfab での LLM のファインチューニングによるニュース分類 <!-- FIXME: 全体的に# による見出し階層がおかしい。spam-filter と同様に修正すること。-->
-
-<!-- FIXME: ”Knitfab を使用したLLM”とはどんなLLM? 意味がおかしい。たぶん「係り受け」がおかしいです。 -->
-<!-- 一つの文でまとめて複数の内容を表現しようとせず、一つ一つ短い文を積み重ねたほうが良いです。 -->
-
-<!-- 寺田文例 >> -->
 本事例では、ニュース記事の分類タスクのためのLLMのファインチューニングを題材にして、Knitfab による履歴管理の自動化の効果を示します。一般にファインチューニングでは、学習データやハイパーパラメータを変化させながら、モデルの訓練と性能確認を繰り返します。その間の履歴記録をKnitfabに任せることで、開発者の負担を大きく軽減できます。
-<!-- 寺田文例 << -->
 
 ## 概要
-<!-- FIXME: 概要の内容が不正確です。ファインチューニング(FT)の本来の定義に沿って書くこと。（FTの本質はハイパラの調整ではなくパラメータの調整です。） -->
-<!-- （ブログ原稿 https://docs.google.com/document/d/1RHvauwl6W2drxjy32VnAn2O-U5rtpjC7DVchmRtObR4/edit?tab=t.0#heading=h.pz1merwqgeiw の修正点を参照） -->
 LLM をニュース分類などの特定のタスクに適用するためには、いくつかの方法がありますが、ここではモデルの重みパラメータ調整というファインチューニングを適用します。ファインチューニングを実施するには、学習用のデータセットの調整や、ハイパーパラメータ（ハイパラ）の調整などが必要となります。しかしながら、ハイパーパラメータなど、訓練条件は様々に設定できるので、それら条件を用いて試行錯誤をする中でファインチューニングの管理はすぐに難しいものになります。
 
 そこで、 Knitfab を用いることで、学習工程にくわえて学習の入出力、成果物まで自動管理できるようになり、さまざまな条件での実験管理が容易になります。さらに本事例では、革新的な評価方法である LLM-as-a-judge を Knitfab と連携させる手法を示します。LLM-as-a-judge により、人間のような評価品質を維持しながらコストの削減も可能になります。本事例では、このニュース分類タスクのファインチューニングから LLM-as-a-judge 評価までの一連のタスクを Knitfab 上で実装することを体験し、機械学習パイプラインの自動制御プラットフォームとして Knitfab の強みと容易さをお伝えします。
@@ -75,7 +67,7 @@ git clone https://github.com/opst/knitfab-docs.git
 
 ## ステップ 1: ニュース分類のファインチューニングタスクの定義
 
-本章では、`scripts/train/train.py` にニュース分類ファインチューニングのロジックを説明します。スクリプトは引数指定、モデル準備、データ処理、学習と、評価を構造化したパイプラインに従い、各コンポーネントの構成変更と最適化を容易にする設計を取っています。
+本章では、Pythonスクリプト `scripts/train/train.py` に記述するニュース分類ファインチューニングのロジックを説明します。スクリプトは引数指定、モデル準備、データ処理、学習の機能を持ち，前述のKnitfabパイプラインの構成に従った設計としています．
 
 ### 1.1. 引数指定
 
@@ -90,7 +82,7 @@ git clone https://github.com/opst/knitfab-docs.git
 
 設定ファイルとコマンドラインの両方で引数を指定した場合、設定ファイルの設定内容が優先されます。
 
-**コード解析**
+**コード詳細**
 ```python
 args = parser.parse_args()
 if args.config_file:
@@ -109,7 +101,7 @@ if args.config_file:
 - 4 ビット量子化のために `BitsAndBytesConfig` を設定し、 `AutoModelForSequenceClassification` よりをモデルを読み込みます。
 - トークナイザーを構成し、パディングトークンを設定します。
 
-**コード解析**
+**コード詳細**
 ```python
 quant_config = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -142,7 +134,7 @@ self.model = AutoModelForSequenceClassification.from_pretrained(
 - `空`または `NaN` のエントリを削除します。
 - 入力形式に合わせてデータをトークン化します。
 
-**コード解析**
+**コード詳細**
 ```python
 def load_train_datasets(self) -> None:
     raw_train_dataset = fetch_20newsgroups(subset="train")
@@ -179,7 +171,7 @@ def prepare_datasets(self, dataset: Any) -> Dataset:
 - ファインチューニングを効率化するために `LoraConfig` を構成します。
 - `DataCollatorWithPadding` を使用してさまざまな文章を同じ固定長に変換します。
 
-**コード解析**
+**コード詳細**
 ```python
 training_args = TrainingArguments(
     output_dir=self.args.save_to,
@@ -242,7 +234,7 @@ self.trainer = SFTTrainer(
 - 学習と評価を実装します。
 - 学習済みモデルと評価指標を保存します。
 
-**コード解析**
+**コード詳細**
 ```python
 self.trainer.train()
 self.eval_results = self.trainer.evaluate()
@@ -254,7 +246,7 @@ self.save_results()
 
 ## ステップ 2: LLM-as-a-judge 評価タスクの定義
 
-本章では、ニュース分類ファインチューニング済みのモデルを評価するための、LLM を使用した評価パイプラインについて説明します。`scripts/evaluate/evaluate.py` の `TestGPT2Model` クラスは、定義したテストケースとニュースカテゴリ分類精度指標に従ってモデルを評価し、分類性能レポートを生成します。これにより、モデル間に一貫したベンチマークに従って比較できるため、モデルの精度向上に寄与します。
+本章では、ニュース分類ファインチューニング済みのモデルを評価するための、LLM を使用した評価パイプラインについて説明します。`scripts/evaluate/evaluate.py` の `TestGPT2Model` クラスは、定義したテストケースとニュースカテゴリ分類精度指標に従ってモデルを評価し、分類性能レポートを生成します。これにより、一貫したベンチマークに従ってモデルを比較できるため、モデルの精度向上に寄与します。
 
 ### 2.1. 引数指定
 
@@ -277,7 +269,7 @@ self.save_results()
 - `AutoProcessor` を使用して、トークナイザーを取得します。
 - 効率的な文書分類のために `transformers.pipeline` を使用します。
 
-**コード解析**
+**コード詳細**
 ```python
 model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=num_labels)
 tokenizer = AutoProcessor.from_pretrained(model_path)
@@ -301,7 +293,7 @@ return pipeline(
 - 数値ラベルをニュースカテゴリ名にマッピングします。
 - 期待の分類出力と実際の分類出力を持つテストケースを生成します。
 
-**コード解析**
+**コード詳細**
 ```python
 raw_eval_dataset = fetch_20newsgroups(subset='test')
 categories = raw_eval_dataset.target_names
@@ -339,7 +331,7 @@ for text, category_idx, result in zip(data, target, batch_results):
 - 分類性能の `CategoryPrecision` 指標を定義します。
 - `deepeval.evaluate` を使用して評価を実施し、結果を保存します。
 
-**コード解析**
+**コード詳細**
 ```python
 return GEval(
     name="CategoryPrecision",
@@ -799,7 +791,7 @@ knit data lineage -n all ${knit_id} | dot -Tpng > lineage-graph.png
 
 > [!Warning]
 >
-> Run の 削除は**不可逆的な**の操作です。
+> Run の 削除は**不可逆的な**操作です。
 
 ```bash
 knit run rm ${run_id}
@@ -865,10 +857,10 @@ knit run rm ${run_id}
 `${run_id}` を手順 1 で取得した `runId` に置き換えます。
 
 ## まとめ
-本書では、Knitfab を活用して大規模言語モデル (LLM) ファインチューニングの自動化、および LLM-as-a-judge の性能評価を示しました。
+本書では、Knitfab による大規模言語モデル (LLM) ファインチューニングの自動化、および LLM-as-a-judge による性能評価の例を示しました。
 
-- **Knitfab による自動化された LLM ファインチューニング**: Knitfab は学習工程から学習成果物の管理まで自動化することで、さまざまな構成に対して実験を容易にし、進捗状況の明確な記録を維持できるようになります。これにより、手動工程が減り、LLM の学習とファインチューニングが容易になります。
-- **LLM-as-a-Judge による効率的な LLM 評価**: LLM を評価器として採用することにより、人間と同等程度の評価品質を維持できながら、費用対効果を高め、時間を節約できるようになります。
+- **Knitfab による自動化された LLM ファインチューニング**: Knitfab は学習工程から学習成果物の管理までを一連のパイプラインとすることで、さまざまな構成に対して実験を容易にし、進捗状況の漏れのない記録ができるようになります。これにより、エンジニアの手動の作業が減り、LLM の学習とファインチューニングに集中できます。
+- **LLM-as-a-Judge による効率的な LLM 評価**: LLM を評価器として採用することにより、人間に近い評価品質を自動的に実行でき、費用や時間の節約になります。
 
 ## トラブルシューティング
 ### 問題1
