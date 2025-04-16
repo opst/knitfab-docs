@@ -190,7 +190,7 @@ graph TB
 
 
     subgraph "event loops"
-        subgraph circ["workflow circuit"]
+        subgraph circ["pipeline circuit"]
             lproj["projection\n(Deployment)"]
             lrini["initializing\n(Deployment)"]
             lrst["run management\n(Deployment)"]
@@ -239,7 +239,7 @@ The data folw to RDB and the Kubernetes API has been omitted for simplicity. It 
 
 Users send requests to knitd using the `knit` CLI. knitd then manipulates records in the RDB accordingly.
 
-Each component of the event loops periodically monitors the RDB to find the tasks it needs to perform. In particular, the collection of event loops labeled as the "workflow circuit" drives the workflow using the following sequence:
+Each component of the event loops periodically monitors the RDB to find the tasks it needs to perform. In particular, the collection of event loops labeled as the "pipeline circuit" drives the pipeline using the following sequence:
 
 - Generating a Run from a Plan or Data (projection),
 - Allocating a PVC as the physical entity of the output Data (initializing),
