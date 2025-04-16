@@ -220,7 +220,7 @@ graph TB
 
 
         subgraph "event loops"
-            subgraph circ["workflow circuit"]
+            subgraph circ["pipeline circuit"]
                 lproj["projection\n(Deployment)"]
                 lrini["initializing\n(Deployment)"]
                 lrst["run management\n(Deployment)"]
@@ -281,7 +281,7 @@ Web API を提供するコンテナ knitd が CLI からリクエストを受け
 ています。
 
 イベントループ (event loops) の各コンポーネントは、定期的に RDB を監視して、各々
-果たすべきタスクを探しています。特に、workflow circuit とラベル付けられているイ
+果たすべきタスクを探しています。特に、pipeline circuit とラベル付けられているイ
 ベントループの集まりは、
 
 - "プラン" や "データ" から "ラン" を生成し (projection)、
@@ -289,7 +289,7 @@ Web API を提供するコンテナ knitd が CLI からリクエストを受け
 - "ラン" を Worker として起動して終了まで監視し (run management)、
 - 終了した Worker を破棄しつつ "ラン" を完了させます (finishing)
 
-...という一連の流れで、ワークフローを駆動させています。この Worker とは、Job を
+...という一連の流れで、パイプラインを駆動させています。この Worker とは、Job を
 実体とした Knitfab の **動的なコンポーネント** のひとつです。 Worker の主体は
 ユーザ定義コンテナですが、それ以外にも Knitfab の公開レジストリ
 (`ghcr.io/opst/Knitfab`) から提供されるイメージも利用しています。

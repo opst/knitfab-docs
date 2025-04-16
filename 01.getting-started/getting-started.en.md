@@ -15,7 +15,7 @@ What is Knitfab
 
 Knitfab is a MLOps tool which has
 - an automatic lineage management system
-- with a tag-based workflow engine
+- with a tag-based pipeline engine
 
 Knitfab automatically executes those experiments once users Plan(Described later) them and gather the necessary data. During the execution, Knitfab records the inputs and outputs of each experiment, allowing user to trace the history.
 
